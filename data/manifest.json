@@ -1,0 +1,38 @@
+{
+  "skill_version": "0.1.0",
+  "skill_repo": "https://github.com/GepetoinTraining/poe2-graph",
+  "fetched_at": "2026-05-26",
+  "game_version": "0.5 pre-launch (Return of the Ancients)",
+  "data_sources": {
+    "passive_tree": {
+      "repo": "https://github.com/GepetoinTraining/poe2-skilltree-export",
+      "last_commit": "fb64a33363842c3ac4b2121a68f15bd8c117bf85",
+      "fetched_at": "2026-05-26"
+    },
+    "atlas_tree": {
+      "repo": "https://github.com/GepetoinTraining/atlastree-export",
+      "last_commit": "d535ec777ab0f41ae1b0ce1f7cbb9e00e76061d2",
+      "fetched_at": "2026-05-26"
+    },
+    "poe2db_cache_ttl_hours": 24
+  },
+  "counts": {
+    "passive_tree": {
+      "classes": 12,
+      "groups": 1572,
+      "nodes": 5102,
+      "edges": 6021,
+      "skillOverrides": 83,
+      "jewelSlots": 31
+    },
+    "atlas_tree": {
+      "nodes": 988
+    }
+  },
+  "protected_paths": [
+    "EXILE/",
+    "PLAYER.md",
+    "LEAGUE_*.md",
+    "CHARACTER_*.md"
+  ]
+}

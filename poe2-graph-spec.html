@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>poe2-graph — Spec v0.2</title>
+<style>
+:root {
+  --bg: #0e0e10;
+  --fg: #e8e6df;
+  --muted: #8a877d;
+  --accent: #c89968;
+  --rule: #2a2820;
+  --code-bg: #15140f;
+  --code-fg: #d6c895;
+  --warn: #b8674a;
+  --link: #8aaedb;
+  --good: #7ea878;
+}
+* { box-sizing: border-box; }
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', serif;
+  font-size: 16px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 0;
+}
+body {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header {
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+}
+header h1 {
+  font-size: 28px;
+  letter-spacing: 0.01em;
+  margin: 0 0 6px;
+  font-weight: 500;
+}
+header .meta {
+  color: var(--muted);
+  font-size: 13px;
+  font-family: ui-monospace, 'JetBrains Mono', 'Menlo', monospace;
+}
+header .meta span + span::before {
+  content: " · ";
+  color: var(--rule);
+  padding: 0 6px;
+}
+h2 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 40px 0 12px;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 6px;
+}
+h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 24px 0 8px;
+  color: var(--fg);
+}
+h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 18px 0 6px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+p { margin: 8px 0 14px; }
+code {
+  font-family: ui-monospace, 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 13px;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 14px 16px;
+  border-radius: 3px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border-left: 2px solid var(--accent);
+}
+pre code { background: transparent; padding: 0; }
+a { color: var(--link); text-decoration: none; border-bottom: 1px dotted var(--rule); }
+a:hover { border-bottom-color: var(--link); }
+ul, ol { padding-left: 22px; margin: 8px 0 14px; }
+li { margin: 4px 0; }
+li > ul, li > ol { margin: 4px 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 14px;
+}
+th, td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+th { color: var(--muted); font-weight: 500; }
+td code { font-size: 12px; }
+.callout {
+  border-left: 3px solid var(--accent);
+  padding: 12px 16px;
+  margin: 16px 0;
+  background: rgba(200, 153, 104, 0.05);
+  font-size: 14px;
+}
+.callout.warn { border-color: var(--warn); background: rgba(184, 103, 74, 0.06); }
+.callout.good { border-color: var(--good); background: rgba(126, 168, 120, 0.05); }
+.callout h4 {
+  margin: 0 0 6px;
+  color: var(--accent);
+}
+.callout.warn h4 { color: var(--warn); }
+.callout.good h4 { color: var(--good); }
+.nav {
+  position: sticky;
+  top: 16px;
+  float: right;
+  max-width: 220px;
+  margin: 0 -240px 24px 20px;
+  font-size: 12px;
+  font-family: ui-monospace, 'JetBrains Mono', 'Menlo', monospace;
+  color: var(--muted);
+}
+.nav ol { padding-left: 18px; }
+.nav a { color: var(--muted); border: none; }
+.nav a:hover { color: var(--fg); }
+@media (max-width: 1080px) {
+  .nav { display: none; }
+}
+hr { border: none; border-top: 1px solid var(--rule); margin: 32px 0; }
+.tag {
+  display: inline-block;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  padding: 1px 6px;
+  border: 1px solid var(--rule);
+  color: var(--muted);
+  border-radius: 2px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.tag.now { color: var(--accent); border-color: var(--accent); }
+.tag.later { color: var(--muted); }
+.tag.verified { color: var(--good); border-color: var(--good); }
+footer {
+  margin-top: 64px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 12px;
+  font-family: ui-monospace, monospace;
+}
+.diff-removed { color: var(--warn); text-decoration: line-through; opacity: 0.6; }
+.diff-added { color: var(--good); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+<ol>
+  <li><a href="#thesis">1 Thesis</a></li>
+  <li><a href="#architecture">2 Architecture</a></li>
+  <li><a href="#format">3 Byte format (v7)</a></li>
+  <li><a href="#graph">4 Graph model</a></li>
+  <li><a href="#buildfile">5 .build format</a></li>
+  <li><a href="#scopes">6 Scope phases</a></li>
+  <li><a href="#sources">7 Data sources</a></li>
+  <li><a href="#skill">8 Skill layout</a></li>
+  <li><a href="#artifact">9 Artifact layer</a></li>
+  <li><a href="#connector">10 Connector</a></li>
+  <li><a href="#open">11 Open questions</a></li>
+  <li><a href="#handoff">12 Handoff to Claude Code</a></li>
+</ol>
+</nav>
+
+<header>
+<h1>poe2-graph</h1>
+<div class="meta">
+  <span>spec v0.2</span>
+  <span>2026-05-26</span>
+  <span>pedro + claude (web)</span>
+  <span>pre-implementation</span>
+</div>
+</header>
+
+<section id="thesis">
+<h2>1. Thesis</h2>
+
+<p>Path of Exile 2 ships its build-construction game as a graph database. Passive tree, atlas tree, ascendancies, weapon-set specializations, and choice-resolution overrides all share one schema: <strong>nodes addressable by 16-bit hash, with a separate skill-override table for multi-choice resolution, encoded into save formats as flat coordinate sequences</strong>. The web URL encodes a player's traversal as binary. The in-game <code>.build</code> file encodes the same information as JSON, using stable string IDs.</p>
+
+<p>This spec describes a Claude-native toolkit for that graph. The toolkit reads build URLs and <code>.build</code> files, answers planning questions through graph queries (shortest paths, stat aggregation, build comparison), and emits <code>.build</code> files the game ingests directly via its file watcher. The mechanical part of PoE 2 is downstream from the planning part; this toolkit makes Claude useful at the planning layer.</p>
+
+<div class="callout good">
+<h4>Spec v0.2 corrects v0.1 of three hours ago</h4>
+<p>v0.1 reverse-engineered the byte format without access to GGG's official spec. v0.2 incorporates the published v7 format spec, corrects the parser, and adds findings from the poe2db CDN investigation. The architectural recognitions in v0.1 hold — graph schema, source-collapses-to-stats, choice-coordinate encoding — but the specific byte layout was partially wrong. v0.2 is byte-accurate against a known test URL.</p>
+</div>
+</section>
+
+<section id="architecture">
+<h2>2. Architecture</h2>
+
+<p>Three layers in PoE 2, each with a different rate of change:</p>
+
+<table>
+<tr><th>Layer</th><th>Mutates on</th><th>Reads from</th><th>Implementation</th></tr>
+<tr>
+  <td><strong>Save format</strong></td>
+  <td>player choice</td>
+  <td>—</td>
+  <td>web URL bytes <em>or</em> <code>.build</code> JSON</td>
+</tr>
+<tr>
+  <td><strong>Stat sheet</strong></td>
+  <td>equip / allocate</td>
+  <td>save + graph + items + skillOverrides</td>
+  <td>flat hash table (game-internal)</td>
+</tr>
+<tr>
+  <td><strong>Combat loop</strong></td>
+  <td>60Hz</td>
+  <td>stat sheet only</td>
+  <td>source-blind dispatch (game-internal)</td>
+</tr>
+</table>
+
+<p>Our toolkit lives at <em>layer 1</em>. We never simulate combat. We parse save formats and walk the graph. Damage calculations are someone else's problem (and a worse problem to take on; Path of Building has been carrying that burden for a decade across community maintainers).</p>
+
+<h3>The architectural advantage</h3>
+
+<p>Every existing build tool re-implements GGG's resolution layer in Lua or JS. They break every patch. They scale O(rules × items × patches) in maintenance cost. We instead <strong>trust the canonical graph data GGG publishes</strong> and only do graph operations on it. Our maintenance scales O(1) per patch: refresh the JSON, ship.</p>
+
+<p>This mirrors the game's own architecture. Sources collapse to stats at bind time, not combat time. We mirror that decision: meaning collapses to graph structure at query time, not analysis time. The combat loop doesn't care if +5 Intelligence came from a jewel, an item, a passive, or a skill override on an attribute node. Neither do we.</p>
+</section>
+
+<section id="format">
+<h2>3. Byte format <span class="tag verified">verified against test URL</span></h2>
+
+<p>The web format is documented by GGG as <strong>Version 7</strong>, current with Path of Exile 2: Return of the Ancients (0.5.0). Quoting the official spec:</p>
+
+<pre><code>HEADER (8 bytes)
+  uint32   version          (always 7)
+  uint8    class             (e.g. 7 = Sorceress)
+  uint8    ascendancy        (e.g. 1 = Stormweaver)
+  uint16   count of data (n) (number of allocation records)
+
+RECORDS (variable length, n entries)
+  uint16   node hash
+  uint16   flags
+  uint8?   weapon set        if (flags & 0b00000001) == true
+  uint16?  skill override    if (flags & 0b00000010) == true</code></pre>
+
+<p>The base64url-encoded string after <code>pathofexile2.com/game/passive-skill-tree/</code> decodes directly to this binary. Standard base64url-safe alphabet with padding stripped.</p>
+
+<h3>Record structure interpretation</h3>
+
+<table>
+<tr><th>Flags value</th><th>Length</th><th>Meaning</th></tr>
+<tr><td><code>0x0000</code></td><td>4 bytes</td><td>Plain allocation. Node is on both weapon sets. No multi-choice resolution.</td></tr>
+<tr><td><code>0x0001</code></td><td>5 bytes</td><td>Weapon-set-specific allocation. Active only on the named weapon set (0 or 1, possibly more).</td></tr>
+<tr><td><code>0x0002</code></td><td>6 bytes</td><td>Multi-choice node (Attribute, Mastery). The skill_override field points to a row in the <code>skillOverrides</code> table.</td></tr>
+<tr><td><code>0x0003</code></td><td>7 bytes</td><td>Both: weapon-set-specific AND multi-choice (e.g. an Attribute node allocated only on weapon set 2).</td></tr>
+</table>
+
+<p>Higher flag bits (0b00000100 and above) are reserved by the format. Pedro's test URL only exercises bits 0 and 1. Reserved bits likely cover features GGG hasn't shipped yet, or features in 0.5 we haven't yet seen in a build (Runeforging, Instilled emotions on items, etc.).</p>
+
+<h3>Verified parse: Pedro's test build</h3>
+
+<pre><code>Total bytes: 687
+Header: version=7, class=7 (Sorceress), ascendancy=1 (Stormweaver), n=142
+
+Flag distribution:
+  0x0000 (plain):              75 records  — main tree, shared across both sets
+  0x0001 (weapon-set tag):     28 records  — split between set 1 (8) and set 2 (25)
+                                            (3 jewel sockets cross the boundary)
+  0x0002 (skill-override):     34 records  — Attribute choices, mostly Intelligence
+  0x0003 (set + override):      5 records  — Attribute picks specific to weapon set 2
+
+Total: 142 records, 687 bytes consumed. Round-trip clean.</code></pre>
+
+<h3>Skill override resolution</h3>
+
+<p>The <code>skill_override</code> field is a uint16 pointing into <code>data.skillOverrides</code> in the published tree JSON. The override table has 83 entries (in 0.5). Most relevant for our parser:</p>
+
+<pre><code>skillOverrides[26297] = { name: "Strength",     grantedStrength:     5 }
+skillOverrides[14927] = { name: "Dexterity",    grantedDexterity:    5 }
+skillOverrides[57022] = { name: "Intelligence", grantedIntelligence: 5 }
+skillOverrides[46793] = { name: "Damage",        stats: ["5% increased Damage"] }
+skillOverrides[44242] = { name: "Defences",      stats: ["5% increased Armour, Evasion and Energy Shield"] }
+... 78 more</code></pre>
+
+<p>When the parser encounters a node with <code>flags & 0b00000010</code>, the trailing uint16 names the choice. The Attribute node itself has no stats; its stats come from the overrides table at resolution time. <strong>This is the central-noded lookup pattern made concrete</strong>: nodes are coordinates, overrides are choices, both resolve to flat (stat_id, value) tuples at bind time.</p>
+
+<div class="callout">
+<h4>The clean separation</h4>
+<p>This format design means: a node's identity (where it sits on the tree) is independent of what it grants (which choice was made). A jewel that grants "+5 Int" produces the same combat-layer effect as an Attribute node with skill_override=57022. The save format records the choice, not the effect. The game resolves the choice into the effect at bind time. The combat loop reads only the resolved effect. <strong>Three layers, three rates of change, one stat table.</strong></p>
+</div>
+
+<h3>Reference parser (Python)</h3>
+
+<pre><code>import struct, base64
+
+def parse_build_url(url_or_code):
+    # accept either full URL or just the encoded portion
+    code = url_or_code.rsplit('/', 1)[-1] if '/' in url_or_code else url_or_code
+    code += '=' * ((4 - len(code) % 4) % 4)
+    raw = base64.urlsafe_b64decode(code)
+
+    version = struct.unpack('>I', raw[0:4])[0]
+    assert version == 7, f"Only v7 supported, got v{version}"
+    cls         = raw[4]
+    ascendancy  = raw[5]
+    n_records   = struct.unpack('>H', raw[6:8])[0]
+
+    i = 8
+    records = []
+    for _ in range(n_records):
+        node_hash = struct.unpack('>H', raw[i:i+2])[0]
+        flags     = struct.unpack('>H', raw[i+2:i+4])[0]
+        i += 4
+        weapon_set, skill_override = None, None
+        if flags & 0b00000001:
+            weapon_set = raw[i]; i += 1
+        if flags & 0b00000010:
+            skill_override = struct.unpack('>H', raw[i:i+2])[0]; i += 2
+        records.append({
+            'node_hash': node_hash, 'flags': flags,
+            'weapon_set': weapon_set, 'skill_override': skill_override
+        })
+
+    return {
+        'version': version, 'class': cls, 'ascendancy': ascendancy,
+        'records': records
+    }</code></pre>
+
+<p>Tested against Pedro's URL: 142 records, final byte offset matches total length exactly, all node_hashes resolve to entries in <code>data.nodes</code>, all skill_override values resolve to entries in <code>data.skillOverrides</code>. The reference implementation is the entire parser. Round-trip and re-encode is a symmetric operation; we have not yet written the encoder but the format is fully specified.</p>
+</section>
+
+<section id="graph">
+<h2>4. Graph model</h2>
+
+<p>GGG's official passive tree export ships as a 5MB JSON with this structure:</p>
+
+<pre><code>{
+  "tree": "Default",
+  "classes":         [ ... 12 entries with class start nodes + ascendancy subtrees ... ],
+  "groups":          { ... 1572 orbital clusters (visual layout) ... },
+  "nodes":           { ... 5102 nodes ... },
+  "edges":           [ ... 6021 {from, to} records, addressable by index ... ],
+  "skillOverrides":  { ... 83 choice-resolution entries ... },
+  "jewelSlots":      [ ... node ids of all jewel sockets ... ],
+  "min_x" / "min_y" / "max_x" / "max_y": world bounds for visual rendering
+}</code></pre>
+
+<p>Each node carries:</p>
+
+<pre><code>{
+  "id": "intelligence11",          // string id used by .build format
+  "skill": 22419,                  // numeric id used by web URL (node_hash)
+  "name": "Attribute",
+  "stats": ["+5 to any [Attributes|Attribute]"],
+  "isNotable": false,
+  "isKeystone": false,
+  "isJewelSocket": false,
+  "isMastery": false,
+  "isMultipleChoice": false,
+  "isMultipleChoiceOption": false,
+  "isGenericAttribute": true,      // → expect a skill_override on allocation
+  "ascendancyId": null,            // or "Sorceress1", "Druid2", etc.
+  "group": 748,
+  "orbit": 0, "orbitIndex": 0,
+  "x": -478.005, "y": -2158.22,
+  "out": ["18407", "4739"],        // neighbor node ids (strings, decimal)
+  "in": [],
+  "edges": [2942, 2943]            // indices into top-level edges array
+}</code></pre>
+
+<p>Edges are first-class addressable objects with their own indices, not just adjacency-list entries. This is a graph database schema, not just a graph. Future patches can attach modifiers to edges (mastery effects, path-conditional bonuses) without changing the save format, because the save format records only node visits.</p>
+
+<h3>Canonical queries</h3>
+
+<p>Once loaded into NetworkX, every interesting build question becomes a single graph operation:</p>
+
+<table>
+<tr><th>Question</th><th>Graph operation</th></tr>
+<tr><td>Distance from class start to keystone X?</td><td><code>nx.shortest_path_length(G, start, X)</code></td></tr>
+<tr><td>Optimal route through N notables?</td><td>Steiner tree approximation</td></tr>
+<tr><td>Which allocated nodes are orphaned from start?</td><td>connected component check on allocated set ∪ start</td></tr>
+<tr><td>Nearest unallocated notable?</td><td>BFS from allocated frontier until notable hit</td></tr>
+<tr><td>Build A vs Build B diff?</td><td>set difference on allocations + path comparison</td></tr>
+<tr><td>Stat aggregation for build?</td><td>sum <code>node.stats</code> + <code>skillOverrides[so].stats</code> across allocated set</td></tr>
+</table>
+
+<p>The stat aggregation step requires a stat parser (turning "15% increased Critical Hit Chance for Spells" into a structured tuple). This is the only place we re-implement game rules. We do it minimally: parse string → tuple, no math, no damage simulation. Aggregating identical stat_ids across sources is simple addition.</p>
+
+<h3>Path length sanity check</h3>
+
+<p>From Witch start (node 54447) to Ancestral Bond (node 45202): 17 graph hops. Confirmed via <code>nx.shortest_path</code> on the loaded graph. This is what makes dual-spec characters (like Pedro's) compelling — the 17 points only need to be allocated on one weapon set, not shared across both.</p>
+</section>
+
+<section id="buildfile">
+<h2>5. The <code>.build</code> file format</h2>
+
+<p>Officially documented at <a href="https://www.pathofexile.com/developer/docs/game">pathofexile.com/developer/docs/game</a>. JSON file dropped into <code>Documents/My Games/Path of Exile 2/BuildPlanner/</code>. The game's file watcher detects it and renders inline guidance: passive routing in the tree, gem recommendations during crafting, gear hints on inventory slots.</p>
+
+<pre><code>{
+  "name":         "Crit-Freeze Spark Stormweaver",
+  "author":       "claude + pedro",
+  "description":  "Cold-conversion Spark via Call of the Brotherhood",
+  "ascendancy":   "Sorceress1",
+
+  "passives": [
+    "intelligence11",                       // bare string = just allocate
+    "lightning_damage4",
+    { "id": "intelligence45",
+      "additional_text": "<m>{<blue>{Pick after Crit Overload}}",
+      "level_interval": [55, 65],
+      "weapon_set": 1 },                    // optional weapon-set targeting
+    ...
+  ],
+
+  "skills": [
+    { "id": "Metadata/Items/Gems/SkillGemSpark",
+      "support_skills": [
+        "Metadata/Items/Gems/SupportGemControlledDestruction",
+        { "id": "Metadata/Items/Gems/SupportGemInevitableCritical",
+          "additional_text": "<red>{After level 30}}" }
+      ] }
+  ],
+
+  "inventory_slots": [
+    { "inventory_id": "Weapon1",
+      "additional_text": "<silver>{Wand}\n<grey>{+Lightning Spell Skills priority}" }
+  ]
+}</code></pre>
+
+<h3>The two-id reality</h3>
+
+<p>Each passive node has <strong>two identifiers</strong> in the published tree JSON:</p>
+
+<ul>
+  <li><strong><code>skill</code></strong>: numeric, used by the web URL binary format (the <code>node_hash</code> field above)</li>
+  <li><strong><code>id</code></strong>: string, used by the <code>.build</code> JSON format (e.g. <code>intelligence11</code>, <code>melee17</code>, <code>strength89</code>)</li>
+</ul>
+
+<p>Our code joins these via the tree JSON's nodes dict. The web URL parser produces numeric IDs; the <code>.build</code> writer needs string IDs; the resolver maps both to display names and stats. <strong>String IDs are probably more stable across patches than numeric ones</strong>, since renaming a node would break in-game guidance for existing players. The <code>.build</code> writer should prefer string IDs wherever possible.</p>
+
+<h3>Markup format</h3>
+
+<p>The <code>additional_text</code> field supports rich markup the game renders inline:</p>
+
+<table>
+<tr><th>Type</th><th>Keys</th></tr>
+<tr><td>Font weight/style</td><td><code>&lt;r&gt;</code> regular, <code>&lt;b&gt;</code> bold, <code>&lt;i&gt;</code> italic, <code>&lt;u&gt;</code> underline</td></tr>
+<tr><td>Font size</td><td><code>&lt;s&gt;</code> small, <code>&lt;m&gt;</code> medium, <code>&lt;l&gt;</code> large</td></tr>
+<tr><td>Colour</td><td><code>&lt;red&gt;</code>, <code>&lt;orange&gt;</code>, <code>&lt;yellow&gt;</code>, <code>&lt;green&gt;</code>, <code>&lt;blue&gt;</code>, <code>&lt;indigo&gt;</code>, <code>&lt;violet&gt;</code>, <code>&lt;black&gt;</code>, <code>&lt;white&gt;</code>, <code>&lt;grey&gt;</code>, <code>&lt;bronze&gt;</code>, <code>&lt;silver&gt;</code>, <code>&lt;gold&gt;</code>, plus <code>&lt;rgb(r,g,b)&gt;</code></td></tr>
+<tr><td>Wrapping</td><td><code>{Example Text}</code> — the curly braces are mandatory, the tag without braces does nothing</td></tr>
+</table>
+
+<p>Markup nests: <code>&lt;m&gt;{&lt;red&gt;{Strength +5 is recommended}}</code> = medium font, red text.</p>
+
+<div class="callout">
+<h4>This is the league-start deliverable</h4>
+<p>0.5 launches Friday May 29. The <code>.build</code> format launched three weeks ago. Almost nobody is using it yet — Mobalytics and YouTube guides still dominate. A skill that auto-generates rich <code>.build</code> files from a player's situation, with markup-annotated routing decisions, is something nobody has built because the format is days old. The whole point of the league-start scope is to ship something that lets Claude be the player's planning partner during their first hours in the new league, with guidance rendered inline by the actual game client.</p>
+</div>
+</section>
+
+<section id="scopes">
+<h2>6. Scope phases</h2>
+
+<h3>Phase 1: Read &amp; summarize <span class="tag now">league-start</span></h3>
+
+<ul>
+  <li>Parse web URL via the v7 byte format (parser is small and self-contained, see §3)</li>
+  <li>Parse <code>.build</code> JSON files</li>
+  <li>Load tree JSON, build NetworkX graph</li>
+  <li>Resolve allocations: notables, keystones, jewel sockets, ascendancy nodes</li>
+  <li>Resolve skill_overrides via the choice table</li>
+  <li>Detect dual-spec characters (weapon-set-tagged records)</li>
+  <li>Answer graph questions (path costs, missing nearby notables, etc.)</li>
+</ul>
+
+<h3>Phase 2: Write <code>.build</code> files <span class="tag now">league-start</span></h3>
+
+<p>Reverse direction. Claude takes a player's situation (current tree, goals, league context, current level) and emits a <code>.build</code> file with annotated routing. Player drops it in their <code>BuildPlanner/</code> folder. Game renders the guidance inline.</p>
+
+<ul>
+  <li>Convert numeric ↔ string IDs via tree JSON join</li>
+  <li>Generate <code>additional_text</code> annotations with proper markup</li>
+  <li>Support <code>weapon_set</code> targeting for dual-spec recommendations</li>
+  <li>Support <code>level_interval</code> for progression guidance</li>
+  <li>Validate against schema (passive IDs exist, skills are valid gems, ascendancy matches class)</li>
+  <li>Optionally generate companion item filter for the build</li>
+</ul>
+
+<h3>Phase 3: Artifact workbench <span class="tag later">post-league-start</span></h3>
+
+<p>HTML/JS artifact that loads tree JSON from IndexedDB cache, accepts paste-in URLs or uploads, renders structured analysis. Visual graph display optional (the JSON has x/y coordinates; rendering it is an SVG over a fetched background image).</p>
+
+<h3>Phase 4: Connector with OAuth <span class="tag later">later</span></h3>
+
+<p>MCP server registered with GGG. Reads the player's account profile, characters, current passive allocation. Generates personalized <code>.build</code> files from live character state. Reads currency exchange rates for craft-cost analysis. Requires a formal application to GGG that Pedro writes, in Pedro's voice, justifying scopes individually.</p>
+
+<div class="callout warn">
+<h4>GGG OAuth registration policy</h4>
+<p>From the developer docs: <em>"Due to the large volume of recent requests, we will immediately reject any low-effort or LLM-generated requests. We expect you to read and understand these docs, and to have a clear vision for what you want to do before requesting OAuth access."</em> The application is itself the deliverable for this phase, not the code. Written by Pedro. Pedro's 2012 backer history is a positive signal but not a guarantee.</p>
+</div>
+
+<h3>Phase 5: Live workbench <span class="tag later">later</span></h3>
+
+<p>Connector + artifact + Claude in conversation = the live workbench. Player asks "what should I craft tonight?", Claude reads their character, knows the league economy, looks at their goal, suggests a craft path with currency cost estimates. This is the "playing the game with players" outcome.</p>
+
+<p>Bounded by what GGG exposes for PoE 2: account profile, characters, currency exchange, item filters. <strong>No stash API for PoE 2 yet</strong> (only PoE 1 has stash endpoints). The live workbench is bounded by GGG's PoE 2 endpoint roadmap.</p>
+</section>
+
+<section id="sources">
+<h2>7. Data sources</h2>
+
+<table>
+<tr><th>Source</th><th>What it gives</th><th>Auth</th><th>Use</th></tr>
+<tr>
+  <td><a href="https://github.com/GepetoinTraining/poe2-skilltree-export">GepetoinTraining/poe2-skilltree-export</a><br>(fork of grindinggear/poe2-skilltree-export)</td>
+  <td>passive tree JSON, skillOverrides table</td>
+  <td>none</td>
+  <td>core graph data, refresh per patch</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/GepetoinTraining/atlastree-export">GepetoinTraining/atlastree-export</a><br>(fork of grindinggear/atlastree-export)</td>
+  <td>atlas tree JSON (PoE 1 + PoE 2)</td>
+  <td>none</td>
+  <td>endgame analysis, same schema</td>
+</tr>
+<tr>
+  <td><a href="https://www.pathofexile.com/developer/docs/reference">GGG OAuth API</a></td>
+  <td>profile, characters, leagues, currency exchange, item filters</td>
+  <td>OAuth 2.1 (application required)</td>
+  <td>phase 4+</td>
+</tr>
+<tr>
+  <td>poe.ninja PoE 2 endpoints<br><code>poe.ninja/poe2/api/</code></td>
+  <td>build snapshots, currency prices, item prices</td>
+  <td>none, ~12 req / 5 min</td>
+  <td>meta-build analysis without OAuth</td>
+</tr>
+<tr>
+  <td><a href="https://cdn.poe2db.tw/cache2/">poe2db.tw CDN</a></td>
+  <td>cached item/gem/mod popups indexed by <code>Metadata\</code> internal paths</td>
+  <td>none, scrape with reasonable rate</td>
+  <td>resolve gem stats, unique mods, base item types — the layer GGG hasn't officially exported</td>
+</tr>
+<tr>
+  <td>poe2wiki.net MediaWiki API</td>
+  <td>community wiki content</td>
+  <td>none</td>
+  <td>unique items, mechanics lookups</td>
+</tr>
+<tr>
+  <td>craftofexile.com</td>
+  <td>crafting odds, modifier weights</td>
+  <td>none, scrape</td>
+  <td>craft cost estimation (phase 5)</td>
+</tr>
+</table>
+
+<div class="callout">
+<h4>poe2db's role, clarified</h4>
+<p>poe2db.tw runs a data extraction pipeline against the game files (probably using LibGGPK or similar) and serves the result through a CDN with URLs keyed by the game's internal <code>Metadata\</code> paths. Their <code>cdn.poe2db.tw/cache2/us/</code> endpoint serves cached HTML popups for any item by path. This is the canonical source for resolving <code>.build</code> skill IDs like <code>Metadata/Items/Gems/SkillGemSpark</code> into actual gem stats, since GGG's official Data Exports page says "We are currently unable to provide any PoE2-specific data" beyond the tree JSONs.</p>
+<p>The heap snapshot investigation showed that poe2db's page-level heap is mostly ad infrastructure; the <em>data</em> is server-side, served on demand. The right way to use poe2db is as a parameterized lookup, not by scraping rendered pages.</p>
+</div>
+
+<div class="callout">
+<h4>Existing MCP server we should not duplicate</h4>
+<p><a href="https://glama.ai/mcp/servers/t0w4w7h26s">sergeyklay/poe2-mcp-server</a> already exists. Tools: <code>poe2_currency_prices</code>, <code>poe2_item_price</code>, <code>poe2_exchange_top</code>, <code>poe2_wiki_search</code>, <code>poe2_db_lookup</code>, <code>poe2_meta_builds</code>. No OAuth required. Built on poe.ninja + poe2db + poe2wiki. The phase 4+ connector we build should be the <em>OAuth complement</em> (personal character data, item filter R/W), not a replacement.</p>
+</div>
+</section>
+
+<section id="skill">
+<h2>8. Skill layout</h2>
+
+<pre><code>poe2-graph/
+├── SKILL.md                  # architectural understanding (the recognitions from this conversation)
+├── parser.py                 # web URL byte decoder + encoder (v7 format)
+├── build_writer.py           # emit .build JSON with markup
+├── build_reader.py           # parse .build JSON
+├── graph.py                  # NetworkX wrapper + canonical queries
+├── stats.py                  # stat string → structured tuple (minimal, the only "rules" we touch)
+├── resolvers.py              # numeric_id ↔ string_id ↔ display_name joins
+├── poe2db_client.py          # CDN lookup wrapper for item/gem/mod resolution
+├── data/
+│   ├── passive-tree.json     # cached from grindinggear fork
+│   ├── atlas-tree.json       # cached from grindinggear fork
+│   ├── manifest.json         # patch version, fetch date, source URLs
+│   └── README.md             # how to refresh after a patch
+├── examples/
+│   ├── stormweaver-dual-spec.md   # the build we decoded tonight (annotated walkthrough)
+│   ├── format-notes-v7.md         # byte format spec with examples
+│   └── titan-warrior.build        # GGG's official .build example, kept for reference
+└── tests/
+    ├── test_parser.py             # parser round-trip against pedro's URL
+    ├── test_graph.py              # known-good shortest paths
+    └── test_buildfile.py          # .build schema validation</code></pre>
+
+<h3>SKILL.md must carry</h3>
+
+<ol>
+  <li><strong>The architectural recognitions</strong>: graph-as-schema, sources-collapse-to-stats, choice-coordinates-via-skillOverrides, subgraphs-share-schema, edges-as-first-class-objects</li>
+  <li><strong>The v7 byte format spec</strong> (see §3 above) — fully byte-accurate</li>
+  <li><strong>The <code>.build</code> JSON format</strong> with markup support and the two-ID reality</li>
+  <li><strong>The numeric↔string ID join via tree JSON</strong> — our resolver code keys on this</li>
+  <li><strong>Canonical query playbook</strong>: which graph operation answers which player question</li>
+  <li><strong>Where to refresh data</strong>: forked GGG repos for trees; poe2db CDN for items/gems/mods</li>
+  <li><strong>The non-goals</strong>: we don't simulate damage, we don't replace PoB, we don't compute DPS — we walk the graph and emit annotations</li>
+</ol>
+
+<p>A future Claude reading this skill cold should be able to do what tonight's conversation did, in one inference, without re-deriving the byte format or re-discovering the graph schema.</p>
+</section>
+
+<section id="artifact">
+<h2>9. Artifact layer</h2>
+
+<p>The artifact is what a player sees in a Claude conversation. It loads the cached tree JSON from IndexedDB (5MB fetched once, persists across reloads within the artifact origin). Subsequent interactions are instant.</p>
+
+<h3>Artifact responsibilities</h3>
+
+<ul>
+  <li>Accept paste-in web URL or <code>.build</code> upload</li>
+  <li>Parse and resolve via the same logic the skill uses</li>
+  <li>Render: structured allocation summary, notable list, keystone highlights, stat aggregation table, dual-spec breakdown</li>
+  <li>Render: graph queries on demand ("path to X", "notables I'm 2 nodes from")</li>
+  <li>Export: download <code>.build</code> file with annotations</li>
+  <li>Compare: diff two builds (allocation set difference, stat delta, ascendancy difference)</li>
+</ul>
+
+<h3>What the artifact must <em>not</em> do</h3>
+
+<ul>
+  <li>Simulate combat or compute DPS — out of scope, hard to maintain, PoB exists</li>
+  <li>Store player accounts or auth tokens — no OAuth at the artifact level</li>
+  <li>Talk to the GGG API directly — rate limits live at the connector/MCP layer</li>
+</ul>
+</section>
+
+<section id="connector">
+<h2>10. Connector (later)</h2>
+
+<p>MCP server, separate repo, separate deploy. The OAuth half of the surface area, complementing the existing public-data MCP servers.</p>
+
+<table>
+<tr><th>Tool</th><th>Scope needed</th><th>Returns</th></tr>
+<tr><td><code>poe2_profile</code></td><td><code>account:profile</code></td><td>account name, status</td></tr>
+<tr><td><code>poe2_characters</code></td><td><code>account:characters</code></td><td>list of player's characters</td></tr>
+<tr><td><code>poe2_character_detail</code></td><td><code>account:characters</code></td><td>equipment, passive allocation, level, league</td></tr>
+<tr><td><code>poe2_leagues</code></td><td>none</td><td>active leagues, league rules</td></tr>
+<tr><td><code>poe2_currency_exchange</code></td><td>tbd, see API docs</td><td>rates for craft cost analysis</td></tr>
+<tr><td><code>poe2_item_filters_read</code></td><td><code>account:item_filter</code></td><td>player's current item filters</td></tr>
+<tr><td><code>poe2_item_filters_write</code></td><td><code>account:item_filter</code></td><td>upload generated filter</td></tr>
+</table>
+
+<p>The connector stays thin: auth, rate limiting, raw API wrapping. All graph reasoning happens above it in Claude, using the same toolkit the skill provides.</p>
+
+<h3>The GGG OAuth application — Pedro's writing project</h3>
+
+<p>The OAuth registration request to <code>oauth@grindinggear.com</code> must include:</p>
+
+<ol>
+  <li>PoE account name with discriminator (Pedro's 2012-backer account)</li>
+  <li>Application name (proposal: <code>poe2-graph</code> or similar — technical, not marketing)</li>
+  <li>Client type: confidential server-side client (MCP server holds credentials)</li>
+  <li>Grant types: <code>authorization_code</code> for user-data scopes</li>
+  <li>Specific scopes with per-scope justification</li>
+  <li>Secure redirect URI</li>
+</ol>
+
+<p>This application must be written by Pedro, in Pedro's voice. GGG's policy is explicit: LLM-generated applications are auto-rejected. The application is itself a small writing project. This spec exists partly to give Pedro something to point at — "here is the technical understanding, the application is built on top of this" — without putting any AI-generated paragraphs in front of the GGG review team.</p>
+</section>
+
+<section id="open">
+<h2>11. Open questions <span class="tag verified">most reduced since v0.1</span></h2>
+
+<p>v0.1 had 7 open questions about the byte format. The published v7 spec resolved 5 of them. Remaining:</p>
+
+<ol>
+  <li><strong>Flag bits 0b00000100 and above</strong> — none observed in Pedro's URL. Likely reserved for features not yet shipped or features in 0.5 we haven't tested against (Runeforging on uniques, Instilled emotions on amulets, Ancient Runes from Farrow's questline).</li>
+  <li><strong>Weapon set byte values beyond 0/1</strong> — only 0 and 1 observed. Possibly more values exist if GGG plans three weapon sets in future.</li>
+  <li><strong>Other character-class numeric IDs</strong> — Pedro's URL shows class=7 for Sorceress. We need a few more sample URLs across classes to map all 12 class IDs and all ascendancy IDs.</li>
+  <li><strong>Mastery node encoding</strong> — Pedro's build has no allocated masteries. Likely encoded as flags=0x0002 (skill_override carrying the chosen mastery branch). Untested.</li>
+  <li><strong>Ascendancy-Notable encoding for the new ascendancies (Spirit Walker, Martial Artist, Disciple of Varashta)</strong> — different ascendancy IDs but same record structure expected. Sample needed.</li>
+  <li><strong><code>.build</code> file errors</strong> — the docs don't list error semantics. What happens if the file references a passive ID that doesn't exist? Silently ignored? Game refuses to load? Tested-against-game-client behaviour unknown.</li>
+</ol>
+
+<p>Each is a small empirical study. Phase 1's test corpus should include 8-10 build URLs covering different classes, ascendancies, and feature usage, with the parser verified against each.</p>
+</section>
+
+<section id="handoff">
+<h2>12. Handoff to Claude Code</h2>
+
+<p>This spec was written by Claude (web) in conversation with Pedro across one extended session. We did the reverse-engineering, the byte-format verification, the architectural recognition, the data-source reconnaissance, and the scope partitioning. What remains is implementation — and that is Claude Code's strength.</p>
+
+<h3>What the implementer Claude needs from us as researchers</h3>
+
+<p>Things we (web Claude + Pedro) are positioned to deliver during the build:</p>
+
+<ul>
+  <li><strong>More test URLs.</strong> Pedro's one build covers Sorceress/Stormweaver and exercises flags 0/1/2/3 but not higher bits. We can gather 8-10 sample URLs from public builds on poe.ninja, the official forum, and league-start guides to exercise more code paths. This is research, not implementation — it can be done in parallel.</li>
+  <li><strong>Sample <code>.build</code> files</strong>, ideally from the few build creators who have started publishing them in 0.5. We have GGG's Titan Warrior example. Two or three real-creator examples would catch idiomatic patterns we haven't seen.</li>
+  <li><strong>The poe2db CDN URL structure</strong> mapped out empirically. We know <code>cdn.poe2db.tw/cache2/us/Poe_Data_BaseItemTypes_hover...json</code> works for items; we should verify and document the patterns for gems, mods, and unique items. This is one focused recon session.</li>
+  <li><strong>Stat string syntax catalog.</strong> Stats in the tree JSON look like <code>"15% increased [Critical|Critical Hit Chance] for [Spell|Spells]"</code> with <code>[link|display]</code> bracket annotations. The full bracket syntax (escape rules, nested brackets, unlinked entries) deserves a small grammar document. Web Claude can extract this from the published tree JSON by enumeration.</li>
+  <li><strong>Notable/keystone catalog</strong> for each ascendancy, with descriptions. Useful for the resolver to produce intelligent "you have these notables" summaries. Mechanical, can be auto-generated from the tree JSON.</li>
+  <li><strong>The GGG OAuth application draft</strong>. Pedro writes this. Web Claude helps Pedro think it through but does not write the prose. The result is Pedro-voiced, technically grounded.</li>
+</ul>
+
+<h3>What Claude Code is positioned to do that we are not</h3>
+
+<ul>
+  <li><strong>The actual implementation.</strong> Parser, encoder, graph builder, resolver, <code>.build</code> writer, validator. Real code in a real repo, with real tests, run against the test corpus.</li>
+  <li><strong>Test harness.</strong> Property-based tests for parser round-trip (parse → encode → parse → assert equal). Schema validation tests for the <code>.build</code> writer. Graph query correctness against known paths.</li>
+  <li><strong>Skill packaging.</strong> SKILL.md + supporting files in the right layout for Anthropic's skill system. Verified to work when a fresh Claude loads it.</li>
+  <li><strong>The integration question.</strong> How does the artifact actually call into the skill code? What's the IPC story for a Python skill being exercised by a JS artifact? Claude Code knows the current Anthropic platform shape better than we do.</li>
+  <li><strong>Iteration on real data.</strong> When the parser hits an unexpected case in the test corpus, Claude Code is the right interlocutor for the user. We hand off the spec and the test cases; Claude Code does the empirical work.</li>
+</ul>
+
+<h3>The split, plainly</h3>
+
+<p>Web Claude is good at <strong>thinking with Pedro across the abstraction layer</strong> — the byte format, the graph model, the architectural recognitions. The conversation is the work.</p>
+
+<p>Claude Code is good at <strong>building the artifact</strong> — the parser, the tests, the integration, the iteration. The repo is the work.</p>
+
+<p>This spec is the handoff document. It is meant to be readable by Claude Code without the four-hour conversation that produced it. If the spec is clear, the implementation should follow without re-deriving anything.</p>
+
+<h3>What to ask Claude Code first</h3>
+
+<p>Pedro: when you open this spec in Claude Code, the first question worth asking is some version of:</p>
+
+<blockquote style="border-left: 2px solid var(--accent); padding-left: 16px; color: var(--muted); margin: 16px 0;">
+"This is a spec for a poe2 skill. Read the spec, then tell me: what's missing that you'd need before writing code? What in here is ambiguous? What would you want me to research and bring back? Don't start writing yet — just tell me what you need."
+</blockquote>
+
+<p>The answer becomes our research backlog. Web Claude + Pedro work the backlog; Claude Code writes the code. Two surfaces, one project, each doing what it does.</p>
+</section>
+
+<hr>
+
+<section>
+<h2>Naming and badging</h2>
+
+<p>GGG requires every public/widely-available application to display: <em>"This product isn't affiliated with or endorsed by Grinding Gear Games in any way."</em> The artifact, the MCP server, and any user-facing surface must carry this. Skill-level work doesn't need it; player-facing artifact output does.</p>
+
+<p>User-Agent format for OAuth API calls: <code>OAuth {clientId}/{version} (contact: {contact})</code> — applies once we're in OAuth land. Public APIs (poe.ninja, poe2db, wiki) need an identifiable User-Agent too; we should set one per skill convention.</p>
+</section>
+
+<section>
+<h2>Content creator integration</h2>
+
+<p>The <code>.build</code> file format has an <code>author</code> field. Build creators (AnimePrincess, Allie, Mathil, etc.) will naturally start publishing <code>.build</code> files alongside their videos as the format catches on. Two integration paths to keep in mind:</p>
+
+<ol>
+  <li><strong>Read other creators' <code>.build</code> files</strong> — phase 1 already does this. A player downloads AnimePrincess's Stormweaver leaguestarter and asks Claude "what does this do and where am I in it".</li>
+  <li><strong>Generate <code>.build</code> files from creator video transcripts or build pages</strong> — phase 3+. Claude reads a Mobalytics page, generates a <code>.build</code> file capturing the recommended routing. Quality-of-life multiplier for the whole ecosystem.</li>
+</ol>
+
+<p>Creator-credit conventions: when generating a <code>.build</code> from a third-party guide, the <code>author</code> field should credit the original creator with a note that the file is auto-generated. Annotation text should link back to the source.</p>
+</section>
+
+<footer>
+poe2-graph spec v0.2 · pre-implementation · 2026-05-26 · pedro + claude (web) · forks at <a href="https://github.com/GepetoinTraining/poe2-skilltree-export">GepetoinTraining/poe2-skilltree-export</a> · this product isn't affiliated with or endorsed by grinding gear games in any way
+</footer>
+
+</body>
+</html>

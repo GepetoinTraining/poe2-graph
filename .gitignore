@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.vs/
+.claude/
+*.swp
+probe_*.html
