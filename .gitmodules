@@ -1,0 +1,16 @@
+[submodule "tools/neversink-poe2"]
+	path = tools/neversink-poe2
+	url = https://github.com/GepetoinTraining/NeverSink-Filter-for-PoE2.git
+	branch = main
+[submodule "tools/neversink-poe1"]
+	path = tools/neversink-poe1
+	url = https://github.com/GepetoinTraining/NeverSink-Filter.git
+	branch = master
+[submodule "tools/pob-poe1"]
+	path = tools/pob-poe1
+	url = https://github.com/GepetoinTraining/PathOfBuilding.git
+	branch = dev
+[submodule "tools/pob-poe2"]
+	path = tools/pob-poe2
+	url = https://github.com/GepetoinTraining/PathOfBuilding-PoE2.git
+	branch = dev
