@@ -10,7 +10,7 @@ At the start of any conversation, Claude checks `exile.is_onboarded()`. If `Fals
 
 ### Phase 1 — Filesystem scan (passive, ~5 seconds)
 
-Claude runs `filesystem_scanner.scan()` (TBD module) which checks known paths for:
+Claude runs `filesystem_scanner.scan()` which checks known paths for:
 
 - **Path of Building Community** (`Documents\Path of Building Community\`) → `pob_user`
 - **POE Overlay / Awakened PoE Trade / POE-TradeMacro** (AppData) → `trade_overlay_user`
