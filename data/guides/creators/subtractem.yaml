@@ -1,0 +1,51 @@
+schema_version: 1
+handle: subtractem
+display_name: Subtractem
+
+channels:
+  youtube: https://www.youtube.com/@subtractem
+  twitch: https://www.twitch.tv/subtractem
+  website: https://subtractem.com
+home_url: https://subtractem.com
+build_hub: https://subtractem.com
+live_status_url: https://decapi.me/twitch/uptime/subtractem
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - warrior
+  - titan
+  - warbringer
+  - melee_builds
+  - slam_style
+  - leaguestarter_warrior
+
+style_tags:
+  - clean_documentation
+  - melee_first
+  - clear_explanations
+  - approachable
+
+style_notes: |
+  Melee specialist with a clear, well-documented teaching style. Slam-style
+  Warrior is his archetype — Titan / Warbringer builds, melee positioning,
+  and slam timing get explicit attention in his guides.
+
+  Surface when player is on Warrior / Titan / Warbringer, wants to learn
+  melee positioning and slam timing as mechanics, or is league-starting a
+  melee character and needs a creator who actually plays the archetype
+  (rather than a generalist who covers it).
+
+transmits:
+  - edge: marginal_capability_thinking
+    confidence: 0.6
+    note: "Melee gear is leverage-point heavy; he frames upgrades by what they enable in the slam-cycle"
+  - edge: downside_discipline
+    confidence: 0.55
+    note: "Melee positioning under pressure rewards halt-and-rethink reflexes"
+  - edge: league_phase_awareness
+    confidence: 0.55
+    note: "Leaguestarter Warrior guides are phase-explicit about damage and defense gating"

@@ -1,0 +1,43 @@
+# Seed system guide #1: handling a Mirror-tier drop.
+#
+# A "system guide" is metadata + a reference to one or more case studies that
+# exercise the edges it transmits. The actual teaching happens through the
+# case studies; this file is the index entry.
+
+schema_version: 1
+id: mirror_handling_v1
+topic: "Mirror-tier drop handling"
+summary: |
+  What to do when you drop a Mirror of Kalandra: secure the item, read the
+  chart as accumulation/distribution, reframe to option value, price
+  patiently. Resists the new-player fire-sale instinct.
+game: poe2
+version_minimum: "0.5.0"
+last_updated: 2026-05-26
+difficulty: advanced
+
+transmits:
+  - posture_under_drop
+  - option_value_vs_face_value
+  - market_timing
+  - patient_pricing
+
+case_studies:
+  - mirror_drop_day_1
+  - mirror_drop_week_3      # TODO: author
+  - mirror_for_item_trade   # TODO: author
+
+creators:
+  - handle: ben_
+    role: posture_primary
+    note: "HC streamer; demonstrates patient analytical posture, no hype"
+  - handle: empyriangaming
+    role: economy_supplement
+    note: "Explains option value vs face value in farming context; mirror-class evaluation"
+  - handle: zizaran
+    role: community_voice
+    note: "High-visibility big-find composure; useful when player needs the 'this is normal' reframe"
+
+prerequisites:
+  - edge: market_timing
+    min_confidence: 0.3

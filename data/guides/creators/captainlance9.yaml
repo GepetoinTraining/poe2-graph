@@ -1,0 +1,62 @@
+schema_version: 1
+handle: captainlance9
+display_name: CaptainLance9
+
+channels:
+  youtube: https://www.youtube.com/@CaptainLance9
+  twitch: https://www.twitch.tv/captainlance9
+  mobalytics: https://mobalytics.gg/poe-2/profile/captainlance9
+home_url: https://www.youtube.com/@CaptainLance9
+build_hub: https://mobalytics.gg/poe-2/profile/captainlance9
+live_status_url: https://decapi.me/twitch/uptime/captainlance9
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - off_meta_builds
+  - mechanically_inventive
+  - unique_item_centric
+  - defensive_curiosity
+  - cross_class
+
+style_tags:
+  - experimental
+  - puzzle_solver
+  - trial_and_error_transparent
+  - what_if_voice
+  - mobalytics_partner
+  - pedro_endorsed
+
+style_notes: |
+  The "what if we..." creator. Mechanically inventive off-meta builds across
+  every class. Active 0.5 examples: Reverse Chill Stormweaver (Shackles of
+  the Wretched + Sierran Inheritance), Meteor Bear Druid (Walking Calamity
+  + Furious Wellspring), Spirit Walker Beast Tamer (Tame Beast on unique
+  boss beasts). Streams the testing process so viewers see ideas fail and
+  iterate, not just the polished final build.
+
+  Pedro flags him for "weird unkillable shit" — particularly strong for
+  defensive curiosity and mechanical creativity. Surface when player wants
+  something unusual, has a weird unique they want to build around, is bored
+  of meta and wants a puzzle, or wants the kind of unkillable defensive
+  setup he specializes in.
+
+transmits:
+  - edge: playstyle_authenticity
+    confidence: 0.85
+    note: "Living counter-example to meta-following; the canonical voice for 'play what's mechanically interesting'"
+  - edge: aspirational_calibration
+    confidence: 0.7
+    note: "Worth admiring and watching; copying requires accepting the experimental tax"
+  - edge: option_value_vs_face_value
+    confidence: 0.75
+    note: "Builds around items others ignore; demonstrates non-face-value identification"
+  - edge: marginal_capability_thinking
+    confidence: 0.6
+    note: "Defensive stacking forces explicit reasoning about what each layer enables"
+  - edge: investing_vs_gambling
+    confidence: 0.55
+    note: "Experimental nature means some builds don't pan out; he's honest about which ones"

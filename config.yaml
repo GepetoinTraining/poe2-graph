@@ -1,0 +1,163 @@
+# poe2-graph — main user config
+#
+# This file is for YOU. Edit it directly to change how the skill behaves.
+# Claude reads this on session start (and on demand) but never overwrites it
+# silently — if a setting changes, Claude will tell you why before suggesting
+# the change.
+#
+# Comments are first-class — annotate freely. Unknown keys are preserved.
+# To restore defaults, delete this file; Claude will regenerate with the
+# canonical defaults.
+
+schema_version: 1
+
+# ============================================================================
+# Third-party tools
+# ----------------------------------------------------------------------------
+# Two flavors:
+#
+#   bundled_fork — we bundle this as a git submodule under tools/. Update
+#                  cycle controls how often the worker / updater checks for
+#                  new commits from the upstream parent.
+#
+#   linked       — we don't bundle; the player installs separately. The
+#                  filesystem_scanner detects whether it's installed; we
+#                  don't manage its updates.
+#
+# update_cycle.mode:
+#   off         — never check, never update
+#   manual      — check on demand only (`python updater.py update-tools`)
+#   scheduled   — check at a regular interval, log but don't auto-pull
+#   continuous  — check at a regular interval, auto-pull when changes land
+#                 (this is the league-launch mode)
+#
+# update_cycle.interval_seconds: how long between checks in scheduled/continuous mode.
+# update_cycle.auto_pull: if true, worker pulls; if false, worker reports only.
+# ============================================================================
+
+tools:
+  # ----- bundled forks (submodules under tools/) -----
+
+  - name: pob-poe2
+    type: bundled_fork
+    enabled: true
+    submodule_path: tools/pob-poe2
+    upstream: PathOfBuildingCommunity/PathOfBuilding-PoE2
+    fork: GepetoinTraining/PathOfBuilding-PoE2
+    update_cycle:
+      mode: scheduled
+      interval_seconds: 604800  # weekly; PoB updates are slower than filters
+      auto_pull: false          # 1.6GB pulls — don't do silently
+
+  - name: pob-poe1
+    type: bundled_fork
+    enabled: true
+    submodule_path: tools/pob-poe1
+    upstream: PathOfBuildingCommunity/PathOfBuilding
+    fork: GepetoinTraining/PathOfBuilding
+    update_cycle:
+      mode: scheduled
+      interval_seconds: 604800
+      auto_pull: false
+
+  - name: neversink-poe2
+    type: bundled_fork
+    enabled: true
+    submodule_path: tools/neversink-poe2
+    upstream: NeverSinkDev/NeverSink-Filter-for-PoE2
+    fork: GepetoinTraining/NeverSink-Filter-for-PoE2
+    update_cycle:
+      mode: continuous            # filter refresh is high-velocity at league launch
+      interval_seconds: 300       # 5 min — appropriate for launch-window polling
+      auto_pull: true             # pull silently — small files, low risk
+
+  - name: neversink-poe1
+    type: bundled_fork
+    enabled: true
+    submodule_path: tools/neversink-poe1
+    upstream: NeverSinkDev/NeverSink-Filter
+    fork: GepetoinTraining/NeverSink-Filter
+    update_cycle:
+      mode: scheduled
+      interval_seconds: 86400     # daily; PoE 1 filters update less often
+      auto_pull: false
+
+  # ----- linked tools (player installs separately) -----
+
+  - name: awakened-poe-trade
+    type: linked
+    enabled: true
+    detection_probe: awakened_poe_trade
+    update_cycle:
+      mode: off                    # we don't manage updates for linked tools
+
+  - name: exilence-next
+    type: linked
+    enabled: true
+    detection_probe: exilence_next
+    update_cycle:
+      mode: off
+
+  - name: chaos-recipe-enhancer
+    type: linked
+    enabled: true
+    detection_probe: chaos_recipe_enhancer
+    update_cycle:
+      mode: off
+
+  - name: poe-overlay
+    type: linked
+    enabled: true
+    detection_probe: poe_overlay
+    update_cycle:
+      mode: off
+
+  - name: poe-trademacro
+    type: linked
+    enabled: false   # legacy AHK — disabled by default; flip on for veterans
+    detection_probe: poe_trademacro
+    update_cycle:
+      mode: off
+
+# ============================================================================
+# Local data caches
+# ----------------------------------------------------------------------------
+# poe2db is the upstream community item / mod database. We cache pages locally
+# with a 24h TTL by default. Disk footprint is small but not zero — at full
+# scrape across all categories we're around ~30MB. If you want to cap that or
+# scope to specific categories only, configure here.
+# ============================================================================
+
+cache:
+  poe2db:
+    ttl_hours: 24
+    max_size_mb: 50           # cap total cache size; oldest pages evicted first
+    categories:
+      # mode: "all" caches everything we fetch.
+      # mode: "named_only" restricts to the list below — useful if you only
+      # care about a few base types and want to avoid caching every modifier
+      # of every item.
+      mode: all
+      named: []
+      # named example:
+      # named: [Amulets, Rings, Belts, Body_Armours, Helmets, Wands, Sceptres]
+
+# ============================================================================
+# Update worker defaults
+# ----------------------------------------------------------------------------
+# These are the defaults for `python worker.py` when launched without explicit
+# flags. CLI flags always override this section.
+# ============================================================================
+
+worker:
+  default_interval_seconds: 600       # 10 min — sensible for outside league launch
+  log_path: worker.log                 # relative to repo root
+  sync_upstream_default: true          # use `gh repo sync` to pull upstream → fork
+
+# ============================================================================
+# Filesystem scanner behavior
+# ============================================================================
+
+scanner:
+  run_on_session_start: true           # auto-scan when a session begins
+  recommend_missing_tools: true        # if a tool isn't installed, mention the guide

@@ -1,0 +1,53 @@
+schema_version: 1
+handle: steelmage
+display_name: Steelmage
+
+channels:
+  twitch: https://www.twitch.tv/steelmage
+  youtube: https://www.youtube.com/@steelmage
+home_url: https://www.twitch.tv/steelmage
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/steelmage
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - sorceress
+  - mapper
+  - atlas_optimization
+  - mapping_efficiency
+  - T15_endgame
+  - farmer
+
+style_tags:
+  - methodical
+  - optimization_focused
+  - mapper_voice
+  - data_driven
+
+style_notes: |
+  Sorceress player and atlas / mapping optimization specialist. Methodical
+  optimization-focused stream style — efficient mapping, atlas tree
+  optimization, content selection across league phases.
+
+  Surface when player wants to push T15+ mapping, needs atlas tree
+  guidance, or wants to understand how mapping efficiency actually
+  compounds across a league. His content is less about the build and more
+  about what to do with the build once it works.
+
+transmits:
+  - edge: league_phase_awareness
+    confidence: 0.75
+    note: "Atlas pacing and content selection across league phases is core to his content"
+  - edge: marginal_capability_thinking
+    confidence: 0.65
+    note: "Mapping efficiency is itself a capability-per-cost optimization problem"
+  - edge: flow_anticipation
+    confidence: 0.6
+    note: "Atlas / content optimization implies forward-looking 'what farms become valuable next'"
+  - edge: currency_velocity
+    confidence: 0.5
+    note: "Mapping yields his bread and butter; he notices when drops accelerate or thin"

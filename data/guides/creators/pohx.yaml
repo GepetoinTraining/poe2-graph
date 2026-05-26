@@ -1,0 +1,61 @@
+schema_version: 1
+handle: pohx
+display_name: Pohx
+
+channels:
+  website: https://pohx.net
+  youtube: https://www.youtube.com/@pohx
+  twitch: https://www.twitch.tv/pohx
+home_url: https://pohx.net
+build_hub: https://pohx.net
+live_status_url: https://decapi.me/twitch/uptime/pohx
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - low_button_builds
+  - defensive_first
+  - patient_scaling
+  - righteous_fire
+  - accessibility_conscious
+  - beginner_friendly
+
+style_tags:
+  - extremely_thorough
+  - accessibility_aware
+  - patient_voice
+  - documents_everything
+
+style_notes: |
+  Known *explicitly* for accessibility-conscious builds — minimal-button
+  playstyles, defensive-first scaling, builds that work for players with
+  RSI, motor limitations, or just preference for slow-and-safe over
+  fast-and-twitchy. Righteous Fire is his canonical archetype in PoE 1;
+  RF doesn't exist the same way in PoE 2 yet, but the *posture* he
+  embodies transfers directly.
+
+  Surface when player wants minimal-button playstyle, has accessibility
+  considerations, wants to learn patient defensive scaling, or expresses
+  any fatigue with twitchy / APM-heavy builds. His PoE 2 presence is
+  smaller than his PoE 1 footprint, but flag him anyway — the *posture*
+  is what we're surfacing, not specific build code.
+
+transmits:
+  - edge: time_budget_calibration
+    confidence: 0.85
+    note: "His builds are explicitly designed for players who can't grind 60 hours/week"
+  - edge: playstyle_authenticity
+    confidence: 0.8
+    note: "The canonical 'play what works for you, not what the meta says' voice in PoE"
+  - edge: aspirational_calibration
+    confidence: 0.6
+    note: "His builds are aspirational in the right way — copyable, sustainable, not flex"
+  - edge: marginal_capability_thinking
+    confidence: 0.65
+    note: "Defensive-first scaling forces explicit reasoning about what each layer enables"
+  - edge: investing_vs_gambling
+    confidence: 0.6
+    note: "His content has very low gambling-flavored crafting; calculated investments throughout"

@@ -1,0 +1,73 @@
+schema_version: 1
+handle: kripparrian
+display_name: Kripparrian / Kripp
+
+channels:
+  twitch: https://www.twitch.tv/nl_kripp
+  youtube: https://www.youtube.com/user/Kripparrian
+  mobalytics: https://mobalytics.gg/poe-2/kripp
+home_url: https://www.twitch.tv/nl_kripp
+build_hub: https://mobalytics.gg/poe-2/kripp
+live_status_url: https://decapi.me/twitch/uptime/nl_kripp
+
+disposition: public
+
+games: [poe1, poe2, d3, d4, arpg_general]
+primary_language: en
+
+specialties:
+  - ssf
+  - solo_self_found
+  - arpg_veteran
+  - long_form_youtube
+  - dev_interviews
+  - league_start_runs
+  - build_takes
+
+style_tags:
+  - veteran_arpg_voice
+  - methodical
+  - daily_uploads
+  - youtube_first
+  - calm_narration
+  - reference_size_audience
+
+style_notes: |
+  Octavian "Kripp" Morosan — Romanian-Canadian. One of the largest
+  individual ARPG content creators alive. Long history with PoE 1
+  (hardcore SSF reputation), continues into PoE 2 with SSF-focused
+  content. YouTube channel uploads twice daily (2pm + 9pm EST); Twitch
+  at nl_kripp. Long-form interview series with Jonathan Rogers (PoE 2
+  director) is in his catalog — useful when player wants design-
+  intent context, not build advice.
+
+  Style is calm, methodical, audible-thought narration. Not a meta
+  optimizer — he plays the game his way (SSF, varied builds) and
+  narrates the reasoning. Best for players who want a long-form
+  watching experience with low APM-spike, or who want ARPG-wide context
+  (D3/D4 comparisons surface naturally in his framing).
+
+  Audience size means surfacing Kripp is a representation-broadest move:
+  most viewers have already heard of him. Useful when player asks "who
+  should I watch" with no preference — a known quantity beats a niche
+  recommend.
+
+transmits:
+  - edge: playstyle_authenticity
+    confidence: 0.85
+    note: "Lifelong SSF preference is the canonical 'I play my game, not the meta game' demonstration"
+  - edge: time_budget_calibration
+    confidence: 0.65
+    note: "Daily upload cadence is itself a long-haul time-budget framing"
+  - edge: posture_under_drop
+    confidence: 0.75
+    note: "SSF context — every drop matters; composure is built-in to the format"
+  - edge: downside_discipline
+    confidence: 0.7
+    note: "SSF means no resets; halt-or-push reasoning is explicit on hard decisions"
+  - edge: marginal_capability_thinking
+    confidence: 0.6
+    note: "Crafting and gear decisions framed as capability-unlocks across the long horizon"
+  - edge: league_phase_awareness
+    confidence: 0.6
+    note: "Long-running league content captures phase awareness implicitly"

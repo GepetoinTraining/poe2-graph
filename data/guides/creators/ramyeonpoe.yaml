@@ -1,0 +1,40 @@
+schema_version: 1
+handle: ramyeonpoe
+display_name: 라면 RAMYEON POE
+
+channels:
+  youtube: https://www.youtube.com/@RAMYEONPOE
+home_url: https://www.youtube.com/@RAMYEONPOE
+build_hub: null
+live_status_url: null
+
+disposition: public
+
+games: [poe1]
+primary_language: ko
+
+specialties:
+  - meme_builds
+  - off_meta_experiments
+
+style_tags:
+  - novelty
+  - entertainment_first
+  - collaborative
+
+style_notes: |
+  Longstanding Korean novelty-build channel. Channel explicitly disclaims
+  responsibility for losses from following its builds. Collaborates with creator
+  Eirikeiken. Community-texture creator rather than a guide creator — useful for
+  pointing players toward off-meta thinking and understanding what the game's
+  design space allows, not for efficient progression. PoE 2 coverage is plausible
+  given the channel's PoE focus, but not confirmed in 2025-2026 data. Currently
+  scoped to poe1; promote to poe2 once 0.5 activity verified.
+
+transmits:
+  - edge: miss_economy
+    confidence: 0.7
+    note: "Running deliberately bad builds develops a healthy sense of what failure actually costs."
+  - edge: option_value_vs_face_value
+    confidence: 0.55
+    note: "Meme builds frequently expose non-obvious synergies that mainstream play ignores."

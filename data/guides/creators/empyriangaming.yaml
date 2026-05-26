@@ -1,0 +1,62 @@
+schema_version: 1
+handle: empyriangaming
+display_name: Empyrian
+
+channels:
+  youtube: https://www.youtube.com/@empyriangaming
+  twitch: https://www.twitch.tv/empyriangaming
+home_url: https://www.youtube.com/@empyriangaming
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/empyriangaming
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - endgame_farming
+  - currency_strategies
+  - economic_retrospectives
+  - sanctum_trials
+  - league_phase_optimization
+
+style_tags:
+  - clinical
+  - math_forward
+  - economy_first
+  - retrospective_format
+  - long_form
+
+style_notes: |
+  PoE 1's most analytical farming voice; the patterns transfer to PoE 2.
+  His signature format is the "I made X divines / mirrors farming this way"
+  retrospective — narrated as a sequence of decisions, with the math shown.
+  Doubles as economic case-study material because the framing is always
+  "this is what the league looked like, this is what I read, this is what I
+  did about it."
+
+  Surface when the player wants to understand endgame economy, is choosing
+  what to farm, or needs to understand which farms actually scale with
+  investment versus which look profitable but plateau. His Sanctum content
+  carries over especially well to PoE 2 Trials.
+
+transmits:
+  - edge: currency_velocity
+    confidence: 0.9
+    note: "Reads which orbs are flowing where; his retrospectives lead with this"
+  - edge: flow_anticipation
+    confidence: 0.85
+    note: "Forward-looking calls — what farms will mature, what crashes — are his signature"
+  - edge: market_timing
+    confidence: 0.85
+    note: "Treats charts as accumulation/distribution phases, not snapshots"
+  - edge: option_value_vs_face_value
+    confidence: 0.8
+    note: "Explicit about the difference between price and what an item enables"
+  - edge: league_phase_awareness
+    confidence: 0.85
+    note: "Week-by-week farming strategy explicitly framed as a function of phase"
+  - edge: investing_vs_gambling
+    confidence: 0.75
+    note: "Distinguishes calculated EV farms from hope-based ones repeatedly"

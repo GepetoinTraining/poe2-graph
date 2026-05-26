@@ -1,0 +1,44 @@
+schema_version: 1
+handle: ghazzy
+display_name: Ghazzy
+
+channels:
+  youtube: https://www.youtube.com/@TheGhazzyTV
+  twitch: https://www.twitch.tv/ghazzytv
+build_hub: https://www.poe-vault.com/builds
+live_status_url: https://decapi.me/twitch/uptime/ghazzytv
+home_url: null
+
+disposition: public         # public | opted_out
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - minions
+  - summoner
+  - build_guides
+  - endgame
+  - league_starter
+
+style_tags:
+  - thorough
+  - technical
+  - long_form
+  - explains_the_why
+
+style_notes: |
+  Long-form video guides with build mechanics explained step by step.
+  Strong on summoner archetypes. Good first stop when a player is learning
+  a minion build cold.
+
+# Edges this creator transmits well, per our edge taxonomy. Confidence is
+# our assessment of how well they teach that edge, not a measure of their
+# own skill. Updated as players validate or contradict.
+transmits:
+  - edge: investing_vs_gambling
+    confidence: 0.7
+    note: "Explicit about budget tiers per build phase"
+  - edge: league_phase_awareness
+    confidence: 0.6
+    note: "Pacing notes per league stage in his leaguestarter guides"

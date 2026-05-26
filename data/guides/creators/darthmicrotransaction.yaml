@@ -1,0 +1,46 @@
+schema_version: 1
+handle: darthmicrotransaction
+display_name: DarthMicrotransaction
+
+channels:
+  twitch: https://www.twitch.tv/darthmicrotransaction
+  youtube: https://www.youtube.com/c/DarthMicrotransaction
+home_url: https://www.twitch.tv/darthmicrotransaction
+build_hub: https://www.poebuilds.cc/poe2/author/DarthMicrotransaction%20TV/
+live_status_url: https://decapi.me/twitch/uptime/darthmicrotransaction
+
+disposition: public
+
+games: [poe2]
+primary_language: en
+
+specialties:
+  - league_start
+  - daily_progression
+  - accessible_builds
+  - grind_documentation
+
+style_tags:
+  - casual
+  - high_volume
+  - daily_schedule
+  - grind_realistic
+
+style_notes: |
+  Daily-streaming ARPG generalist (PoE 2 primary) with a large following.
+  Streams daily at 11am PST with near-constant PoE 2 content; content skews
+  toward showing the grind as it actually happens rather than edited guide-form.
+  Peak 46k viewers (Jan 2025). Not a deep theorycrafter, but excellent for
+  players who want to see how realistic league progression unfolds day-by-day,
+  including currency decisions and gear transitions made under time pressure.
+
+transmits:
+  - edge: currency_velocity
+    confidence: 0.65
+    note: "Daily-grind streaming surfaces real spending and saving cadence naturally."
+  - edge: league_phase_awareness
+    confidence: 0.65
+    note: "Multi-day streams document early-to-late phase gear transitions live."
+  - edge: time_budget_calibration
+    confidence: 0.6
+    note: "Consistent schedule and visible session lengths model realistic play-time budgeting."

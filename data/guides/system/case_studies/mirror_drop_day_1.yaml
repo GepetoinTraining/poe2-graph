@@ -1,0 +1,102 @@
+# Case study: Mirror drops on league day 1.
+#
+# Scoring is multi-dimensional. A player can show good posture but bad
+# market reading. Tag bumps apply per dimension hit, not per scenario.
+# Default bump per dimension hit is +0.4 (asymptotic).
+
+schema_version: 1
+id: mirror_drop_day_1
+guide: mirror_handling_v1
+edge_tags:
+  - posture_under_drop
+  - option_value_vs_face_value
+  - market_timing
+  - league_phase_awareness
+
+prerequisites: []
+estimated_time: "10-15 min conversation"
+
+setup:
+  scenario: |
+    Player drops a Mirror of Kalandra on day 1 of the new league. Adrenaline
+    is up. Trade chat is full of week-1 fire-sale prices. The player's first
+    instinct is "sell now, I'm rich."
+  live_data:
+    source: poe.ninja
+    needed: "Mirror of Kalandra price chart for current league (24-72h window)"
+    hint: "Look for the accumulation-vs-distribution pattern and volume direction."
+  player_state: |
+    Emotional, low information. Likely undervalues both the item and the
+    ceiling-change it represents for their build.
+
+decision_point: |
+  Player wants to list the Mirror immediately at the visible trade price.
+  What do you tell them?
+
+scoring_dimensions:
+  - dimension: secured_the_item
+    edge: posture_under_drop
+    check: |
+      Did the player name "put it in stash, breathe, sleep on it" before any
+      market action? A "yes" requires the player to articulate a delay, not
+      just agree when prompted.
+
+  - dimension: read_the_chart
+    edge: market_timing
+    check: |
+      Did the player identify the chart as showing accumulation vs distribution,
+      or did they read the price as a single snapshot? "It's at 9k" is a miss;
+      "volume's been falling for 3 days while price held — that's distribution"
+      is a hit.
+
+  - dimension: read_the_volume
+    edge: volume_reading
+    check: |
+      Did the player explicitly notice volume direction, not just price level?
+      They should mention "rising price on falling volume = sellers exhausted"
+      or similar.
+
+  - dimension: named_a_floor
+    edge: patient_pricing
+    check: |
+      Did the player name a minimum acceptable price they wouldn't go below,
+      or did they accept "whatever it sells for"? Naming a floor — even a
+      conservative one — counts as a hit.
+
+  - dimension: considered_option_value
+    edge: option_value_vs_face_value
+    check: |
+      Did the player reframe the Mirror as "what ceiling does this enable for
+      my build" rather than "how much is the Mirror worth"? A hit requires
+      naming an item or item tier the Mirror could mirror.
+
+claude_response_template: |
+  1. Acknowledge the drop honestly. "That's a real moment. Don't list yet."
+  2. Pull the chart. Walk through accumulation vs distribution out loud.
+  3. Show the volume mismatch. Name it.
+  4. Reframe: "Not how much, but what ceiling does this buy."
+  5. Assign: 72-hour hold, list-above-market when ready, return to discuss
+     what gear ceiling they're chasing in the meantime.
+  6. Note the follow-up. "Come back in 72 hours and tell me what happened."
+
+tag_bumps_per_dimension_hit: 0.4
+tag_bumps_per_dimension_miss: 0.0
+
+follow_up:
+  delay_hours: 72
+  prompt: |
+    "You were going to wait 72 hours on that Mirror. How did it go? Did you
+    actually wait? Did you check the chart in between? Did you think about
+    ceiling, or did the price-anchoring win?"
+  bumps_on_actual_wait:
+    - edge: posture_under_drop
+      delta: 0.3
+    - edge: patient_pricing
+      delta: 0.2
+  bumps_on_actual_sale_at_floor:
+    - edge: patient_pricing
+      delta: 0.4
+
+attribution:
+  author: claude+pedro (seed)
+  source: "Pedro's mirror-trade-up history; conversational extract 2026-05-26"

@@ -1,0 +1,75 @@
+schema_version: 1
+handle: belton
+display_name: BeltonPoE / James Belton
+
+channels:
+  twitch: https://www.twitch.tv/beltonpoe
+  youtube: https://www.youtube.com/@BeltonPoE
+home_url: https://www.twitch.tv/beltonpoe
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/beltonpoe
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - mirror_crafting
+  - economy
+  - high_end_crafting
+  - meta_crafts
+  - mirror_tier_items
+  - market_analysis
+
+style_tags:
+  - analytical
+  - crafting_specialist
+  - economy_specialist
+  - reference_quality
+  - pedro_endorsed
+
+style_notes: |
+  Canadian streamer. Public reputation in the PoE community: "The Most
+  Prolific Mirror Crafter and Economy Focused Creator in Path of Exile's
+  History." Streaming since 2021-07-21. PoE 2 active through 0.5 patch
+  cycle. All-time peak 4,274 concurrent viewers (2024-01-20).
+
+  This is the canonical mirror-crafter voice. Where Empyrian teaches
+  endgame *farming* economy, Belton teaches the *very-top-end crafting*
+  economy — the mechanics, the math, and the patience of producing items
+  at the divine-to-mirror tier. Surface when: player asks about high-end
+  crafting, has accumulated enough wealth to consider a mirror-tier
+  project, wants to understand how mirror items get made (and why they
+  cost what they do), or needs to learn the discipline of expensive
+  multi-stage crafts where mistakes are punishing.
+
+  His content is reference-quality for the niche. For players still in
+  the campaign or early mapping, Belton is aspirational — calibrate
+  against time budget + peak wealth tier before recommending.
+
+transmits:
+  - edge: miss_economy
+    confidence: 0.95
+    note: "Mirror-tier crafts ARE the canonical miss-distribution math problem; he models it explicitly"
+  - edge: investing_vs_gambling
+    confidence: 0.9
+    note: "Distinguishes EV-positive multi-stage crafts from gambling indistinguishable from each other"
+  - edge: option_value_vs_face_value
+    confidence: 0.9
+    note: "Mirror-tier items are pure option value; his framing of 'what does this enable' is the canonical version"
+  - edge: market_timing
+    confidence: 0.85
+    note: "Listing and timing of mirror-tier items demands market-cycle awareness"
+  - edge: currency_velocity
+    confidence: 0.8
+    note: "High-end crafting consumes currency at scale; he reads the flow continuously"
+  - edge: patient_pricing
+    confidence: 0.85
+    note: "Mirror-tier listings cannot be fire-sold; patience is structural to the niche"
+  - edge: downside_discipline
+    confidence: 0.85
+    note: "Multi-stage crafts force explicit halt-or-push reasoning at every fork"
+  - edge: marginal_capability_thinking
+    confidence: 0.7
+    note: "Capability-per-cost reasoning at the upper bound of the cost axis"

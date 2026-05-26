@@ -1,0 +1,53 @@
+schema_version: 1
+handle: professorlih
+display_name: ProfessorLih (Escola do Exilado)
+
+channels:
+  youtube: https://www.youtube.com/@EscolaDoExilado
+  twitch: https://www.twitch.tv/professorlih
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/professorlih
+home_url: null
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: pt-br
+
+specialties:
+  - beginner_education
+  - atlas_progression
+  - mechanics_explanation
+  - league_prep
+  - build_overview
+
+style_tags:
+  - pedagogical
+  - beginner_friendly
+  - structured
+  - portuguese
+  - long_form
+
+style_notes: |
+  ProfessorLih runs Escola do Exilado ("School of the Exile"), self-described as
+  the largest PT-BR beginner-focused PoE channel. He streams Tuesday–Saturday at
+  20h BRT on Twitch and uploads edited guides to YouTube under the @EscolaDoExilado
+  handle. His style is classroom-first: videos are named like lesson plans ("11 Things
+  Beginners NEED to Know", "Everything About Atlas and Voidstones", "Complete Path of
+  Building Guide for Beginners"). He covers both PoE 1 and PoE 2, with confirmed 0.5
+  Return of the Ancients coverage published May 2026. Well suited for players who need
+  a structured on-ramp to game mechanics, atlas pathing, and reading the economy before
+  their first serious league. Live streams mix gameplay with open Q&A.
+
+transmits:
+  - edge: time_budget_calibration
+    confidence: 0.75
+    note: "Explicitly teaches how to sequence early league decisions — what to do in acts, what to do first in maps"
+  - edge: league_phase_awareness
+    confidence: 0.80
+    note: "Prep guides keyed to pre-league, league launch, and mid-league windows"
+  - edge: playstyle_authenticity
+    confidence: 0.65
+    note: "Encourages players to understand their own learning pace and not copy builds blindly"
+
+evidence_url: https://www.youtube.com/watch?v=rNG3FdUuksQ

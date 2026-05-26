@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>poe2-graph — Goals &amp; Guides Subspec v0.1</title>
+<style>
+:root {
+  --bg: #0e0e10;
+  --fg: #e8e6df;
+  --muted: #8a877d;
+  --accent: #c89968;
+  --rule: #2a2820;
+  --code-bg: #15140f;
+  --code-fg: #d6c895;
+  --warn: #b8674a;
+  --link: #8aaedb;
+  --good: #7ea878;
+}
+* { box-sizing: border-box; }
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', serif;
+  font-size: 16px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 0;
+}
+body { max-width: 760px; margin: 0 auto; padding: 56px 32px 96px; }
+header { border-bottom: 1px solid var(--rule); margin-bottom: 32px; padding-bottom: 20px; }
+header h1 { font-size: 28px; letter-spacing: 0.01em; margin: 0 0 6px; font-weight: 500; }
+header .meta { color: var(--muted); font-size: 13px; font-family: ui-monospace, monospace; }
+header .meta span + span::before { content: " · "; color: var(--rule); padding: 0 6px; }
+h2 { font-size: 18px; font-weight: 500; margin: 40px 0 12px; color: var(--accent); border-bottom: 1px solid var(--rule); padding-bottom: 6px; }
+h3 { font-size: 15px; font-weight: 500; margin: 24px 0 8px; }
+h4 { font-size: 13px; font-weight: 600; margin: 16px 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+p { margin: 8px 0 14px; }
+code { font-family: ui-monospace, monospace; font-size: 13px; background: var(--code-bg); color: var(--code-fg); padding: 1px 5px; border-radius: 2px; }
+pre { background: var(--code-bg); color: var(--code-fg); padding: 14px 16px; border-radius: 3px; overflow-x: auto; font-size: 12.5px; line-height: 1.5; margin: 12px 0; border-left: 2px solid var(--accent); }
+pre code { background: transparent; padding: 0; }
+a { color: var(--link); text-decoration: none; border-bottom: 1px dotted var(--rule); }
+ul, ol { padding-left: 22px; margin: 8px 0 14px; }
+li { margin: 4px 0; }
+table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--muted); font-weight: 500; }
+td code { font-size: 12px; }
+.callout { border-left: 3px solid var(--accent); padding: 12px 16px; margin: 16px 0; background: rgba(200,153,104,0.05); font-size: 14px; }
+.callout.warn { border-color: var(--warn); background: rgba(184,103,74,0.06); }
+.callout.good { border-color: var(--good); background: rgba(126,168,120,0.05); }
+.callout h4 { margin: 0 0 6px; color: var(--accent); }
+.callout.warn h4 { color: var(--warn); }
+.callout.good h4 { color: var(--good); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 32px 0; }
+.tag { display: inline-block; font-family: ui-monospace, monospace; font-size: 11px; padding: 1px 6px; border: 1px solid var(--rule); color: var(--muted); border-radius: 2px; margin-left: 6px; }
+.matrix { font-family: ui-monospace, monospace; font-size: 12px; }
+.matrix td { padding: 12px; vertical-align: top; }
+.matrix th { padding: 6px 12px; font-family: 'Iowan Old Style', serif; }
+.matrix .cell-title { color: var(--accent); margin-bottom: 6px; }
+footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; font-family: ui-monospace, monospace; }
+</style>
+</head>
+<body>
+
+<header>
+<h1>poe2-graph — goals &amp; guides subspec</h1>
+<div class="meta">
+  <span>v0.1</span>
+  <span>2026-05-26</span>
+  <span>pedro + claude (web)</span>
+  <span>for handoff to claude code</span>
+</div>
+</header>
+
+<section>
+<h2>0. Thesis</h2>
+
+<p><strong>The greatest advantage a player has in PoE is not mechanics, it is knowledge.</strong> A player with two leagues of accumulated economic understanding outearns a player with twice their hours but no model of <em>when items are cheap, when they're expensive, what ebbs and flows when, and what farm is the next profitable one</em>. The "1% structurally cheating" community accusation is wrong about the mechanism but right that there's an information gap. The gap is real, and it's transmissible.</p>
+
+<p>This subspec describes the two systems that turn the <code>poe2-graph</code> skill from a build-construction tool into a <strong>transmissible model of the meta-game</strong>. Goals capture what the player wants; guides capture the edge they need to get there. Both compose across two scopes (cross-league durable, in-league situational) and route to a central knowledge store on the player's side that, over time, becomes shareable back to the community.</p>
+
+<div class="callout good">
+<h4>The architectural inversion</h4>
+<p>Every existing knowledge product in PoE is one-to-many: a wiki publishes, many players consume. This system is <strong>many-to-many through the player</strong>. Each player accumulates their own model in their <code>EXILE/</code> directory. The good models become curatable into shareable artifacts later. The skill is the substrate; the player is the author; the community is the eventual harvest.</p>
+</div>
+</section>
+
+<section>
+<h2>1. The four-cell composition</h2>
+
+<p>Goals and guides each split along scope (cross-league vs in-league) and compose orthogonally:</p>
+
+<table class="matrix">
+<tr><th></th><th>Cross-league (durable)</th><th>In-league (situational)</th></tr>
+<tr>
+  <th>GOALS</th>
+  <td>
+    <div class="cell-title">Player goals</div>
+    "Hit Mirror tier this year"<br>
+    "Main HC for three leagues"<br>
+    "Learn to craft my own gear"<br>
+    Lives in <code>PLAYER.md</code>
+  </td>
+  <td>
+    <div class="cell-title">League goals</div>
+    "Finish Atlas questline"<br>
+    "Farm Breach to ilvl 80"<br>
+    "Get to T15 in 2 weeks"<br>
+    Lives in <code>LEAGUE_&lt;id&gt;.md</code>
+  </td>
+</tr>
+<tr>
+  <th>GUIDES</th>
+  <td>
+    <div class="cell-title">System guides</div>
+    Atlas pathing, trade engagement,<br>
+    crafting orders, currency flow,<br>
+    league-phase pricing patterns<br>
+    Lives in <code>data/guides/system/</code>
+  </td>
+  <td>
+    <div class="cell-title">Character guides</div>
+    This build's leveling tree,<br>
+    gear breakpoints, ascendancy timing,<br>
+    endgame transitions<br>
+    Lives in <code>CHARACTER_&lt;slug&gt;.md</code>
+  </td>
+</tr>
+</table>
+
+<p>Each cell has its own author, rate of change, storage location, and consumer. They compose at query time into responses no static guide could produce — because no static guide knows <em>this</em> player, <em>this</em> league, <em>this</em> character all at once.</p>
+</section>
+
+<section>
+<h2>2. The edge taxonomy</h2>
+
+<p>System guides transmit <strong>edge</strong> — postures, patterns, and timing knowledge that separate skilled players from beginners. Edge is not mechanics; mechanics are on the wiki. Edge is what experienced players have internalized but doesn't fit in a how-to.</p>
+
+<p>Each piece of edge gets a tag in <code>knows.poe2.&lt;edge_name&gt;</code> in <code>PLAYER.md</code>, with confidence in <code>[0, 1)</code> per the asymptotic bump rule. The starting set:</p>
+
+<table>
+<tr><th>Edge tag</th><th>What it is</th><th>How it's checked</th></tr>
+<tr>
+  <td><code>market_timing</code></td>
+  <td>Reading price charts as accumulation/distribution phases, not snapshots. Knowing the league has rhythms.</td>
+  <td>Case study: present a chart, ask "buy, sell, or hold, and why."</td>
+</tr>
+<tr>
+  <td><code>volume_reading</code></td>
+  <td>Volume direction leads price. Rising price on falling volume = top. Rising price on rising volume = real.</td>
+  <td>Case study: chart with volume mismatch, ask what they read.</td>
+</tr>
+<tr>
+  <td><code>league_phase_awareness</code></td>
+  <td>Week 1, 2, 4, post-month, end-of-league have completely different optimal strategies and prices.</td>
+  <td>Conversation: "we're week 2 — what should be cheap, what should be expensive, why."</td>
+</tr>
+<tr>
+  <td><code>currency_velocity</code></td>
+  <td>Which orbs are flowing out of circulation. Leading indicator for what's about to crash.</td>
+  <td>Case study with poe.ninja data: which currency is draining, what does that mean.</td>
+</tr>
+<tr>
+  <td><code>option_value_vs_face_value</code></td>
+  <td>Mirrors aren't 9k Divines. They're <em>the ability to make a trade most players never make</em>. Some items have option value beyond their cash price.</td>
+  <td>Mirror-drop scenario: "what's this worth, and what does worth mean."</td>
+</tr>
+<tr>
+  <td><code>downside_discipline</code></td>
+  <td>Stop crafting at first sellable outcome. Sunk-cost is the new player's bleed. Halt-and-list beats push-through.</td>
+  <td>Craft scenario: "you hit +3 Cold instead of +3 Projectile. What now."</td>
+</tr>
+<tr>
+  <td><code>miss_economy</code></td>
+  <td>Calculate expected value across the miss distribution, not just hit probability. Craft selection is itself a function of miss-value.</td>
+  <td>Multi-craft scenario: choose between two crafts, justify by full distribution.</td>
+</tr>
+<tr>
+  <td><code>patient_pricing</code></td>
+  <td>List above market, wait 24-48h, find the right buyer. Fire-sale pricing donates value to flippers.</td>
+  <td>Listing scenario: player names price, claude shows market median, asks for reasoning.</td>
+</tr>
+<tr>
+  <td><code>investing_vs_gambling</code></td>
+  <td>Knowing the difference between a craft with calculated EV and a craft you're rolling on hope.</td>
+  <td>Craft scenario with hidden EV — does the player do the math or feel the math.</td>
+</tr>
+<tr>
+  <td><code>flow_anticipation</code></td>
+  <td>What farm becomes profitable next. Reading what builds will mature into needing what items, two weeks ahead.</td>
+  <td>Forward-looking: "given the meta two weeks in, what's about to become demanded."</td>
+</tr>
+<tr>
+  <td><code>posture_under_drop</code></td>
+  <td>The discipline of <em>not</em> selling immediately after a big drop. Securing the item, sleeping on it, thinking about ceiling-changes.</td>
+  <td>The Mirror-drop case study. "Kid drops a Mirror — what's the conversation."</td>
+</tr>
+<tr>
+  <td><code>negotiation_posture</code></td>
+  <td>Mirror-tier trades happen in messages, not click-buy. How to signal, how to verify, how to counteroffer.</td>
+  <td>Roleplay a trade negotiation in chat.</td>
+</tr>
+</table>
+
+<p>This list grows. New edges discovered during play become new tags. The skill is allowed to <strong>recognize an edge the player demonstrated that wasn't yet in the taxonomy</strong> and propose adding it. Curation is collaborative.</p>
+
+<div class="callout">
+<h4>Categories beyond the economic frame</h4>
+<p>The seed twelve edges above are economy- and crafting-weighted because that's where the spec started. The taxonomy is general; edges can be <em>psychological</em>, <em>social</em>, or <em>identity</em> too. Now in the taxonomy: <code>time_budget_calibration</code>, <code>aspirational_calibration</code> (admire vs mimic), <code>playstyle_authenticity</code>. The psychological category resists the "optimize the fun out" failure mode — players adopting strategies designed for someone else's life and burning out by week three. Seed case study: <code>found_fubgun_excitement</code> in <code>playstyle_calibration_v1</code>.</p>
+</div>
+
+<div class="callout">
+<h4>Why this taxonomy is not a curriculum</h4>
+<p>Edges are not learned in order. A new player might absorb <code>posture_under_drop</code> the first day from a single Mirror drop conversation, and still not get <code>currency_velocity</code> after a year. Confidence accumulates per-edge, independently. The skill recommends what edge to work on next based on the player's stated goals, not a fixed sequence.</p>
+</div>
+</section>
+
+<section>
+<h2>3. The case-study format</h2>
+
+<p>System guides transmit edge through <strong>case studies</strong>, not quizzes. A case study is a scenario where the player makes a decision and Claude responds with what an experienced player would do and why, anchored against live market data where possible.</p>
+
+<h3>Anatomy of a case study</h3>
+
+<pre><code>{
+  "id": "mirror_drop_day_1",
+  "edge_tags": ["posture_under_drop", "option_value_vs_face_value",
+                "market_timing", "league_phase_awareness"],
+  "prerequisites": [],
+  "estimated_time": "10-15min conversation",
+
+  "setup": {
+    "scenario": "Player drops a Mirror of Kalandra on league day 1.",
+    "live_data": "poe.ninja Mirror price chart for current league",
+    "player_state": "Likely emotional, low information"
+  },
+
+  "decision_point": "Player wants to sell immediately. What do you tell them?",
+
+  "scoring_dimensions": [
+    {
+      "dimension": "secured_the_item",
+      "edge": "posture_under_drop",
+      "check": "Did the player name 'put it in stash, breathe' before any market action?"
+    },
+    {
+      "dimension": "read_the_chart",
+      "edge": "market_timing",
+      "check": "Did the player identify the accumulation/distribution pattern,
+                or did they read price as a snapshot?"
+    },
+    {
+      "dimension": "read_the_volume",
+      "edge": "volume_reading",
+      "check": "Did the player notice volume direction, or just price level?"
+    },
+    {
+      "dimension": "named_a_floor",
+      "edge": "patient_pricing",
+      "check": "Did the player name a minimum acceptable price, or just 'whatever it sells for'?"
+    },
+    {
+      "dimension": "considered_option_value",
+      "edge": "option_value_vs_face_value",
+      "check": "Did the player ask 'what does the Mirror let me do' versus
+                'how much is the Mirror worth'?"
+    }
+  ],
+
+  "claude_response_template": "Show the chart. Walk through accumulation
+    vs distribution. Show volume mismatch. Reframe: 'not how much, but
+    what ceiling does this enable for your build'. Assign: 72-hour wait,
+    list-above-market, return to discuss what gear ceiling they're chasing.",
+
+  "tag_bumps_per_dimension_hit": 0.4,
+  "tag_bumps_per_dimension_miss": 0.0,
+  "follow_up_after_72h": "Did they actually wait? Did they read volume
+    daily? Did they think about ceiling? Bump posture_discipline accordingly."
+}</code></pre>
+
+<p>The case study lives as a JSON or YAML file in <code>data/guides/system/case_studies/</code>. The author (us, or a curated community contributor) writes the scoring dimensions and the response template. The skill renders the scenario, presents it to the player, scores their response across the dimensions, and applies tag bumps proportional to how many dimensions they hit.</p>
+
+<div class="callout good">
+<h4>Case studies are dual-purpose, not catalog-only</h4>
+<p>A small seed corpus (the three guides × three case studies, ~9 total) serves two purposes that collapse: it <strong>teaches Claude the shape</strong>, and it <strong>publishes the canonical examples</strong>. Beyond the seed, Claude improvises case-study-flavored moments from real player situations using the same schema — a transient case-study object built at conversation time, scored in-conversation, applied via the same bump machinery. When an improvised case proves itself generalisable, it becomes the seed for a NEW canonical case-study YAML (the curation path in §7). The catalog grows from authored seeds → community contributions → promoted Claude-improvisations. Authoring effort stays bounded; the long tail handles itself.</p>
+</div>
+
+<h3>Critical properties of case studies</h3>
+
+<ul>
+  <li><strong>Anchored against live data when possible.</strong> The Mirror case study uses today's chart. Claude can call the existing MCP server (sergeyklay/poe2-mcp-server) for current poe.ninja prices, render the actual chart, and ground the conversation in real numbers.</li>
+  <li><strong>Multi-dimensional scoring.</strong> A case study never has one right answer. It has several dimensions of correct thinking. A player can show good posture but bad market reading, or vice versa. Tag bumps per dimension, not per scenario.</li>
+  <li><strong>The follow-up is part of the case study.</strong> "Come back in 72 hours and tell me what happened" is the test of whether the lesson stuck. The skill schedules a follow-up note that surfaces at the next session: "you were going to wait 72 hours on that Mirror, how did it go?"</li>
+  <li><strong>Tag bumps are conservative.</strong> Hitting one dimension is +0.4 (asymptotic), not +1. It takes multiple case studies on the same edge to build genuine confidence. The skill is humble by construction.</li>
+</ul>
+</section>
+
+<section>
+<h2>4. GUIDES.xml — the composable index</h2>
+
+<p>Same shape as <code>EXILE.xml</code>: generated from source files at session start, loaded into Claude's context, queryable as relational data. Skeleton:</p>
+
+<pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;guides&gt;
+  &lt;system_guide id="mirror_handling_v1"
+                game="poe2" version="0.5.0"
+                last_updated="2026-05-26"
+                difficulty="advanced"&gt;
+    &lt;topic&gt;Mirror-tier drop handling&lt;/topic&gt;
+    &lt;summary&gt;What to do when you drop a Mirror of Kalandra — secure,
+      read the chart, reframe to option value, patient pricing.&lt;/summary&gt;
+
+    &lt;transmits&gt;
+      &lt;edge name="posture_under_drop"/&gt;
+      &lt;edge name="option_value_vs_face_value"/&gt;
+      &lt;edge name="market_timing"/&gt;
+      &lt;edge name="patient_pricing"/&gt;
+    &lt;/transmits&gt;
+
+    &lt;case_studies&gt;
+      &lt;case_study id="mirror_drop_day_1"/&gt;
+      &lt;case_study id="mirror_drop_week_3"/&gt;
+      &lt;case_study id="mirror_for_item_trade"/&gt;
+    &lt;/case_studies&gt;
+
+    &lt;creators&gt;
+      &lt;creator handle="ben_" role="posture_primary"
+               url="https://twitch.tv/ben_"
+               note="HC stream, demonstrates patience and analytical posture"/&gt;
+      &lt;creator handle="empyriangaming" role="economy_supplement"
+               url="https://youtube.com/@empyriangaming"
+               note="endgame economic reasoning"/&gt;
+    &lt;/creators&gt;
+
+    &lt;prerequisites&gt;
+      &lt;edge name="market_timing" min_confidence="0.3"/&gt;
+    &lt;/prerequisites&gt;
+  &lt;/system_guide&gt;
+
+  &lt;creator handle="ben_"&gt;
+    &lt;full_name&gt;Ben_&lt;/full_name&gt;
+    &lt;platform_primary&gt;twitch&lt;/platform_primary&gt;
+    &lt;home_url&gt;https://twitch.tv/ben_&lt;/home_url&gt;
+    &lt;disposition&gt;public&lt;/disposition&gt;
+    &lt;transmits&gt;
+      &lt;edge name="posture_under_drop" confidence="0.95"/&gt;
+      &lt;edge name="downside_discipline" confidence="0.9"/&gt;
+      &lt;edge name="patient_pricing" confidence="0.85"/&gt;
+    &lt;/transmits&gt;
+    &lt;style_tags&gt;
+      &lt;tag name="quietly_analytical"/&gt;
+      &lt;tag name="no_hype"/&gt;
+      &lt;tag name="hardcore_focus"/&gt;
+    &lt;/style_tags&gt;
+    &lt;player_disposition section="prefers" name="ben_" confidence="0.0"/&gt;
+  &lt;/creator&gt;
+
+  &lt;character_guide id="storm_main_leveling_aldur"
+                   character_id="storm_main"
+                   league_id="aldur"
+                   covers="leveling 1-80, gear breakpoints, ascendancy timing"
+                   src="EXILE/CHARACTER_storm_main.md"/&gt;
+&lt;/guides&gt;</code></pre>
+
+<h3>Key elements</h3>
+
+<table>
+<tr><th>Element</th><th>Purpose</th></tr>
+<tr><td><code>&lt;system_guide&gt;</code></td><td>One topic of edge transmission. References case studies, creators, and prerequisites. Versioned per game patch.</td></tr>
+<tr><td><code>&lt;creator&gt;</code></td><td>First-class entity. Has style tags, transmits-which-edges declaration, and per-player disposition. Opt-out via <code>&lt;disposition&gt;opted_out&lt;/disposition&gt;</code>.</td></tr>
+<tr><td><code>&lt;case_study&gt;</code></td><td>Reference to a case-study file. Each guide has multiple — different scenarios that exercise the same edges.</td></tr>
+<tr><td><code>&lt;character_guide&gt;</code></td><td>Reference to a per-character markdown file. Personal, lives in EXILE, not shared.</td></tr>
+<tr><td><code>&lt;prerequisites&gt;</code></td><td>Edges with minimum confidence required to engage this guide. The skill checks the player's tags before offering.</td></tr>
+</table>
+</section>
+
+<section>
+<h2>5. Goals — cross-league and in-league</h2>
+
+<p>Goals are the player's stated intentions. They're written, never inferred. The skill prompts the player to articulate them; the skill does not assume them.</p>
+
+<h3>Player goals (cross-league)</h3>
+
+<p>Stored in <code>PLAYER.md</code> under a <code>player_goals:</code> frontmatter key. Each goal has structure:</p>
+
+<pre><code>player_goals:
+  - id: mirror_tier_year
+    statement: "Hit Mirror tier this year"
+    created: 2026-05-26
+    type: economic           # economic | mechanical | knowledge | identity
+    horizon: years            # leagues | months | years
+    measurable: true
+    measure: "Net worth in Mirrors at any point >= 1"
+    related_edges: [market_timing, currency_velocity, flow_anticipation]
+    progress: 0.0             # asymptotic; updated by Claude per session
+
+  - id: main_hc_three_leagues
+    statement: "Main hardcore for three consecutive leagues"
+    type: identity
+    horizon: leagues
+    measurable: true
+    measure: "3 consecutive leagues with HC characters as primary"
+    related_edges: [downside_discipline, posture_under_drop]
+    progress: 0.0
+</code></pre>
+
+<h3>League goals (in-league)</h3>
+
+<p>Stored in <code>LEAGUE_&lt;id&gt;.md</code> under a <code>league_goals:</code> frontmatter key. Same structure, scoped to one league:</p>
+
+<pre><code>league_goals:
+  - id: atlas_complete
+    statement: "Finish the full Atlas questline"
+    type: mechanical
+    measurable: true
+    measure: "Atlas questline marked complete in-game"
+    deadline: "league_week_3"
+    progress: 0.0
+
+  - id: breach_t80
+    statement: "Farm Breach to item level 80"
+    type: economic
+    related_edges: [flow_anticipation, market_timing]
+    deadline: "league_week_2"
+    progress: 0.0
+</code></pre>
+
+<h3>Goal composition with guides</h3>
+
+<p>This is where the system earns its keep. A player asks "what should I do tonight." Claude composes:</p>
+
+<ol>
+  <li>Pull active league goals. Filter by deadline proximity and current progress.</li>
+  <li>Pull related edges from each goal. Cross-reference player's edge confidence.</li>
+  <li>Identify the lowest-confidence edge that's most-prerequisite to the highest-priority goal.</li>
+  <li>Find a system guide that transmits that edge.</li>
+  <li>Find a case study within that guide that matches the player's current situation.</li>
+  <li>If the player has high <code>prefers.deliberate_practice</code>, propose the case study.</li>
+  <li>If not, embed the lesson in normal conversation about tonight's plan.</li>
+</ol>
+
+<p>The result: <strong>tonight's recommended action is derived from cross-league identity goals, in-league tactical goals, edge-confidence gaps, and personality preferences — composed live</strong>. No static guide can do this because no static guide knows the player's edge confidences.</p>
+
+<h3>Cross-axis goal-goal composition</h3>
+
+<p>League goals should ladder to player goals. The skill checks: does this league's goals contribute to any cross-league goal? If a player's cross-league goal is "Hit Mirror tier this year" and their league goal is "Speedfarm T15s by week 2," those ladder cleanly. If their cross-league goal is "Main HC for three leagues" and their league goal is "Push deepest Sanctum delve," the skill can flag the friction — Sanctum delving is high-risk, HC discipline argues against it. The skill names the tension; the player decides.</p>
+</section>
+
+<section>
+<h2>6. The character-guide layer</h2>
+
+<p>Character guides are per-character, per-life documents living in <code>EXILE/CHARACTER_&lt;slug&gt;.md</code>. They are the <em>source of truth</em>; the <code>.build</code> file is the rendered output the game ingests.</p>
+
+<h3>Structure</h3>
+
+<pre><code>---
+character_id: storm_main
+class: Sorceress
+ascendancy: Stormweaver
+league: aldur
+status: active
+
+# Build identity
+archetype: crit_freeze_spark_stormweaver
+core_skill: Spark
+core_keystone: null              # or "Ancestral Bond" if dual-spec totem
+ascendancy_choice_set_1: Stormweaver
+ascendancy_choice_set_2: null    # for dual-spec characters
+
+# Economic plan
+gear_breakpoints:
+  - level: 50
+    description: "First +Lightning Skills wand, ~5 div budget"
+    estimated_cost_div: 5
+  - level: 70
+    description: "Call of the Brotherhood ring for cold conversion"
+    estimated_cost_div: 15
+  - level: 85
+    description: "Mirror-tier endgame chest"
+    estimated_cost_div: 200
+
+# Progression milestones
+milestones:
+  - id: cruel_complete
+    target_level: 35
+    actual_level: null
+  - id: maps_started
+    target_level: 65
+    actual_level: null
+  - id: pinnacle_attempted
+    target_level: 90
+    actual_level: null
+
+# Pacing notes (Claude's reasoning, player can edit)
+pacing_notes:
+  - "Don't transition to CoC Comet until 75% spell crit chain"
+  - "Hold off on Brotherhood until after Sigil of Power node"
+
+# Related goals (cross-reference)
+contributes_to_league_goals: [atlas_complete, breach_t80]
+contributes_to_player_goals: [mirror_tier_year]
+---
+
+# Free-form notes
+</code></pre>
+
+<h3>Generation flow</h3>
+
+<p>Character guide → <code>.build</code> file is one-way generation. When the character guide changes (new milestone hit, breakpoint reached, league context shifts), the <code>.build</code> regenerates. The <code>.build</code> never feeds back to the character guide — it's a projection of the guide into the game's render layer.</p>
+
+<p>This means the character guide can carry things the <code>.build</code> format can't express: economic plans, pacing notes, cross-references to goals, the <em>reasoning</em> behind choices. Claude reads the guide when explaining "why is this build's tree shaped this way" — the answer is in the guide, not the <code>.build</code>.</p>
+</section>
+
+<section>
+<h2>7. The longtail — durable knowledge accumulation</h2>
+
+<p>The structural payoff of this system is what happens over many leagues.</p>
+
+<h3>Per-player accumulation</h3>
+
+<p>Each league:</p>
+<ul>
+  <li>New <code>LEAGUE_&lt;id&gt;.md</code> with that league's goals</li>
+  <li>New <code>CHARACTER_&lt;slug&gt;.md</code> for each character played</li>
+  <li>Edge confidences in <code>PLAYER.md</code> accumulate across leagues</li>
+  <li>Case studies run during play deposit tag bumps</li>
+  <li>Creator dispositions sharpen — who the player likes, who they ignore</li>
+</ul>
+
+<p>By league 3, the player has a substantial <code>PLAYER.md</code> reflecting actual learned edge. By league 6, the skill is recommending edge-work targeted at the player's specific gaps. By league 10, the player's PLAYER.md is itself a document with genuine value — a record of their development as a PoE player that the next league's conversations build on.</p>
+
+<h3>Curation back to community</h3>
+
+<p>The long arc: <strong>some players develop excellent edge models</strong>. Their PLAYER.md and accumulated case studies become candidates for community curation. The skill provides export tools:</p>
+
+<ul>
+  <li><code>exile.export_anonymous_edge_model()</code> — produce a sanitized version of the player's tag confidences and approach notes, account-free</li>
+  <li><code>exile.export_case_study_authored_by_player(id)</code> — publish a case study the player wrote based on their own play</li>
+  <li>Community-curated case studies enter the shared <code>data/guides/system/case_studies/</code> with attribution</li>
+</ul>
+
+<p>This is the path from many private models to a few curated public ones. The community harvests the best examples; the skill ships those examples as new case studies to new players. <strong>The player who taught themselves market_timing the hard way now transmits that lesson to fifty players in one league.</strong></p>
+
+<div class="callout good">
+<h4>Why this is the durable model</h4>
+<p>Existing PoE knowledge products break because they're authored top-down by experts and consumed by beginners — and experts forget what was hard. The skill flips this: knowledge accumulates <em>through</em> the player who's currently learning. The hardest-won edge is the most transmissible, because the player who just learned it remembers exactly what tripped them up. The community curation step harvests <em>recently-learned</em> edge, which is much more teachable than expert-tacit edge.</p>
+</div>
+</section>
+
+<section>
+<h2>8. Module surface</h2>
+
+<p>What Claude Code needs to implement in <code>guides.py</code>:</p>
+
+<pre><code># Index management
+guides.compose_guides_xml() -> str
+guides.write_guides_xml() -> Path
+
+# System guide queries
+guides.system_guides_for_edge(edge: str) -> list[SystemGuide]
+guides.system_guides_for_goal(goal_id: str) -> list[SystemGuide]
+guides.system_guides_at_difficulty(level: str) -> list[SystemGuide]
+
+# Case study lifecycle
+guides.case_study_load(id: str) -> CaseStudy
+guides.case_study_present(cs: CaseStudy, live_data: dict) -> str  # renders scenario
+guides.case_study_score(cs: CaseStudy, player_response: str) -> dict[str, bool]
+guides.case_study_apply_bumps(cs: CaseStudy, scoring: dict, fm: dict) -> dict
+guides.case_study_schedule_followup(cs: CaseStudy, hours: int) -> None
+
+# Creator management
+guides.creator_load(handle: str) -> Creator
+guides.creator_set_disposition(handle: str, disposition: str) -> None  # public | opted_out
+guides.creators_who_transmit(edge: str) -> list[Creator]
+guides.creators_matching_player(player_fm: dict, edge: str) -> list[Creator]
+  # combines player's prefers.&lt;handle&gt; with creator's transmits
+
+# Goal management
+goals.player_goals(fm: dict) -> list[PlayerGoal]
+goals.league_goals(league_id: str) -> list[LeagueGoal]
+goals.goal_add(scope: str, goal: dict) -> None  # scope: "player" | f"league:{id}"
+goals.goal_update_progress(scope: str, id: str, delta: float) -> float
+goals.goal_friction(player_goals, league_goals) -> list[Friction]
+  # finds laddering vs conflicting goals
+goals.related_edges_for_goal(goal_id: str) -> list[str]
+
+# Composition (the keystone)
+guides.recommend_next_action(player_fm, league_fm, character_fm) -> Recommendation
+  # composes goals × edge gaps × prefs into "what to do tonight"
+
+# Curation export (post-league)
+guides.export_anonymous_edge_model(player_fm) -> dict
+guides.export_case_study_draft(player_fm, observations) -> str
+</code></pre>
+</section>
+
+<section>
+<h2>9. Directory layout</h2>
+
+<pre><code>poe2-graph/
+├── data/
+│   └── guides/
+│       ├── system/                        # community-shared
+│       │   ├── mirror_handling_v1.yaml    # system guide metadata
+│       │   ├── crafting_economy_v1.yaml
+│       │   ├── league_phase_timing_v1.yaml
+│       │   └── case_studies/
+│       │       ├── mirror_drop_day_1.yaml
+│       │       ├── plus3_amulet_miss.yaml
+│       │       ├── breach_splinter_timing.yaml
+│       │       └── ...
+│       └── creators/                       # creator profiles
+│           ├── ben_.yaml
+│           ├── empyriangaming.yaml
+│           ├── mathil.yaml
+│           └── ...
+├── EXILE/                                  # per-player, gitignored
+│   ├── PLAYER.md                           # cross-league goals here
+│   ├── LEAGUE_aldur.md                     # in-league goals here
+│   ├── CHARACTER_storm_main.md             # character guide here
+│   └── ...
+└── guides.py                               # module
+</code></pre>
+
+<p>System guides and creator profiles are versioned, community-contributable, and ship with the skill. Player goals and character guides live in the player's <code>EXILE/</code> and are sacrosanct (the updater never touches them, as the spec already documents).</p>
+</section>
+
+<section>
+<h2>10. The first three system guides to ship</h2>
+
+<p>Phase 1 ships three system guides as the seed corpus. Each one is fully authored — system_guide YAML, 2-3 case studies, creator references:</p>
+
+<div class="callout">
+<h4>v0.2 update: actual seed corpus shipped, slate revised</h4>
+<p>The originally-planned three guides were all economic. Conversation during Claude Code's implementation pass surfaced two corrections: (1) the psychological/self-awareness category was missing from the original taxonomy, and (2) upgrade pacing is a more foundational discipline edge than crafting-EV math for most players. The shipped seed corpus is now better-distributed across categories and difficulty levels.</p>
+</div>
+
+<p><strong>Seed corpus actually shipped:</strong></p>
+
+<ol>
+  <li><strong>mirror_handling_v1.yaml</strong> <span class="tag verified">difficulty: advanced</span> — case studies: <code>mirror_drop_day_1</code> (shipped), <code>mirror_drop_week_3</code> (TODO), <code>mirror_for_item_trade</code> (TODO). Transmits: <code>posture_under_drop</code>, <code>option_value_vs_face_value</code>, <code>market_timing</code>, <code>patient_pricing</code>.</li>
+  <li><strong>playstyle_calibration_v1.yaml</strong> <span class="tag verified">difficulty: foundational · psychological</span> — case studies: <code>found_fubgun_excitement</code> (shipped), <code>fourth_alt_burnout</code> (TODO), <code>trade_versus_ssf_self_test</code> (TODO), <code>endgame_aspiration_vs_campaign_friction</code> (TODO). Transmits: <code>time_budget_calibration</code>, <code>aspirational_calibration</code>, <code>playstyle_authenticity</code>.</li>
+  <li><strong>upgrade_pacing_v1.yaml</strong> <span class="tag verified">difficulty: intermediate · economic-discipline</span> — case studies: <code>mid_map_upgrade_decision</code> (shipped), <code>chase_unique_temptation</code> (TODO), <code>alt_character_pivot_economics</code> (TODO), <code>gear_floor_versus_ceiling</code> (TODO). Transmits: <code>marginal_capability_thinking</code> (the 80/100 rule), <code>investing_vs_gambling</code>, <code>downside_discipline</code>.</li>
+</ol>
+
+<p>These three guides cover the three categories of edge that matter most across the player population: <strong>psychological calibration</strong> (does the player know what they actually enjoy), <strong>upgrade-pacing discipline</strong> (does the player know how to sequence investment without stranding themselves), and <strong>rare-event handling</strong> (does the player know what to do when something materially changes their economic ceiling). Each carries one fully-authored seed case study and 2-3 TODO slots for the next pass. Other guides (Sanctum-specific, Breach-specific, Sirius-specific, crafting-EV-deep-dive, league-phase-timing) come later, often community-contributed.</p>
+
+<p>The original three-economic slate (<code>crafting_economy_v1</code>, <code>league_phase_timing_v1</code>) remains valuable and will be authored as v2 seed guides — but the v1 corpus benefits more from category breadth than economic depth, given that most player-killing mistakes happen psychologically (burning out from misaligned aspiration) or via upgrade-pacing failure (stranding mid-progress) rather than through fine-grained crafting-EV missteps.</p>
+</section>
+
+<section>
+<h2>11. What this leaves for later</h2>
+
+<ul>
+  <li><strong>Live market integration</strong> — case studies that need live poe.ninja data currently fetch via the existing MCP server. A tighter integration where the skill itself caches market state for case-study rendering is later work.</li>
+  <li><strong>Voice / video transcription for creator content</strong> — automatically clipping a YouTube video to the relevant 90 seconds where Empyrian explains map mod evaluation. Big project, not phase 1.</li>
+  <li><strong>Multi-player anonymized aggregation</strong> — looking across many players' EXILE models to identify which edges are systematically underdeveloped in the player base. Research project, requires opt-in and privacy work.</li>
+  <li><strong>Creator opt-in API</strong> — letting a creator submit their own creator profile and case study contributions directly to the skill. Community governance work, post-launch.</li>
+  <li><strong>The deliberate_practice preference detection</strong> — initial confidence 0.3, bumps based on whether player engages with offered case studies. "Decline three, stop offering" rule. Simple to implement, requires the case-study lifecycle to exist first.</li>
+</ul>
+</section>
+
+<section>
+<h2>12. Handoff to Claude Code</h2>
+
+<p>What to ask Claude Code for, in this order:</p>
+
+<ol>
+  <li><strong>The YAML schemas</strong> — read this spec, propose YAML for: a system_guide file, a case_study file, a creator profile. Get those locked down before authoring.</li>
+  <li><strong>The <code>guides.py</code> module surface</strong> — implement against the schemas. Make the module surface work end-to-end with a single seeded example (the Mirror case study) before authoring the rest.</li>
+  <li><strong>Author the three seed guides</strong> — <code>mirror_handling_v1</code>, <code>crafting_economy_v1</code>, <code>league_phase_timing_v1</code>. Each with 2-3 case studies fully written, scoring dimensions, response templates.</li>
+  <li><strong>Wire goals into existing exile.py</strong> — extend PLAYER.md and LEAGUE_*.md templates with goal frontmatter, add goal-management functions.</li>
+  <li><strong>Implement the recommend_next_action composer</strong> — the keystone. Pulls goals, edge gaps, prefs, current character state, returns a structured recommendation.</li>
+  <li><strong>Wire creator profiles into ATTRIBUTIONS.md</strong> — every creator referenced needs to be in ATTRIBUTIONS.md too, for the durable credit trail.</li>
+</ol>
+
+<p>The piece that wants careful thought before code: <strong>the case-study scoring</strong>. How does Claude actually score a player's natural-language response against scoring dimensions? Probably via embedded judgment calls — Claude reads the player's response, decides per-dimension whether they hit, applies bumps. The case study YAML carries the rubric; Claude does the assessment. No ML model, no embedding match — just structured prompting.</p>
+
+<p>Worth thinking about before implementation: how does the case-study scoring get tested? The first few are probably hand-evaluated. Later we might develop a small validation set of "known good" and "known weak" player responses to verify the scoring is consistent.</p>
+</section>
+
+<hr>
+
+<footer>
+poe2-graph goals + guides subspec v0.1 · 2026-05-26 · pedro + claude (web) · for handoff to claude code · this product isn't affiliated with or endorsed by grinding gear games in any way
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+schema_version: 1
+handle: animeprincess
+display_name: AnimePrincess
+
+channels:
+  mobalytics: https://mobalytics.gg/poe-2/profile/animeprincess
+home_url: https://mobalytics.gg/poe-2/profile/animeprincess
+build_hub: https://mobalytics.gg/poe-2/profile/animeprincess
+live_status_url: null
+
+disposition: public
+
+games: [poe2]
+primary_language: en
+
+specialties:
+  - spark_stormweaver
+  - ci_archmage
+  - leaguestarter_routing
+  - stunmancer_endgame
+  - verified_builds
+
+style_tags:
+  - thorough
+  - accessible
+  - leaguestart_oriented
+  - mobalytics_featured
+  - community_women
+
+style_notes: |
+  Author of the most-favorited Spark Stormweaver leaguestarter guide for
+  0.5 on Mobalytics. Specializes in Stormweaver and CI Archmage variants
+  with a leaguestart-to-endgame routing focus. "Verified" status on her
+  builds (she actually plays them to high level, not just designs them).
+
+  Surface when player is league-starting Sorceress / Stormweaver,
+  specifically for Spark, or wants a thorough verified leaguestarter rather
+  than a creative off-meta build. Style is accessible to players who want
+  a recipe to follow without needing to invent.
+
+transmits:
+  - edge: league_phase_awareness
+    confidence: 0.75
+    note: "Leaguestart-to-endgame routing is explicitly phase-aware"
+  - edge: marginal_capability_thinking
+    confidence: 0.6
+    note: "Gear breakpoint guidance frames upgrades by what they unlock"
+  - edge: aspirational_calibration
+    confidence: 0.55
+    note: "Mobalytics 'verified' tag means the build is actually achievable, not theoretical"

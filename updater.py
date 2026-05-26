@@ -19,7 +19,7 @@ import json
 import re
 import shutil
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
@@ -31,6 +31,12 @@ VERSION_PATH = ROOT / "VERSION"
 
 USER_AGENT = "poe2-graph-updater/0.1 (https://github.com/GepetoinTraining/poe2-graph)"
 
+# poe-tool-dev maintains a serverless poller that hits GGG's patch server
+# every minute and writes the current version to a single file. Currently
+# tracks PoE 1; PoE 2 coverage TBD. License: MIT.
+# https://github.com/poe-tool-dev/latest-patch-version
+GAME_VERSION_URL = "https://raw.githubusercontent.com/poe-tool-dev/latest-patch-version/main/latest.txt"
+
 # Files the updater preserves across skill updates. Pattern matching is shallow:
 # exact directory names + glob-style patterns checked against root-relative paths.
 PROTECTED_PATHS = (
@@ -39,6 +45,8 @@ PROTECTED_PATHS = (
     "LEAGUE_*.md",
     "CHARACTER_*.md",
     "data/poe2db_cache/",  # cache is regeneratable, but no point wiping it on skill update
+    "tools/",              # bundled forks (submodules) — managed by `git submodule`, not by skill update
+    "config.yaml",         # user-edited config — Claude reads, never silently overwrites
 )
 
 
@@ -68,13 +76,20 @@ def _fetch_json(url: str, timeout: int = 15) -> dict:
     return json.loads(_fetch_text(url, timeout=timeout))
 
 
-def _github_api_latest_commit(repo_url: str) -> Optional[str]:
-    """Return the SHA of the default branch's tip. None on failure."""
+def _fork_name_from_url(repo_url: str) -> Optional[str]:
+    """Extract 'owner/repo' from a GitHub URL. None on parse failure."""
     m = re.match(r"https://github\.com/([^/]+)/([^/]+?)(?:\.git)?/?$", repo_url)
     if not m:
         return None
-    owner, name = m.group(1), m.group(2)
-    api_url = f"https://api.github.com/repos/{owner}/{name}/commits?per_page=1"
+    return f"{m.group(1)}/{m.group(2)}"
+
+
+def _github_api_latest_commit(repo_url: str) -> Optional[str]:
+    """Return the SHA of the default branch's tip. None on failure."""
+    fork = _fork_name_from_url(repo_url)
+    if not fork:
+        return None
+    api_url = f"https://api.github.com/repos/{fork}/commits?per_page=1"
     try:
         data = _fetch_json(api_url)
     except Exception:
@@ -113,10 +128,17 @@ class StalenessReport:
     passive_tree: SourceStatus
     atlas_tree: SourceStatus
     poe2db_cache_age_days: Optional[float]
+    upstream_game_version: Optional[str] = None  # from poe-tool-dev/latest-patch-version
+    tool_submodules: list[SourceStatus] = field(default_factory=list)
 
     @property
     def any_stale(self) -> bool:
-        return self.skill.stale or self.passive_tree.stale or self.atlas_tree.stale
+        return (
+            self.skill.stale
+            or self.passive_tree.stale
+            or self.atlas_tree.stale
+            or any(s.stale for s in self.tool_submodules)
+        )
 
 
 def check_skill_version() -> SourceStatus:
@@ -148,6 +170,154 @@ def check_data_source(key: str) -> SourceStatus:
     )
 
 
+def latest_game_version() -> Optional[str]:
+    """Fetch the current PoE patch version from poe-tool-dev/latest-patch-version.
+
+    Returns the version string (e.g. "3.28.0.10") or None on failure. Currently
+    tracks PoE 1 only; PoE 2 coverage is upstream-pending.
+    """
+    try:
+        return _fetch_text(GAME_VERSION_URL, timeout=10).strip()
+    except Exception:
+        return None
+
+
+# ----- tool submodules -----
+
+def _parse_gitmodules(gm_path: Optional[Path] = None) -> list[tuple[str, str, str]]:
+    """Return [(name, path, url), ...] from .gitmodules.
+
+    `name` is the submodule path used as the section identifier (e.g. 'tools/pob-poe2').
+    Returns empty list if no .gitmodules file or no submodules registered.
+    """
+    gm = gm_path if gm_path is not None else ROOT / ".gitmodules"
+    if not gm.exists():
+        return []
+    import configparser
+    cp = configparser.ConfigParser()
+    try:
+        cp.read(gm, encoding="utf-8")
+    except Exception:
+        return []
+    out: list[tuple[str, str, str]] = []
+    for section in cp.sections():
+        m = re.match(r'^submodule "([^"]+)"$', section)
+        if not m:
+            continue
+        name = m.group(1)
+        path = cp.get(section, "path", fallback=name)
+        url = cp.get(section, "url", fallback="")
+        out.append((name, path, url))
+    return out
+
+
+def check_tool_submodule(name: str, path: str, url: str) -> SourceStatus:
+    """Check one submodule's local HEAD against its upstream default branch."""
+    abs_path = ROOT / path
+    if not abs_path.exists() or not any(abs_path.iterdir() if abs_path.is_dir() else []):
+        return SourceStatus(
+            name=name,
+            local_ref="(not initialized)",
+            remote_ref=None,
+            stale=False,
+            note="submodule registered but not yet cloned — run `git submodule update --init`",
+        )
+
+    rc, out, _ = _run(["git", "-C", str(abs_path), "rev-parse", "HEAD"])
+    if rc != 0 or not out.strip():
+        return SourceStatus(
+            name=name,
+            local_ref="(unknown)",
+            remote_ref=None,
+            stale=False,
+            note="could not read local HEAD",
+        )
+    local = out.strip()
+
+    remote = _github_api_latest_commit(url) if url else None
+    stale = remote is not None and remote != local
+    return SourceStatus(
+        name=name,
+        local_ref=local,
+        remote_ref=remote,
+        stale=stale,
+        note="remote unreachable" if remote is None else "",
+    )
+
+
+def check_tool_submodules() -> list[SourceStatus]:
+    return [check_tool_submodule(name, path, url) for (name, path, url) in _parse_gitmodules()]
+
+
+def update_tool_submodule(name: str, path: str, url: str) -> tuple[bool, str]:
+    """Pull origin's default branch into the submodule's local checkout.
+
+    Returns (changed, message). changed=True if the local HEAD moved.
+    Uses `git fetch origin` + `git reset --hard origin/HEAD` — assumes the
+    submodule is meant to track origin's default branch (the standard
+    `git submodule update --remote` semantics).
+    """
+    abs_path = ROOT / path
+    if not abs_path.exists():
+        return False, f"submodule path {path} not found"
+
+    rc, before_out, _ = _run(["git", "-C", str(abs_path), "rev-parse", "HEAD"])
+    if rc != 0:
+        return False, "could not read pre-pull HEAD"
+    before = before_out.strip()
+
+    rc, _, err = _run(["git", "-C", str(abs_path), "fetch", "origin"])
+    if rc != 0:
+        return False, f"git fetch failed: {err.strip()}"
+
+    rc, _, err = _run(["git", "-C", str(abs_path), "reset", "--hard", "origin/HEAD"])
+    if rc != 0:
+        return False, f"git reset failed: {err.strip()}"
+
+    rc, after_out, _ = _run(["git", "-C", str(abs_path), "rev-parse", "HEAD"])
+    after = after_out.strip() if rc == 0 else "?"
+
+    if before == after:
+        return False, "no change"
+    return True, f"{before[:8]} → {after[:8]}"
+
+
+def sync_fork_from_upstream(fork_repo: str) -> tuple[bool, str]:
+    """Run `gh repo sync` to update one of our forks from its upstream parent.
+
+    `fork_repo` is the 'owner/repo' string (e.g. 'GepetoinTraining/NeverSink-Filter-for-PoE2').
+    `gh repo sync` auto-detects the parent; no explicit --source needed.
+
+    Returns (changed, message). changed=True if the fork moved.
+    Requires `gh` CLI authenticated with repo scope.
+    """
+    rc, out, err = _run(["gh", "repo", "sync", fork_repo])
+    text = (out + err).strip()
+    if rc != 0:
+        return False, f"gh repo sync failed: {text}"
+    # gh prints either "✓ Synced the ... branch..." (changed) or "✓ Branch ... is already up to date" (no change)
+    changed = "already up to date" not in text.lower() and "synced" in text.lower()
+    return changed, text
+
+
+def update_all_tool_submodules(sync_upstream: bool = True) -> list[tuple[str, bool, str, Optional[tuple[bool, str]]]]:
+    """Update every submodule. Returns list of (name, local_changed, local_msg, sync_result).
+
+    If sync_upstream=True, first `gh repo sync` each fork from its parent before pulling.
+    sync_result is None when sync_upstream=False, else (sync_changed, sync_msg).
+    """
+    out: list[tuple[str, bool, str, Optional[tuple[bool, str]]]] = []
+    for (name, path, url) in _parse_gitmodules():
+        sync_result: Optional[tuple[bool, str]] = None
+        if sync_upstream:
+            fork = _fork_name_from_url(url)
+            if fork:
+                sync_result = sync_fork_from_upstream(fork)
+        local_changed, local_msg = update_tool_submodule(name, path, url)
+        out.append((name, local_changed, local_msg, sync_result))
+    return out
+
+
 def poe2db_cache_age_days() -> Optional[float]:
     cache = DATA_DIR / "poe2db_cache"
     if not cache.exists():
@@ -165,6 +335,8 @@ def report() -> StalenessReport:
         passive_tree=check_data_source("passive_tree"),
         atlas_tree=check_data_source("atlas_tree"),
         poe2db_cache_age_days=poe2db_cache_age_days(),
+        upstream_game_version=latest_game_version(),
+        tool_submodules=check_tool_submodules(),
     )
 
 
@@ -285,6 +457,19 @@ def _format_report(r: StalenessReport) -> str:
     else:
         marker = "STALE" if age > 1.0 else "ok"
         lines.append(f"  {marker:5s} poe2db_cache    age={age:.1f}d  (24h TTL)")
+    if r.upstream_game_version:
+        lines.append(f"  --    game_version    upstream={r.upstream_game_version}  (poe-tool-dev/latest-patch-version, PoE 1 only)")
+    else:
+        lines.append(f"  --    game_version    (upstream unreachable)")
+    if r.tool_submodules:
+        lines.append("")
+        lines.append("  Bundled forks (tools/):")
+        for s in r.tool_submodules:
+            marker = "STALE" if s.stale else "ok"
+            local_short = (s.local_ref or "")[:8] if s.local_ref else "?"
+            remote_short = (s.remote_ref or "?")[:8] if s.remote_ref else "?"
+            note = f"  [{s.note}]" if s.note else ""
+            lines.append(f"    {marker:5s} {s.name:24s}  local={local_short}  remote={remote_short}{note}")
     return "\n".join(lines)
 
 
@@ -297,6 +482,9 @@ def main() -> None:
     sub.add_parser("update-skill", help="pull latest skill code from our GitHub repo")
     sub.add_parser("invalidate-cache", help="wipe the poe2db.tw cache")
     sub.add_parser("update-all", help="run skill update + data update + cache invalidate")
+    pt = sub.add_parser("update-tools", help="pull each tool submodule's latest (default: also sync forks from upstream)")
+    pt.add_argument("--no-sync-upstream", action="store_true", help="skip gh repo sync; only pull origin into submodules")
+    pt.add_argument("--only", type=str, help="comma-sep submodule paths to scope")
     args = p.parse_args()
 
     if args.cmd == "status":
@@ -317,6 +505,21 @@ def main() -> None:
             print(f"{key}: {'changed' if changed else 'no change'}")
         n = invalidate_poe2db_cache()
         print(f"removed {n} cached page(s)")
+    elif args.cmd == "update-tools":
+        only = {s.strip() for s in args.only.split(",")} if args.only else None
+        sync_upstream = not args.no_sync_upstream
+        for (name, path, url) in _parse_gitmodules():
+            if only is not None and name not in only and path not in only:
+                continue
+            if sync_upstream:
+                fork = _fork_name_from_url(url)
+                if fork:
+                    s_changed, s_msg = sync_fork_from_upstream(fork)
+                    suffix = " (CHANGED)" if s_changed else ""
+                    print(f"  sync {fork}: {s_msg}{suffix}")
+            l_changed, l_msg = update_tool_submodule(name, path, url)
+            suffix = " (CHANGED)" if l_changed else ""
+            print(f"  pull {name}: {l_msg}{suffix}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,58 @@
+schema_version: 1
+handle: ben_
+display_name: Ben_
+
+channels:
+  twitch: https://www.twitch.tv/ben_
+  youtube: https://www.youtube.com/@BenZou
+home_url: https://www.twitch.tv/ben_
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/ben_
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - hardcore
+  - long_term_HC_streak
+  - analytical_play
+  - patient_decision_making
+
+style_tags:
+  - quiet_analytical
+  - no_hype
+  - no_tilt
+  - HC_focused
+  - posture_primary
+
+style_notes: |
+  Multi-league HC streak streamer. Quietly analytical voice — never hypes,
+  rarely tilts, narrates decisions as he makes them. Doesn't run build guides
+  in the tutorial sense; the value is the posture and reasoning he models
+  in real time. The canonical "watch him for an hour" creator for any player
+  who's panicking after a big drop, considering HC for the first time, or
+  recently lost a character and needs to see patient analytical play
+  demonstrated rather than explained.
+
+  His edge is shape, not content. Don't recommend him as a build resource;
+  recommend him when the player needs to see how the discipline of waiting
+  + thinking actually looks.
+
+transmits:
+  - edge: posture_under_drop
+    confidence: 0.95
+    note: "The canonical demonstration — composure on big finds, no fire-sale instinct"
+  - edge: downside_discipline
+    confidence: 0.9
+    note: "HC context forces clean halt-and-list reasoning at every fork"
+  - edge: patient_pricing
+    confidence: 0.85
+    note: "Lists above market, waits, sees the right buyer find him"
+  - edge: time_budget_calibration
+    confidence: 0.65
+    note: "HC discipline as a function of hours-available; he models the honest version"
+  - edge: marginal_capability_thinking
+    confidence: 0.7
+    note: "HC forces 80/100-rule thinking; he articulates why an upgrade does or doesn't clear"

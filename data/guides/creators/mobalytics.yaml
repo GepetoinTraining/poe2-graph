@@ -1,0 +1,32 @@
+schema_version: 1
+handle: mobalytics
+display_name: Mobalytics
+
+channels: {}
+home_url: https://mobalytics.gg/poe-2
+build_hub: https://mobalytics.gg/poe-2/builds
+live_status_url: null
+
+disposition: public
+
+games: [poe2]
+primary_language: en
+
+specialties:
+  - meta_builds
+  - build_database
+  - leveling_trees
+  - league_starter
+
+style_tags:
+  - aggregator
+  - multi_author
+  - structured_stages
+
+style_notes: |
+  Aggregator/database site, not a single author. Build pages have
+  structured stages (campaign → maps → bossing → endgame) and editable
+  filter tags. Good when the player has narrowed to a specific skill
+  and wants a tested template.
+
+transmits: []

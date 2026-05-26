@@ -1,0 +1,45 @@
+schema_version: 1
+handle: lengjing_poe2lens
+display_name: 棱镜 (Prism / poe2lens)
+
+channels:
+  bilibili: https://space.bilibili.com/35110142
+home_url: https://poe2lens.com
+build_hub: https://poe2lens.com
+live_status_url: null
+
+disposition: public
+
+games: [poe2]
+primary_language: zh-cn
+
+specialties:
+  - starter_builds
+  - season_guides
+  - build_verification
+
+style_tags:
+  - curated
+  - verified_builds
+  - menu_format
+  - documentation_first
+
+style_notes: |
+  Emphasises pre-vetted reliability — 0.5 season video explicitly frames
+  five build recommendations as "经过验证" (verified). Selection-focused rather
+  than theorycrafting: for each build, covers early smoothness, late-game
+  ceiling, and unique-item dependencies. Companion site poe2lens.com suggests
+  a documentation-first orientation. ~160k Bilibili followers. QQ community
+  group 760119732 is active for Q&A. Good entry point for CN players who want
+  a seasonal menu rather than deep theory.
+
+transmits:
+  - edge: option_value_vs_face_value
+    confidence: 0.7
+    note: "Emphasis on build selection by actual ceiling vs stated tier encourages evaluating optionality before committing."
+  - edge: league_phase_awareness
+    confidence: 0.65
+    note: "Season-start framing of each guide implicitly models early vs late league build viability."
+  - edge: aspirational_calibration
+    confidence: 0.6
+    note: "Budget-tiered build presentation helps players match ambition to realistic gear access."

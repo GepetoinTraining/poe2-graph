@@ -1,0 +1,47 @@
+schema_version: 1
+handle: miz4ry
+display_name: みざりー (Mizarii)
+
+channels:
+  twitch: https://www.twitch.tv/miz4ry
+  youtube: https://www.youtube.com/channel/UCvGQ6Se8KO9UO8wLPCuWVww
+home_url: https://www.twitch.tv/miz4ry
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/miz4ry
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: ja
+
+specialties:
+  - ladder_racing
+  - poe2_patch_analysis
+  - huntress_twister
+
+style_tags:
+  - competitive
+  - live_analysis
+  - twitch_partner
+  - daily_streamer
+
+style_notes: |
+  #1 most-watched Japanese-language PoE 2 Twitch streamer as of May 2026.
+  Ladder-focused competitor who reached top-100 approximately 100 times in
+  PoE 1 and is actively climbing PoE 2 ladder with live patch-note analysis
+  sessions. Streams PoE 2 daily (210 hours in the last 30 days; peak 356
+  viewers, average 77). Tests builds live rather than publishing polished
+  guides — ideal for players who learn by watching skilled decision-making
+  under real constraints. Twitch Partner since around 2021; PoE 1 ladder
+  pedigree makes their PoE 2 judgments credible.
+
+transmits:
+  - edge: flow_anticipation
+    confidence: 0.8
+    note: "Ladder racing requires reading which encounters give the most XP/currency per time unit — transmitted through live decision narration."
+  - edge: time_budget_calibration
+    confidence: 0.75
+    note: "Competitive ladder context forces explicit trade-offs between speed and safety that beginners rarely articulate."
+  - edge: league_phase_awareness
+    confidence: 0.7
+    note: "Ladder competitor necessarily tracks which phase of the league they are in and adjusts accordingly."

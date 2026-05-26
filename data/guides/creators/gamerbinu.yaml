@@ -1,0 +1,39 @@
+schema_version: 1
+handle: gamerbinu
+display_name: 게이머비누 (Gamerbinu)
+
+channels:
+  youtube: https://www.youtube.com/c/GamerBinu
+home_url: https://www.youtube.com/c/GamerBinu
+build_hub: https://www.youtube.com/playlist?list=PL3r2pyNdOdJeKv6HQDEWt1MM0ZBxwDzys
+live_status_url: https://www.youtube.com/c/GamerBinu/streams
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: ko
+
+specialties:
+  - league_start_builds
+  - build_contest_curation
+  - arpg_generalist
+
+style_tags:
+  - approachable
+  - mid_tier_guide
+  - community_curated
+
+style_notes: |
+  Korean generalist ARPG YouTuber (82K+ subs) who covers PoE and PoE 2 build
+  contests and league-start guides alongside Diablo 4 content. Has organized
+  community build contests (e.g. a 10-divine budget contest for Necropolis
+  that landed on PoB Archives). Kakao Games partnership for the 0.4 Huntress
+  update confirms active PoE 2 collaboration through at least April 2025.
+
+transmits:
+  - edge: aspirational_calibration
+    confidence: 0.65
+    note: "Budget-capped build contests train players to work within realistic currency constraints rather than copying ultra-wealthy setups."
+  - edge: league_phase_awareness
+    confidence: 0.6
+    note: "League-start framing implicitly teaches phase-specific gear priorities."

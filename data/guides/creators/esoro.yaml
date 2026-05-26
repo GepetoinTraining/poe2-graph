@@ -1,0 +1,50 @@
+schema_version: 1
+handle: esoro
+display_name: Esoro
+
+channels:
+  youtube: https://www.youtube.com/@Esoro
+  twitch: https://www.twitch.tv/esoro
+home_url: https://www.youtube.com/@Esoro
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/esoro
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - damage_theorycraft
+  - max_dps_videos
+  - skill_optimization
+  - mechanical_ceiling_research
+
+style_tags:
+  - theorycraft_first
+  - dps_focused
+  - reference_only
+  - poe1_dominant
+
+style_notes: |
+  Pure damage theorycraft — "max DPS this skill" content is his archetype.
+  Most useful as a reference for what the mechanical ceiling of a given
+  skill looks like, not as a build-to-follow (his configurations are
+  often unrealistic for mid-game players).
+
+  Catalog entry is provisional / reference-only. Surface when player has
+  asked specifically about the upper bound of a skill's damage potential
+  or wants to understand which skill mechanics scale infinitely vs. cap
+  out. Pair with a more grounded creator (Ghazzy, Empyrian, Subtractem)
+  for actually achievable versions.
+
+transmits:
+  - edge: marginal_capability_thinking
+    confidence: 0.55
+    note: "DPS theorycraft is capability-per-cost analysis at the mechanical ceiling"
+  - edge: option_value_vs_face_value
+    confidence: 0.45
+    note: "Identifies which mechanical interactions scale better than face-value would suggest"
+  - edge: aspirational_calibration
+    confidence: 0.35
+    note: "Risk of mis-calibration — his builds are aspirational ceiling, rarely achievable directly"

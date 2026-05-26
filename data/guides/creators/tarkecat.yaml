@@ -1,0 +1,45 @@
+schema_version: 1
+handle: tarkecat
+display_name: TarkeCat
+
+channels:
+  twitch: https://www.twitch.tv/tarkecat
+  youtube: https://www.youtube.com/c/TarkeCat
+home_url: https://www.twitch.tv/tarkecat
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/tarkecat
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - off_meta_builds
+  - game_philosophy
+  - baeclast_podcast
+  - community_discourse
+
+style_tags:
+  - analytical
+  - articulate
+  - conversational
+  - candid
+
+style_notes: |
+  Co-host of Baeclast (PoE's flagship community podcast). Streams "hipster"
+  off-meta builds; best source for game-philosophy and meta-critique discussion.
+  Excels at explaining WHY something works or fails rather than just presenting
+  what to copy. Baeclast episodes with GGG developers (e.g. Chris Wilson) are an
+  exceptional resource for design-intent understanding.
+
+transmits:
+  - edge: playstyle_authenticity
+    confidence: 0.85
+    note: "Hipster-build ethos explicitly centres playing what you enjoy over meta-chasing."
+  - edge: aspirational_calibration
+    confidence: 0.75
+    note: "Frequently discusses realistic expectations for non-meta choices."
+  - edge: option_value_vs_face_value
+    confidence: 0.65
+    note: "Off-meta build analysis requires understanding what a gear slot is actually worth for your specific archetype."

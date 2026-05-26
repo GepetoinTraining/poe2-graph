@@ -1,0 +1,36 @@
+schema_version: 1
+handle: mathil
+display_name: Mathil
+
+channels:
+  youtube: https://www.youtube.com/@MathilTV
+  twitch: https://www.twitch.tv/mathil1
+live_status_url: https://decapi.me/twitch/uptime/mathil1
+build_hub: null
+home_url: null
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - crazy_builds
+  - uniques
+  - build_diversity
+  - bossing
+
+style_tags:
+  - fast_paced
+  - demonstrates_viability
+  - less_explicit_teaching
+
+style_notes: |
+  Off-meta unique-driven builds. Fast play; less teaching, more
+  demonstrating that an idea works. Best after the player has the basics
+  and wants permission to try weird things.
+
+transmits:
+  - edge: option_value_vs_face_value
+    confidence: 0.7
+    note: "Uses uniques others overlook; demonstrates non-face-value choices"

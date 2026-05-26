@@ -1,0 +1,54 @@
+schema_version: 1
+handle: fubgun
+display_name: Fubgun
+
+channels:
+  twitch: https://www.twitch.tv/fubgun
+  youtube: https://www.youtube.com/@fubgun
+  mobalytics: https://mobalytics.gg/poe-2/profile/fubgun
+home_url: https://www.twitch.tv/fubgun
+build_hub: https://mobalytics.gg/poe-2/profile/fubgun
+live_status_url: https://decapi.me/twitch/uptime/fubgun
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - deadeye
+  - ranger
+  - ice_shot
+  - speedclear
+  - fast_mapping
+  - endgame_optimization
+
+style_tags:
+  - optimized
+  - fast_paced
+  - big_number_focused
+  - speedclearing
+  - mobalytics_partner
+
+style_notes: |
+  Ranger / Deadeye specialist. Ice Shot variants, speedclearing endgame
+  mapping. Fast, optimized, big-number-focused playstyle. Style is more
+  "watch how fast this can go" than tutorial, though his builds are
+  followable.
+
+  Surface when player is on Ranger / Deadeye, wants speedclearing playstyle,
+  or wants to understand what fast-mapping looks like at the optimization
+  ceiling. Caveat: speedclearing demands the gear and the muscle memory; a
+  player following Fubgun without that will feel slow and conclude the
+  build is bad. The skill should know that.
+
+transmits:
+  - edge: marginal_capability_thinking
+    confidence: 0.65
+    note: "Speedclear forces explicit reasoning about which upgrades actually unlock more pack-clearing"
+  - edge: league_phase_awareness
+    confidence: 0.6
+    note: "Build pacing assumes endgame-mapping phase; he's clear about when the build comes online"
+  - edge: flow_anticipation
+    confidence: 0.55
+    note: "Optimization mindset means he sees which gear breakpoints will become demanded"

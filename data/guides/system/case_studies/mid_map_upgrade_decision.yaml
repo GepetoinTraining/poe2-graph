@@ -1,0 +1,166 @@
+# Case study: the mid-map upgrade decision.
+#
+# A player at their comfortable farm tier (T6 in PoE 2 endgame terms) has hit a
+# currency milestone and is staring at a real upgrade that would consume most
+# of their liquid. The instinct is to buy. The lesson is that the SEQUENCE of
+# investment — patience, ratio thinking, reserve preservation — matters more
+# than the magnitude of any single upgrade.
+#
+# This is the third seed case study, alongside mirror_drop_day_1 (rare upper-end
+# economic discipline) and found_fubgun_excitement (psychological calibration).
+# Together they cover three different categories of edge at three difficulty
+# levels — a better seed distribution than the originally-planned three-economic
+# slate.
+
+schema_version: 1
+id: mid_map_upgrade_decision
+guide: upgrade_pacing_v1
+edge_tags:
+  - marginal_capability_thinking
+  - investing_vs_gambling
+  - downside_discipline
+
+prerequisites: []
+estimated_time: "8-10 min conversation"
+
+setup:
+  scenario: |
+    Player is mapping at T6 (or whatever the current "comfortable farm" tier is
+    for them — substitute as needed). They've just hit ~25 chaos liquid. They've
+    been eyeing a wand / weapon / chest upgrade that costs ~20 chaos. The
+    upgrade is real — it would noticeably improve clear speed or survivability —
+    and the price is fair.
+
+    Their instinct: "I have 25c, the upgrade is 20c, let's buy it and push
+    higher tier."
+  live_data: null
+    # No external data needed; this case study runs on the player's words.
+  player_state: |
+    Mid-grind, item-want anchoring active. Has not yet articulated the
+    capability gain in concrete terms, hasn't separated operational reserve
+    from "currency in stash," and hasn't considered whether the alternative is
+    to keep farming the current tier for another session and upgrade with
+    breathing room.
+
+decision_point: |
+  Player says some version of "I just hit 25c. There's a [wand] for 20c that's
+  a real upgrade. Should I buy it?"
+
+  What do you tell them?
+
+scoring_dimensions:
+  - dimension: named_the_capability_gain
+    edge: marginal_capability_thinking
+    check: |
+      Did the player articulate what the upgrade ENABLES — specific content,
+      specific breakpoint, specific bottleneck removed? Hits: "I'll clear T6
+      30% faster and can move to T7" / "I'll stop dying to phys reflect" / "my
+      Spirit allocation opens up the next gem level." Misses: "more damage" /
+      "it's better" / "shinier." Capability is what you can newly DO, not how
+      a number changes.
+
+  - dimension: named_the_reserve
+    edge: marginal_capability_thinking
+    check: |
+      Did the player account for what they need to KEEP RUNNING after the
+      purchase? Maps, scrolls, sustain currency, accident fund, next-upgrade
+      budget? Hits: "after this I'll have 5c, which doesn't cover map sustain
+      tonight." / "I need at least 8c reserve to keep mapping." Misses: no
+      mention of reserve; treats stash currency as fully fungible with the
+      upgrade.
+
+  - dimension: did_the_arithmetic
+    edge: investing_vs_gambling
+    check: |
+      Did the player do explicit math, not vibes? Hits: "If I buy now I have
+      5c, can't sustain. If I farm 50 more T6 maps that's ~2-3 hours and ~15c,
+      I'd have 40c → 20c upgrade → 20c reserve. That's an extra session of
+      headroom for one session of patience." Misses: no math; "feels worth it."
+
+  - dimension: considered_sequenced_alternative
+    edge: marginal_capability_thinking
+    check: |
+      Did the player consider whether the same currency split across 2-3
+      smaller upgrades might be better than one big purchase? The answer can
+      legitimately be "no, the big one is the right move" — but the
+      consideration must be explicit. Hit: "I could grab a 5c amulet upgrade
+      first, gets me halfway, leaves cash for the wand later." Miss: no
+      mention of alternative sequencing.
+
+  - dimension: invoked_the_80_100_rule
+    edge: marginal_capability_thinking
+    check: |
+      Did the player explicitly weigh: "this upgrade costs 80% of my liquid; is
+      it giving me 80%+ more capability"? Conscious accept (the upgrade really
+      does clear the bar) and conscious reject (it doesn't quite) both hit.
+      Unconscious "I'll just buy it" misses.
+
+claude_response_template: |
+  1. Don't gate the purchase. The player isn't asking permission; they're
+     asking for calibration. Walk them through the calibration; they decide.
+
+  2. Ask the capability question, concrete. "What does this upgrade let you do
+     that you can't do now? Name the content, the boss, the bottleneck." If
+     they answer "more damage," push: "more damage to what, doing what."
+
+  3. Ask the reserve question. "After you spend 20c, what's left? What does
+     your engine need to keep running tonight — maps, scrolls, the random alch
+     or chaos for crafting? Map sustain at T6 burns ~3-5c per session."
+
+  4. Walk the arithmetic out loud. "Buy now: 5c left, engine half-stalled.
+     Farm 50 more maps: ~3 hours, ~15c gained, total 40c, buy → 20c left,
+     engine fed, can chase the next thing." Make the trade visible.
+
+  5. Offer the 80/100 frame, plain. "Rule of thumb: don't spend 80% of your
+     liquid on a single upgrade unless that upgrade delivers 80% more
+     capability. This wand — is it doubling your kill speed and opening T9, or
+     is it 30% more damage on a build that already kills fine? If it's the
+     latter, it's luxury, not leverage."
+
+  6. Don't say no. Say "here's the trade." The player keeps agency. The point
+     is calibration, not protection.
+
+  7. If it applies, surface the sequenced alternative. "Could you grab a 5c
+     amulet that does half the work and leaves you cash for the wand next
+     session?"
+
+tag_bumps_per_dimension_hit: 0.4
+tag_bumps_per_dimension_miss: 0.0
+
+follow_up:
+  delay_hours: 24
+  prompt: |
+    "Yesterday you were eyeing that upgrade. What did you decide, and how did
+    it feel tonight? Did you have enough sustain, or did you regret the spend
+    / regret the patience?"
+  bumps_on_chose_patience_and_smooth:
+    # Picked patience, accumulated, upgraded with reserve, kept moving
+    - edge: marginal_capability_thinking
+      delta: 0.5
+    - edge: downside_discipline
+      delta: 0.3
+  bumps_on_bought_and_strained:
+    # Bought, regretted the stall, learned the lesson through the bruise
+    - edge: marginal_capability_thinking
+      delta: 0.4
+    - edge: investing_vs_gambling
+      delta: 0.3
+  bumps_on_bought_and_thrived:
+    # The 80/100 rule cleared after all; the upgrade was real leverage
+    - edge: marginal_capability_thinking
+      delta: 0.3
+
+attribution:
+  author: claude + pedro (seed)
+  source: |
+    Pedro's framing 2026-05-26: "handling upgrades progressively, never
+    investing 100% of resources unless you're getting an 80% more capability
+    out of the item. the sequence of investment is more important than the
+    actual investment, sometimes you can grind 50-60 more maps at tier 6 and
+    grab that 15 chaos you need to upgrade and still have mapping supplies."
+  notes: |
+    The tier (T6) and currency amount (~25c) in the scenario are illustrative
+    placeholders. When this case study fires in a real conversation, Claude
+    substitutes whichever tier and currency level fits the player's actual
+    mapping state. The arithmetic shape (50 more maps → +60% liquid → upgrade
+    + reserve) generalises across the whole map-tier ladder.

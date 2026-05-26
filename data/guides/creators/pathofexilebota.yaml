@@ -1,0 +1,54 @@
+schema_version: 1
+handle: pathofexilebota
+display_name: "pathofexilebota (Батон / Anton)"
+
+channels:
+  twitch: https://www.twitch.tv/pathofexilebota
+  youtube: https://www.youtube.com/channel/UCeB8aSt0Ugx3KBy5zHdxrTA
+  telegram: https://t.me/podval_batona
+live_status_url: https://decapi.me/twitch/uptime/pathofexilebota
+build_hub: null
+home_url: null
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: ru
+
+specialties:
+  - crafting
+  - currency_farming
+  - league_start
+  - endgame_progression
+  - beginner_guides
+
+style_tags:
+  - deep_knowledge
+  - long_sessions
+  - high_volume
+  - exploits_aware
+  - accessible
+
+style_notes: |
+  Largest Russian-language PoE audience (#1 RU channel, ~152k Twitch followers, 55k YT,
+  42k Telegram). Anton (real name) streams long sessions averaging 2,400+ concurrent viewers
+  with peaks above 13k. Known as a crafter and economy-savvy player who farms currency
+  efficiently and explains the "how" clearly. Posts a mix of VOD-style guides on YouTube
+  (beginner starts, build diaries, league starters) and live commentary on Twitch. Tone is
+  casual but information-dense. Good first stop for a Russian-speaking player who needs
+  a full economy and progression loop explained in their language.
+
+transmits:
+  - edge: currency_velocity
+    confidence: 0.8
+    note: "Crafting focus and efficiency commentary throughout streams"
+  - edge: league_phase_awareness
+    confidence: 0.75
+    note: "Explicit early/mid/late-league pacing in league-start guides"
+  - edge: investing_vs_gambling
+    confidence: 0.65
+    note: "Budget-tier framing in build guides"
+
+# Evidence: YouTube guide posted March 2026; Telegram active May 28 2026 with 0.5 guide;
+# Twitch streamed 234h in last 30 days (verified twitchmetrics.net, May 2026)
+evidence_url: https://www.youtube.com/watch?v=-aQ3s4oNUl4

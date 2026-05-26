@@ -1,0 +1,35 @@
+schema_version: 1
+handle: joseonpenguin
+display_name: 조선펭귄 (Joseon Penguin)
+
+channels:
+  youtube: https://www.youtube.com/channel/UCbYowFYpzzZxuM2pHxTVsTA
+home_url: https://www.youtube.com/channel/UCbYowFYpzzZxuM2pHxTVsTA
+build_hub: null
+live_status_url: null
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: ko
+
+specialties:
+  - korean_guide_resource
+
+style_tags:
+  - korean_native
+  - community_surfaced
+  - niche_preference
+
+style_notes: |
+  Korean YouTube channel dedicated to both PoE 1 and PoE 2 content; repeatedly
+  cited alongside 게이머비누 and 김김두부 in Korean PoE community lists as one
+  of the few channels producing Korean-native PoE content. Subscriber base and
+  upload cadence are not publicly confirmed in available search data — treat as
+  uncertain until verified directly on YouTube. Re-verify against 0.5 launch
+  activity on 2026-05-29.
+
+transmits:
+  - edge: playstyle_authenticity
+    confidence: 0.5
+    note: "Korean community surfacing suggests niche-preference content rather than meta-chasing."

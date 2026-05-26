@@ -1,0 +1,63 @@
+schema_version: 1
+handle: ds_lily
+display_name: ds_lily / Lily
+
+channels:
+  twitch: https://www.twitch.tv/ds_lily
+  youtube: https://www.youtube.com/dslily
+  twitter: https://twitter.com/ds_lily
+home_url: https://www.twitch.tv/ds_lily
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/ds_lily
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - hardcore_ssf
+  - hardcore_racing
+  - race_events
+  - hcssf_top_finisher
+  - long_form_streamer
+
+style_tags:
+  - quiet
+  - mellow
+  - deadpan_humor
+  - HC_focused
+  - SSF_focused
+  - racer
+  - community_women
+  - pedro_endorsed
+
+style_notes: |
+  PoE community fixture since 2013-ish. Streaming style is quieter and more
+  mellow than the high-energy norm — calm narration, deadpan humor,
+  occasional esoteric riffs. Competition focus: HCSSF (Hardcore Solo
+  Self-Found) races, where she typically places top 10. Steady audience
+  growth into PoE 2 — ~200k Twitch followers, ~80k YouTube subs.
+
+  Surface for: HC-curious players who don't vibe with the loud HC voices
+  (Quin69 / Zizaran style); SSF-curious players who want to see the mode
+  played seriously; players who want a calmer stream to learn from without
+  the hype layer. Also a representation signal for players seeking women
+  creators in PoE — a community where the visible voices skew heavily male.
+
+transmits:
+  - edge: posture_under_drop
+    confidence: 0.85
+    note: "HCSSF + race context makes composure visible turn by turn"
+  - edge: downside_discipline
+    confidence: 0.85
+    note: "SSF means no trade safety net — halt-and-list discipline transferred to crafting-and-decisions"
+  - edge: time_budget_calibration
+    confidence: 0.65
+    note: "Race events are time-budget-explicit by nature; she names her pacing"
+  - edge: playstyle_authenticity
+    confidence: 0.75
+    note: "Long-standing mellow-stream identity is itself an authenticity demonstration"
+  - edge: marginal_capability_thinking
+    confidence: 0.65
+    note: "SSF forces explicit reasoning about which gear unlocks the next content tier"

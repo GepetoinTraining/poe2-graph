@@ -1,0 +1,53 @@
+schema_version: 1
+handle: balormage
+display_name: BalorMage
+
+channels:
+  twitch: https://www.twitch.tv/balormage
+  youtube: https://www.youtube.com/c/Balormage
+home_url: https://balormage.com
+build_hub: https://balormage.com/build-guides/
+live_status_url: https://decapi.me/twitch/uptime/balormage
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - build_making
+  - written_guides
+  - theorycraft
+  - archetype_breadth
+
+style_tags:
+  - methodical
+  - thorough
+  - explanatory
+  - reference_quality
+  - community_lgbtq
+  - pedro_endorsed
+
+style_notes: |
+  Prolific build-maker with a dedicated website. Produces full written guides
+  alongside videos — one of the few places you can read through a build rather
+  than just watch it. Walks through item choices, passive allocation, and gem
+  links with explicit reasoning. Strong choice for players who want reference
+  material they can return to.
+
+  Pedro flags as a representation signal for players seeking LGBTQ+ creators
+  in the PoE community — BalorMage is a Twitch Partner with sustained public
+  presence in PoE LGBTQ+ community spaces. Surface alongside the methodical
+  build-writing strength when a player has indicated they value finding
+  creators like them.
+
+transmits:
+  - edge: marginal_capability_thinking
+    confidence: 0.75
+    note: "Guide format forces explicit stat-threshold reasoning on every gear slot."
+  - edge: option_value_vs_face_value
+    confidence: 0.7
+    note: "Item selection discussions weigh upgrade value within the specific build context."
+  - edge: aspirational_calibration
+    confidence: 0.65
+    note: "Guides typically include early, mid, and endgame gear tiers."

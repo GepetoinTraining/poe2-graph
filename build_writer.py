@@ -17,11 +17,11 @@ Markup format (per developer docs):
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional, Union
 
-from parser import Build, FLAG_WEAPON_SET, FLAG_SKILL_OVERRIDE
+from parser import Build
 from resolvers import Tree
 
 
@@ -58,16 +58,24 @@ def rgb(r: int, g: int, b: int, text: str) -> str:
 
 # ----- buildfile model -----
 
+# level_interval is a single int (start level) or a [start, end] pair.
+LevelInterval = Union[int, list[int]]
+
+
 @dataclass
 class PassiveEntry:
     id: str
     additional_text: Optional[str] = None
-    level_interval: Optional[list[int]] = None
+    level_interval: Optional[LevelInterval] = None
     weapon_set: Optional[int] = None
 
     def to_dict(self) -> Union[str, dict[str, Any]]:
         """A bare string when no annotations are attached; richer object otherwise."""
-        if self.additional_text is None and self.level_interval is None and self.weapon_set is None:
+        if (
+            self.additional_text is None
+            and self.level_interval is None
+            and self.weapon_set is None
+        ):
             return self.id
         d: dict[str, Any] = {"id": self.id}
         if self.additional_text is not None:
@@ -83,11 +91,17 @@ class PassiveEntry:
 class SupportSkill:
     id: str
     additional_text: Optional[str] = None
+    level_interval: Optional[LevelInterval] = None
 
     def to_dict(self) -> Union[str, dict[str, Any]]:
-        if self.additional_text is None:
+        if self.additional_text is None and self.level_interval is None:
             return self.id
-        return {"id": self.id, "additional_text": self.additional_text}
+        d: dict[str, Any] = {"id": self.id}
+        if self.additional_text is not None:
+            d["additional_text"] = self.additional_text
+        if self.level_interval is not None:
+            d["level_interval"] = self.level_interval
+        return d
 
 
 @dataclass
@@ -95,6 +109,7 @@ class SkillEntry:
     id: str
     support_skills: list[SupportSkill] = field(default_factory=list)
     additional_text: Optional[str] = None
+    level_interval: Optional[LevelInterval] = None
 
     def to_dict(self) -> dict[str, Any]:
         d: dict[str, Any] = {"id": self.id}
@@ -102,6 +117,8 @@ class SkillEntry:
             d["support_skills"] = [s.to_dict() for s in self.support_skills]
         if self.additional_text is not None:
             d["additional_text"] = self.additional_text
+        if self.level_interval is not None:
+            d["level_interval"] = self.level_interval
         return d
 
 
@@ -109,11 +126,20 @@ class SkillEntry:
 class InventorySlot:
     inventory_id: str
     additional_text: Optional[str] = None
+    unique: Optional[str] = None          # specific unique item name to recommend
+    hint: Optional[str] = None            # short inline hint rendered next to the slot
+    level_interval: Optional[LevelInterval] = None
 
     def to_dict(self) -> dict[str, Any]:
         d: dict[str, Any] = {"inventory_id": self.inventory_id}
         if self.additional_text is not None:
             d["additional_text"] = self.additional_text
+        if self.unique is not None:
+            d["unique"] = self.unique
+        if self.hint is not None:
+            d["hint"] = self.hint
+        if self.level_interval is not None:
+            d["level_interval"] = self.level_interval
         return d
 
 
@@ -211,8 +237,12 @@ def validate(buildfile: BuildFile, tree: Tree) -> list[str]:
         if not tree.node_by_id(p.id):
             warnings.append(f"unknown passive id: {p.id!r}")
         if p.level_interval is not None:
-            if len(p.level_interval) != 2 or p.level_interval[0] > p.level_interval[1]:
-                warnings.append(f"malformed level_interval on {p.id!r}: {p.level_interval}")
+            # LevelInterval is Union[int, list[int]] — bare int is legal (start level only).
+            if isinstance(p.level_interval, list):
+                if len(p.level_interval) != 2 or p.level_interval[0] > p.level_interval[1]:
+                    warnings.append(f"malformed level_interval on {p.id!r}: {p.level_interval}")
+            elif not isinstance(p.level_interval, int):
+                warnings.append(f"malformed level_interval on {p.id!r}: {p.level_interval!r} (expected int or [start, end])")
     return warnings
 
 

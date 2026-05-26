@@ -1,0 +1,45 @@
+schema_version: 1
+handle: poe_mofa_xueyuan
+display_name: POE魔法学院 (POE Magic Academy)
+
+channels:
+  bilibili: https://space.bilibili.com/105777129
+home_url: null
+build_hub: null
+live_status_url: null
+
+disposition: public
+
+games: [poe2]
+primary_language: zh-cn
+
+specialties:
+  - economy_analysis
+  - currency_tracking
+  - league_phase_commentary
+
+style_tags:
+  - episodic
+  - concise
+  - economy_journalism
+  - delayed_gratification_philosophy
+
+style_notes: |
+  Concise episodic content (6-9 min) under the banner "用简单的魔法描述复杂的玩法" —
+  using simple magic to describe complex mechanics. The "流放财经" (PoE Finance)
+  series is the most distinct economy-journalism format in CN PoE content:
+  each episode covers concurrent player count trends, big-ticket item drop-rate
+  changes, and ritual-economy inventory. Channel motto "延迟满足" (delayed
+  gratification) signals an explicit philosophy of patient positioning over
+  reactive trading.
+
+transmits:
+  - edge: market_timing
+    confidence: 0.85
+    note: "流放财经 series explicitly covers when to enter/exit trade positions based on player-count and drop-rate signals."
+  - edge: currency_velocity
+    confidence: 0.8
+    note: "Tracks physical trade volume cycles each episode."
+  - edge: patient_pricing
+    confidence: 0.75
+    note: "Channel's stated philosophy of delayed gratification maps directly to this edge."

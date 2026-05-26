@@ -1,0 +1,50 @@
+schema_version: 1
+handle: talkativetri
+display_name: TalkativeTri
+
+channels:
+  youtube: https://www.youtube.com/@TalkativeTri
+  twitch: https://www.twitch.tv/talkativetri
+home_url: https://www.youtube.com/@TalkativeTri
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/talkativetri
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - minion_theorycraft
+  - witch
+  - necromancer
+  - unusual_minion_ideas
+  - mechanical_discovery
+
+style_tags:
+  - theorycraft_first
+  - mechanical_discovery
+  - reference_only
+  - poe1_dominant
+
+style_notes: |
+  PoE 1 minion theorycrafter — often the source for unusual minion ideas
+  that other creators (Ghazzy especially) then refine into followable
+  builds. PoE 2 presence is smaller but the theorycraft posture transfers:
+  he'll find the new minion edge cases before they become meta.
+
+  Catalog entry is provisional / reference-only. Surface when player is on
+  Witch and Ghazzy's content isn't covering the specific mechanic the
+  player has questions about — TalkativeTri's theorycraft is often the
+  upstream source.
+
+transmits:
+  - edge: option_value_vs_face_value
+    confidence: 0.55
+    note: "Minion theorycraft regularly identifies underrated scaling vectors others miss"
+  - edge: marginal_capability_thinking
+    confidence: 0.55
+    note: "Theorycraft framing makes 'what does this unlock' the core question"
+  - edge: aspirational_calibration
+    confidence: 0.4
+    note: "Worth watching for ideas, not for direct copying — reference-tier signal"

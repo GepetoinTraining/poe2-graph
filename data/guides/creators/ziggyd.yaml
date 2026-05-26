@@ -1,0 +1,58 @@
+schema_version: 1
+handle: ziggyd
+display_name: ZiggyD
+
+channels:
+  youtube: https://www.youtube.com/@ZiggyDStarcraft
+  twitch: https://www.twitch.tv/ziggydlive
+  website: https://ziggyd.tv
+home_url: https://ziggyd.tv
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/ziggydlive
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - educational_long_form
+  - atlas_systems
+  - trade_mechanics
+  - beginner_aware_explanation
+  - written_references
+
+style_tags:
+  - educational
+  - patient
+  - didactic
+  - textbook_voice
+  - non_condescending
+
+style_notes: |
+  The closest thing the PoE ecosystem has to a "textbook voice." Long-form
+  educational content with written companions on his site. Explains the
+  *concepts* underneath the rules rather than the rules themselves — which
+  ages better across patches than meta-of-the-week content.
+
+  Surface for players learning a system cold (atlas, trade, league
+  mechanics), or for any player who prefers reading to watching. His
+  written references are particularly useful when the player wants
+  something they can come back to without scrubbing video.
+
+transmits:
+  - edge: league_phase_awareness
+    confidence: 0.75
+    note: "Frames each league mechanic in terms of when in the league cycle it matters"
+  - edge: playstyle_authenticity
+    confidence: 0.7
+    note: "Pedagogical stance — 'understand the system, then choose how you want to play it'"
+  - edge: time_budget_calibration
+    confidence: 0.6
+    note: "Beginner-friendly framing implicitly respects time-limited players"
+  - edge: investing_vs_gambling
+    confidence: 0.65
+    note: "Crafting and atlas tutorials separate calculated investments from hope-rolls"
+  - edge: marginal_capability_thinking
+    confidence: 0.6
+    note: "Educational framing makes the 'what does this enable' question explicit"

@@ -1,0 +1,49 @@
+schema_version: 1
+handle: palsteron
+display_name: palsteron
+
+channels:
+  youtube: https://www.youtube.com/@palsteron
+  twitch: https://www.twitch.tv/palsteron
+home_url: https://www.youtube.com/@palsteron
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/palsteron
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - atlas_optimization
+  - deep_systems_analysis
+  - mapping_strategy
+  - league_mechanic_deep_dives
+
+style_tags:
+  - systems_focused
+  - deep_analysis
+  - reference_only
+  - poe1_dominant
+
+style_notes: |
+  Deep PoE 1 systems analyst — atlas optimization and mapping strategy at
+  a level of detail beyond what most creators publish. PoE 2 atlas
+  optimization will mature into a similar specialty as the endgame fills
+  in across patches.
+
+  Catalog entry is provisional / reference-only for PoE 2; full-confidence
+  for PoE 1 carryover players. Surface when player wants the deepest
+  available content on atlas-tree optimization or mapping strategy and
+  is willing to do PoE 1 → PoE 2 mental translation.
+
+transmits:
+  - edge: league_phase_awareness
+    confidence: 0.65
+    note: "Atlas strategy across phases is his core content; PoE 1 carryover is direct"
+  - edge: flow_anticipation
+    confidence: 0.55
+    note: "Atlas optimization is forward-looking by nature — anticipating what scales"
+  - edge: marginal_capability_thinking
+    confidence: 0.55
+    note: "Atlas-passive-by-atlas-passive analysis is capability-per-cost thinking applied to mapping"

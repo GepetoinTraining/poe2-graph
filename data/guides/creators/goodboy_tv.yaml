@@ -1,0 +1,53 @@
+schema_version: 1
+handle: goodboy_tv
+display_name: "GoodBoy_TV"
+
+channels:
+  twitch: https://www.twitch.tv/goodboy_tv
+  youtube: https://www.youtube.com/@GoodBoy_TVV
+live_status_url: https://decapi.me/twitch/uptime/goodboy_tv
+build_hub: null
+home_url: null
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: ru
+
+specialties:
+  - mechanics_depth
+  - budget_builds
+  - efficiency
+  - unusual_strategies
+
+style_tags:
+  - serious
+  - thorough
+  - mechanics_focused
+  - long_sessions
+
+style_notes: |
+  Twitch Partner; self-described as "playing mainly Path of Exile." Community reputation
+  (Neolurk wiki, RU tier list) consistently marks GoodBoy_TV as the analytical/mechanics
+  deep-dive creator in the RU space: known for explaining how, with minimal investment,
+  a character can be made many times stronger through understanding rather than raw
+  currency. Appears in PoE 2 pre-launch podcasts with other RU community figures. Average
+  viewership lower than pathofexilebota (~192 recent average) but audience skews toward
+  players who want to understand mechanics, not just copy builds. Good referral for a RU
+  player who is stuck on a system (crafting sequence, atlas, passives) and needs it
+  explained rigorously.
+
+transmits:
+  - edge: marginal_capability_thinking
+    confidence: 0.75
+    note: "Known for explaining incremental character-power unlocks on low budget"
+  - edge: option_value_vs_face_value
+    confidence: 0.65
+    note: "Teaches non-obvious choices that outperform their cost"
+  - edge: time_budget_calibration
+    confidence: 0.6
+    note: "Efficiency framing: min-investment for max output"
+
+# Evidence: Twitch Partner, active streamer 2025-2026; poe.ninja streamer builds show
+# active league characters; PoE 2 launch podcast appearance confirmed on YouTube
+evidence_url: https://www.youtube.com/watch?v=__MOwk2X7Hs

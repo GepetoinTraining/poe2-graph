@@ -1,0 +1,50 @@
+schema_version: 1
+handle: kepa_mita
+display_name: "KEPA_MITA"
+
+channels:
+  twitch: https://www.twitch.tv/kepa_mita
+live_status_url: https://decapi.me/twitch/uptime/kepa_mita
+build_hub: null
+home_url: null
+
+disposition: public
+
+games: [poe2]
+primary_language: ru
+
+specialties:
+  - monk
+  - flicker_builds
+  - self_found_style
+  - casual_progression
+
+style_tags:
+  - casual_tone
+  - chill_streams
+  - newer_channel
+  - poe2_only
+
+style_notes: |
+  New channel (created April 2025) that grew rapidly to ~16k followers on the back of
+  PoE 2 early access. KEPA_MITA streams PoE 2 almost exclusively — 13 of 15 most recent
+  sessions (May 2026) are PoE 2, with Monk/Flicker and Sorceress self-chill builds visible
+  in stream titles. Tone is relaxed and personal ("я на чиле играю" — "I'm just chilling").
+  Averaging 500-700 viewers. Not a guide channel — no systematic build videos detected.
+  Useful for a player who wants to watch RU PoE 2 progression from a community/casual
+  angle rather than a teaching angle. Best evidence of 0.5-era activity is recent; flag
+  if YouTube presence doesn't materialize post-0.5 launch.
+
+active_for_poe2: yes
+
+transmits:
+  - edge: playstyle_authenticity
+    confidence: 0.65
+    note: "Self-chill builds and casual framing model genuine enjoyment over optimization"
+  - edge: posture_under_drop
+    confidence: 0.5
+    note: "Relaxed response to RNG visible in live play"
+
+# Evidence: twitchmetrics confirmed 13/15 recent streams are PoE 2 (May 10-25 2026);
+# channel created 2025-04-22; Affiliate status; 16k followers
+evidence_url: https://www.twitchmetrics.net/c/1301355746-kepa_mita/streams

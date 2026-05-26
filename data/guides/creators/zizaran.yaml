@@ -1,0 +1,64 @@
+schema_version: 1
+handle: zizaran
+display_name: Ziz / Zizaran
+
+channels:
+  twitch: https://www.twitch.tv/zizaran
+  youtube: https://www.youtube.com/@Zizaran
+  events: https://www.exilecon.com
+home_url: https://www.twitch.tv/zizaran
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/zizaran
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - community_events
+  - charity_events
+  - ssf_gauntlet
+  - poe_mania
+  - boss_progression
+  - league_start
+  - hardcore_runs
+
+style_tags:
+  - major_streamer
+  - charity_org
+  - community_voice
+  - high_energy
+  - event_organizer
+
+style_notes: |
+  One of PoE's largest English-language streamers and the organizer of
+  Path of Exile Mania (PoE charity event format) — durably community-
+  facing. League-start grinds, boss rush content, SSF Gauntlet, and HC
+  attempts are all in rotation. The event-organizer dimension matters: he
+  shapes meta-events the community participates in, not just runs his own
+  content.
+
+  Surface when player wants a high-energy English-language voice with
+  broad PoE 2 coverage, is participating in or curious about PoE Mania /
+  Gauntlet events, or wants community-event context (when does the next
+  Gauntlet run, who organizes it). His content is breadth-first; for
+  archetype-specific depth, pair with a specialist (CaptainLance9 for
+  off-meta, OneManaLeft for Archmage, Empyrian for economy).
+
+transmits:
+  - edge: posture_under_drop
+    confidence: 0.7
+    note: "HC + Gauntlet content forces visible composure under big finds and big losses"
+  - edge: playstyle_authenticity
+    confidence: 0.7
+    note: "Charity-event organizing reflects an authentic relationship to the community side of play"
+  - edge: downside_discipline
+    confidence: 0.65
+    note: "SSF Gauntlet runs make halt-and-list / adapt-on-failure reasoning explicit"
+  - edge: league_phase_awareness
+    confidence: 0.65
+    note: "League-start coverage is phase-aware by nature; he names where in the cycle he is"
+  - edge: aspirational_calibration
+    confidence: 0.55
+    note: "High-volume streamer worth admiring; copying his pace requires matching his hours"

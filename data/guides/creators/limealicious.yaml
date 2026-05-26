@@ -1,0 +1,53 @@
+schema_version: 1
+handle: limealicious
+display_name: Limealicious / Laimu
+
+channels:
+  twitch: https://www.twitch.tv/limealicious
+  youtube: https://www.youtube.com/Limealicious
+home_url: https://www.twitch.tv/limealicious
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/limealicious
+
+disposition: public
+
+games: [poe1, poe2, arpg_general, variety]
+primary_language: en
+
+specialties:
+  - variety_streamer
+  - reveal_reactions
+  - arpg_broad
+  - long_form_content
+
+style_tags:
+  - variety
+  - high_energy
+  - community_women
+  - uk_voice
+  - reveal_react_format
+  - provisional
+
+style_notes: |
+  UK-based variety streamer (~290k Twitch followers, large audience).
+  Engages with Path of Exile 2 through reveal-reaction content (Last of
+  the Druids showcase, Third Edict reveal, etc.) and adjacent ARPG play.
+  Not a PoE 2-primary streamer — closer to a broad-ARPG voice with PoE 2
+  in the mix.
+
+  Catalog entry is **provisional**: PoE 2 engagement so far is more
+  reaction-and-context than deep build coverage. Surface for: players
+  who want representation visibility for women creators in the wider
+  ARPG space; players who already watch Laimu for variety and want her
+  PoE 2 takes specifically; reveal-reaction format players.
+
+  Lower edge confidences reflect the variety-rather-than-specialist
+  posture — refine if Laimu's PoE 2 footprint deepens.
+
+transmits:
+  - edge: playstyle_authenticity
+    confidence: 0.55
+    note: "Variety-streamer identity is itself anti-meta-following. Provisional."
+  - edge: aspirational_calibration
+    confidence: 0.45
+    note: "Large-audience reveal reactions reach players who admire-and-watch rather than admire-and-mimic. Provisional."

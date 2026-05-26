@@ -1,0 +1,57 @@
+schema_version: 1
+id: upgrade_pacing_v1
+topic: "Upgrade pacing — sequence over magnitude, ratio over impulse"
+summary: |
+  The trap most mid-game players fall into is the wow-upgrade: a single item that looks
+  transformative, consumes most of their liquid currency, and leaves them unable to
+  sustain mapping or pursue the next step. This guide teaches upgrade-pacing discipline —
+  value upgrades by capability-per-cost, never burn the engine for a single purchase,
+  recognise that 50 more maps at the current tier is often the right next move even when
+  an upgrade is "right there." The 80/100 rule: never spend 80%+ of liquid unless you're
+  getting 80%+ more capability. Resists the impulse-buy-and-strand pattern that quietly
+  kills a league for many players around weeks 2-3.
+game: poe2
+version_minimum: "0.5.0"
+last_updated: 2026-05-26
+difficulty: intermediate
+
+transmits:
+  - marginal_capability_thinking
+  - investing_vs_gambling
+  - downside_discipline
+
+case_studies:
+  - mid_map_upgrade_decision
+  # TODO: chase_unique_temptation — when a lottery-style chase item tempts an over-spend
+  # TODO: alt_character_pivot_economics — when to invest in a second character vs scale the first
+  # TODO: gear_floor_versus_ceiling — knowing which slots are leverage points vs luxury
+
+creators:
+  - handle: empyriangaming
+    role: economic_primary
+    note: |
+      Currency-flow framing of upgrades — the "what does this enable in
+      terms of future farming velocity" lens is core to his retrospectives.
+      Pair when player needs to learn upgrade-as-investment thinking
+      rather than upgrade-as-purchase.
+  - handle: ben_
+    role: HC_discipline_carryover
+    note: |
+      HC context forces 80/100 reasoning naturally; he articulates which
+      upgrades clear the rule and which don't. Surface when player needs
+      to see the discipline modeled in real time rather than explained.
+  - handle: steelmage
+    role: mapper_pacing
+    note: |
+      Mapping efficiency is itself a capability-per-cost optimization
+      problem; he frames atlas-tree allocation in the same vein. Useful
+      when player is thinking about whether to "level the mapper" vs
+      "buy the chase item."
+  - handle: subtractem
+    role: melee_specialty
+    note: |
+      Melee builds are leverage-point-heavy; he names which slot is
+      enabling-next-tier and which is luxury. Surface for Warrior /
+      Titan / Warbringer players asking pacing questions.
+
+prerequisites: []

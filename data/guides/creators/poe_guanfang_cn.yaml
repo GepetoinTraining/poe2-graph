@@ -1,0 +1,41 @@
+schema_version: 1
+handle: poe_guanfang_cn
+display_name: 流放之路官方号 (PoE Official CN)
+
+channels:
+  bilibili: https://space.bilibili.com/349713519
+home_url: https://poe.qq.com/main.shtml
+build_hub: null
+live_status_url: null
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: zh-cn
+
+specialties:
+  - patch_notes
+  - developer_communication
+  - season_announcements
+
+style_tags:
+  - official
+  - patch_timing_authoritative
+  - cn_server_specific
+
+style_notes: |
+  Tencent-GGG official account for the CN server (流放之路 / 流放之路2). Not
+  an independent creator. Value in the catalog is as the canonical source for
+  CN-server-specific patch timing, monetization differences, and server-side
+  event cadence. CN players tracking when CN-specific patches go live (the CN
+  server has separate cadence from international per the 0.3.0 launch precedent)
+  will use this channel. Treat as a primary source for league_phase_awareness
+  on the CN server, NOT as a teaching channel — it doesn't produce build content.
+
+transmits:
+  - edge: league_phase_awareness
+    confidence: 0.8
+    note: "Official patch timing and event schedule posts are the authoritative CN-server phase signal."
+  - edge: flow_anticipation
+    confidence: 0.6
+    note: "Season launch and patch timing posts let players anticipate economy inflection points."

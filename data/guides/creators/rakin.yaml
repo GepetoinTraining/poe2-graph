@@ -1,0 +1,52 @@
+schema_version: 1
+handle: rakin
+display_name: Rakin
+
+channels:
+  twitch: https://www.twitch.tv/rakin
+  youtube: https://www.youtube.com/@Rakin1
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/rakin
+home_url: null
+
+disposition: public
+
+games: [poe2]
+primary_language: pt-br
+
+specialties:
+  - theorycraft
+  - invoker
+  - monk
+  - endgame
+  - ladder_pushing
+
+style_tags:
+  - competitive
+  - high_ceiling
+  - race_mentality
+  - portuguese
+
+style_notes: |
+  Rakin is the dominant PT-BR PoE 2 streamer by viewership — ~368k viewer hours in
+  the 30 days before 0.5 launch, 1.68M Twitch followers. His content is built around
+  finding builds capable of topping the ladder; a December 2024 video series documented
+  the exact Invoker Ailment Tri-Element build that brought him to world rank #1.
+  He publishes shorter YouTube VODs on specific build versions (Storm Wave Invoker,
+  CI Stormwave) alongside Twitch marathons. His teaching angle is implicit — he
+  explains decisions as he executes them, so the value is in watching the logic, not
+  a structured guide format. Strong for players ready to push past median endgame.
+  Mobalytics hosts a "Build Rakin Invoker" guide credited to him.
+
+transmits:
+  - edge: flow_anticipation
+    confidence: 0.75
+    note: "Identifies which build shapes will be viable before the league economy settles"
+  - edge: league_phase_awareness
+    confidence: 0.70
+    note: "Race-pace framing — build choices are always contextualised by what is available early vs. late"
+  - edge: aspirational_calibration
+    confidence: 0.65
+    note: "Plays at ceiling; viewers learn where the ceiling actually is before projecting goals"
+
+evidence_url: https://www.youtube.com/@Rakin1/videos

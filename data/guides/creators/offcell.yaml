@@ -1,0 +1,51 @@
+schema_version: 1
+handle: offcell
+display_name: Offcell
+
+channels:
+  twitch: https://www.twitch.tv/offcell_
+  youtube: https://www.youtube.com/@Offcell
+home_url: https://www.twitch.tv/offcell_
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/offcell_
+
+disposition: public
+
+games: [poe2]
+primary_language: pt-br
+
+specialties:
+  - build_focused_streamer
+  - patch_cycle_engaged
+
+style_tags:
+  - playful
+  - meme_aware
+  - br_streamer_voice
+  - pedro_endorsed
+
+style_notes: |
+  Brazilian PoE 2 streamer, active through the 0.5 patch cycle (latest pre-launch
+  stream title was a meme-form call for patch notes: "QUERO PATO NOTES NA MINHA
+  MESA! AGORA !!"). YouTube channel positions playfully — "Deus dos Games,
+  destruindo todos os games conhecidos pela humanidade" — typical BR streamer
+  self-grandiose humor. Listed in Path of Codex's directory as a PoE 2
+  build-focused creator from Brazil.
+
+  Pedro's personal favorite BR creator — a soft but durable signal worth
+  weighting. Surface readily for BR-context players or when Portuguese-language
+  depth is wanted alongside the larger BR creators (Rakin, MalakaTV, ChacalCoach).
+
+  Catalog entry is **provisional**: specifics on build specialties and edges
+  transmitted aren't yet verified through sustained co-watching. Marked transmits
+  below are inferential from the BR streamer pattern + active engagement with
+  the patch cycle, not measured against authored content. Refine as the player
+  surfaces concrete Offcell moments in conversation.
+
+transmits:
+  - edge: playstyle_authenticity
+    confidence: 0.55
+    note: "BR streamer culture (and Offcell's self-presentation style) tends to favor playing-your-own-game over meta-chasing. Soft-confidence pending verification."
+  - edge: league_phase_awareness
+    confidence: 0.5
+    note: "The patch-notes meme signals real engagement with the league cycle rhythm. Provisional."

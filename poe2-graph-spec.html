@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>poe2-graph — Spec v0.2</title>
+<title>poe2-graph — Spec v0.3</title>
 <style>
 :root {
   --bg: #0e0e10;
@@ -183,22 +183,25 @@ footer {
   <li><a href="#graph">4 Graph model</a></li>
   <li><a href="#buildfile">5 .build format</a></li>
   <li><a href="#scopes">6 Scope phases</a></li>
+  <li><a href="#handoffs">6a Community handoffs</a></li>
   <li><a href="#sources">7 Data sources</a></li>
   <li><a href="#skill">8 Skill layout</a></li>
   <li><a href="#artifact">9 Artifact layer</a></li>
   <li><a href="#connector">10 Connector</a></li>
   <li><a href="#open">11 Open questions</a></li>
   <li><a href="#handoff">12 Handoff to Claude Code</a></li>
+  <li><a href="#exile">13 EXILE — player profile</a></li>
+  <li><a href="#divergences">14 Divergences discovered</a></li>
 </ol>
 </nav>
 
 <header>
 <h1>poe2-graph</h1>
 <div class="meta">
-  <span>spec v0.2</span>
+  <span>spec v0.3</span>
   <span>2026-05-26</span>
-  <span>pedro + claude (web)</span>
-  <span>pre-implementation</span>
+  <span>pedro + claude (web + code)</span>
+  <span>phase 1+2 shipped · league-start T-3</span>
 </div>
 </header>
 
@@ -210,8 +213,35 @@ footer {
 <p>This spec describes a Claude-native toolkit for that graph. The toolkit reads build URLs and <code>.build</code> files, answers planning questions through graph queries (shortest paths, stat aggregation, build comparison), and emits <code>.build</code> files the game ingests directly via its file watcher. The mechanical part of PoE 2 is downstream from the planning part; this toolkit makes Claude useful at the planning layer.</p>
 
 <div class="callout good">
-<h4>Spec v0.2 corrects v0.1 of three hours ago</h4>
-<p>v0.1 reverse-engineered the byte format without access to GGG's official spec. v0.2 incorporates the published v7 format spec, corrects the parser, and adds findings from the poe2db CDN investigation. The architectural recognitions in v0.1 hold — graph schema, source-collapses-to-stats, choice-coordinate encoding — but the specific byte layout was partially wrong. v0.2 is byte-accurate against a known test URL.</p>
+<h4>Spec v0.3 — convergence after Claude Code's first execution pass</h4>
+<p>v0.2 was pre-implementation. v0.3 captures what was actually built, what was deferred via community handoff, and what the implementation discovered the spec got wrong. <strong>Phase 1 and Phase 2 are shipped</strong> (parser, build_reader/writer, graph, resolvers, stats, allocation API, poe2db client, EXILE personalization layer, self-updater, filesystem scanner). 103 tests green. League start (PoE 2 0.5 Return of the Ancients) is Friday 2026-05-29.</p>
+<p>Beyond the originally-scoped phases, v0.3 also documents the surfaces we built that weren't in v0.2 — the EXILE per-player profile system (§13), the self-update mechanism (§16), and the community-handoff pattern (§6a) that explicitly delegates parts of the surface (visualization, item filters, item rendering, market data) to license-clean community projects rather than reinventing them. Spec divergences discovered during build are catalogued in §15.</p>
+</div>
+
+<div class="callout">
+<h4>What's shipped vs deferred</h4>
+<table>
+<tr><th>Surface</th><th>Status</th><th>Where</th></tr>
+<tr><td>v7 URL codec (parse + encode)</td><td><span class="tag verified">shipped</span></td><td><code>parser.py</code></td></tr>
+<tr><td>.build reader / writer with markup</td><td><span class="tag verified">shipped</span></td><td><code>build_reader.py</code> + <code>build_writer.py</code></td></tr>
+<tr><td>NetworkX graph + canonical queries + Steiner</td><td><span class="tag verified">shipped</span></td><td><code>graph.py</code></td></tr>
+<tr><td>Tree resolvers (numeric ↔ string id, ascendancies, overrides)</td><td><span class="tag verified">shipped</span></td><td><code>resolvers.py</code></td></tr>
+<tr><td>Mutable Allocation builder (mid-conversation build construction)</td><td><span class="tag verified">shipped</span></td><td><code>allocation.py</code></td></tr>
+<tr><td>poe2db client (inline ModsView + autocomplete)</td><td><span class="tag verified">shipped</span></td><td><code>poe2db_client.py</code></td></tr>
+<tr><td>EXILE player-profile system (PLAYER.md / LEAGUE_*.md / CHARACTER_*.md, EXILE.xml composer, asymptotic confidence, dual-game support)</td><td><span class="tag verified">shipped</span></td><td><code>exile.py</code> + EXILE/ dir + ONBOARDING.md</td></tr>
+<tr><td>Self-update with multi-source staleness (skill code, tree data, poe2db cache, upstream game version)</td><td><span class="tag verified">shipped</span></td><td><code>updater.py</code></td></tr>
+<tr><td>Filesystem scanner (PoB, Awakened PoE Trade, Exilence, ChaosRecipeEnhancer, etc.)</td><td><span class="tag verified">shipped</span></td><td><code>filesystem_scanner.py</code></td></tr>
+<tr><td>Stat string parser (template → values)</td><td><span class="tag verified">shipped</span></td><td><code>stats.py</code></td></tr>
+<tr><td>Goals + guides integration</td><td><span class="tag now">building now</span></td><td>next chunk</td></tr>
+<tr><td>Item filter generation</td><td><span class="tag verified">handoff</span></td><td>→ NeverSink (§6a)</td></tr>
+<tr><td>Visualizer / tree rendering UI</td><td><span class="tag verified">handoff</span></td><td>→ natwarth/poe2-skilltree (§6a)</td></tr>
+<tr><td>Item parsing + rendering</td><td><span class="tag verified">handoff</span></td><td>→ Path-of-Tools (§6a)</td></tr>
+<tr><td>Game-version detection</td><td><span class="tag verified">handoff</span></td><td>→ poe-tool-dev/latest-patch-version (§6a, wired into <code>updater.py</code>)</td></tr>
+<tr><td>WebSocket messenger (live skill ↔ viewer bridge)</td><td><span class="tag later">stubbed</span></td><td><code>messenger.py</code>, blocked on natwarth license</td></tr>
+<tr><td>Phase 3 artifact workbench</td><td><span class="tag later">deferred</span></td><td>natwarth handoff covers most needs</td></tr>
+<tr><td>Phase 4 OAuth connector</td><td><span class="tag later">later</span></td><td>blocked on Pedro's written GGG application</td></tr>
+<tr><td>Phase 5 live workbench</td><td><span class="tag later">later</span></td><td>composes 3+4</td></tr>
+</table>
 </div>
 </section>
 
@@ -486,36 +516,38 @@ def parse_build_url(url_or_code):
 <section id="scopes">
 <h2>6. Scope phases</h2>
 
-<h3>Phase 1: Read &amp; summarize <span class="tag now">league-start</span></h3>
+<h3>Phase 1: Read &amp; summarize <span class="tag verified">shipped</span></h3>
 
 <ul>
-  <li>Parse web URL via the v7 byte format (parser is small and self-contained, see §3)</li>
-  <li>Parse <code>.build</code> JSON files</li>
-  <li>Load tree JSON, build NetworkX graph</li>
-  <li>Resolve allocations: notables, keystones, jewel sockets, ascendancy nodes</li>
-  <li>Resolve skill_overrides via the choice table</li>
-  <li>Detect dual-spec characters (weapon-set-tagged records)</li>
-  <li>Answer graph questions (path costs, missing nearby notables, etc.)</li>
+  <li>Parse web URL via the v7 byte format — <code>parser.py</code>, round-trip exact against test corpus</li>
+  <li>Parse <code>.build</code> JSON files — <code>build_reader.py</code>, validated against GGG's reference Titan Warrior example</li>
+  <li>Load tree JSON, build NetworkX graph — <code>resolvers.py</code> + <code>graph.py</code>, 5101 nodes / 6015 edges</li>
+  <li>Resolve allocations: notables, keystones, jewel sockets, ascendancy nodes — <code>graph.summarize</code></li>
+  <li>Resolve skill_overrides via the choice table — <code>resolvers.Tree.override*</code></li>
+  <li>Detect dual-spec characters — <code>weapon_set_split</code> in summary</li>
+  <li>Answer graph questions — shortest paths, orphans, nearest unallocated notables, Steiner-tree multi-target routing</li>
+  <li><strong>Added:</strong> mutable Allocation API (<code>allocation.py</code>) — mid-conversation build construction, not just reading</li>
 </ul>
 
-<h3>Phase 2: Write <code>.build</code> files <span class="tag now">league-start</span></h3>
+<h3>Phase 2: Write <code>.build</code> files <span class="tag verified">shipped</span></h3>
 
 <p>Reverse direction. Claude takes a player's situation (current tree, goals, league context, current level) and emits a <code>.build</code> file with annotated routing. Player drops it in their <code>BuildPlanner/</code> folder. Game renders the guidance inline.</p>
 
 <ul>
-  <li>Convert numeric ↔ string IDs via tree JSON join</li>
-  <li>Generate <code>additional_text</code> annotations with proper markup</li>
+  <li>Convert numeric ↔ string IDs via tree JSON join — <code>resolvers</code></li>
+  <li>Generate <code>additional_text</code> annotations with markup — <code>build_writer.red/bold/medium/...</code></li>
   <li>Support <code>weapon_set</code> targeting for dual-spec recommendations</li>
-  <li>Support <code>level_interval</code> for progression guidance</li>
-  <li>Validate against schema (passive IDs exist, skills are valid gems, ascendancy matches class)</li>
-  <li>Optionally generate companion item filter for the build</li>
+  <li>Support <code>level_interval</code> for progression guidance (scalar form OR <code>[start, end]</code> pair)</li>
+  <li>Validate against schema — <code>build_writer.validate</code></li>
+  <li><strong>Added during build (from natwarth's parser):</strong> <code>unique</code>, <code>hint</code> fields on inventory slots; <code>level_interval</code> on supports</li>
+  <li><strong>Companion item filter:</strong> <span class="tag verified">handoff</span> → NeverSink (see §6a). Filter generation is deferred to the canonical community filter; we recommend strictness and personalization notes, we don't reinvent.</li>
 </ul>
 
-<h3>Phase 3: Artifact workbench <span class="tag later">post-league-start</span></h3>
+<h3>Phase 3: Artifact workbench <span class="tag later">deferred via handoff</span></h3>
 
-<p>HTML/JS artifact that loads tree JSON from IndexedDB cache, accepts paste-in URLs or uploads, renders structured analysis. Visual graph display optional (the JSON has x/y coordinates; rendering it is an SVG over a fetched background image).</p>
+<p>Original v0.2 plan: HTML/JS artifact that loads tree JSON from IndexedDB, renders structured analysis. <strong>v0.3 update:</strong> natwarth/poe2-skilltree (MIT-pending) already does this beautifully. We hand off via URL — <code>Allocation.to_url()</code> produces canonical v7 URLs that paste directly into the hosted viewer. The forthcoming WebSocket messenger (<code>messenger.py</code>, license-blocked) will turn this from one-way handoff into bidirectional live editing.</p>
 
-<h3>Phase 4: Connector with OAuth <span class="tag later">later</span></h3>
+<h3>Phase 4: Connector with OAuth <span class="tag later">later · application-blocked</span></h3>
 
 <p>MCP server registered with GGG. Reads the player's account profile, characters, current passive allocation. Generates personalized <code>.build</code> files from live character state. Reads currency exchange rates for craft-cost analysis. Requires a formal application to GGG that Pedro writes, in Pedro's voice, justifying scopes individually.</p>
 
@@ -524,11 +556,71 @@ def parse_build_url(url_or_code):
 <p>From the developer docs: <em>"Due to the large volume of recent requests, we will immediately reject any low-effort or LLM-generated requests. We expect you to read and understand these docs, and to have a clear vision for what you want to do before requesting OAuth access."</em> The application is itself the deliverable for this phase, not the code. Written by Pedro. Pedro's 2012 backer history is a positive signal but not a guarantee.</p>
 </div>
 
-<h3>Phase 5: Live workbench <span class="tag later">later</span></h3>
+<h3>Phase 5: Live workbench <span class="tag later">later · composes 3+4</span></h3>
 
 <p>Connector + artifact + Claude in conversation = the live workbench. Player asks "what should I craft tonight?", Claude reads their character, knows the league economy, looks at their goal, suggests a craft path with currency cost estimates. This is the "playing the game with players" outcome.</p>
 
 <p>Bounded by what GGG exposes for PoE 2: account profile, characters, currency exchange, item filters. <strong>No stash API for PoE 2 yet</strong> (only PoE 1 has stash endpoints). The live workbench is bounded by GGG's PoE 2 endpoint roadmap.</p>
+</section>
+
+<section id="handoffs">
+<h2>6a. Community handoffs — what we explicitly do not build</h2>
+
+<p>GGG's design philosophy is "we make the game; the community makes the tooling." This skill leans into that — we don't reinvent surfaces the community already maintains under permissive licenses. Each handoff below has a maintained, license-clean project; we depend on it, attribute it, and stay in our lane.</p>
+
+<table>
+<tr><th>Surface</th><th>Handoff target</th><th>License</th><th>How we use it</th></tr>
+<tr>
+  <td>Item-filter generation</td>
+  <td><a href="https://github.com/NeverSinkDev/NeverSink-Filter-for-PoE2">NeverSinkDev/NeverSink-Filter-for-PoE2</a></td>
+  <td>MIT</td>
+  <td>Recommend strictness + personalization notes appropriate to the build. We do not emit filters; players use NeverSink directly.</td>
+</tr>
+<tr>
+  <td>Tree visualization (browser)</td>
+  <td><a href="https://natwarth.github.io/poe2-skilltree/">natwarth/poe2-skilltree</a></td>
+  <td>pending (issue #2 open)</td>
+  <td>Generate canonical v7 URLs via <code>Allocation.to_url()</code>; player pastes into the hosted viewer. Future: WebSocket bridge (<code>messenger.py</code>) for live two-way editing.</td>
+</tr>
+<tr>
+  <td>Item ctrl-c parsing + display (browser)</td>
+  <td><a href="https://github.com/Path-of-Tools/poe-item-parser">Path-of-Tools/poe-item-parser</a> + <a href="https://github.com/Path-of-Tools/poe-item-display">poe-item-display</a></td>
+  <td>ISC</td>
+  <td>Schema reference for our <code>CHARACTER_*.md</code> item fields. Future browser artifact uses <code>poe-item-display</code> directly.</td>
+</tr>
+<tr>
+  <td>Current game patch version</td>
+  <td><a href="https://github.com/poe-tool-dev/latest-patch-version">poe-tool-dev/latest-patch-version</a></td>
+  <td>MIT</td>
+  <td>Wired into <code>updater.py</code>. Serverless poller writes <code>latest.txt</code> to GitHub; we GET it for staleness checks.</td>
+</tr>
+<tr>
+  <td>GGPK extraction → structured JSON</td>
+  <td><a href="https://github.com/repoe-fork/repoe">repoe-fork/repoe</a> (originally brather1ng/RePoE)</td>
+  <td>MIT</td>
+  <td>Reference architecture. When PoE 2 RePoE-style outputs land, we adopt them and drop the poe2db scrape path entirely.</td>
+</tr>
+<tr>
+  <td>Game-data <code>.dat</code> schemas</td>
+  <td><a href="https://github.com/poe-tool-dev/dat-schema">poe-tool-dev/dat-schema</a></td>
+  <td>MIT</td>
+  <td>Schema definitions for the binary <code>.dat</code> files in GGPK. Useful if we ever need to extract data ourselves.</td>
+</tr>
+<tr>
+  <td>Public stash river ingest (PoE 1 only)</td>
+  <td><a href="https://github.com/maximumstock/poe-stash-indexer">maximumstock/poe-stash-indexer</a></td>
+  <td>MIT</td>
+  <td>Reference architecture for the day GGG ships a PoE 2 stash API. Not consumed today.</td>
+</tr>
+<tr>
+  <td>Public PoE 2 MCP server (currency, item prices, wiki, meta-builds)</td>
+  <td><a href="https://glama.ai/mcp/servers/t0w4w7h26s">sergeyklay/poe2-mcp-server</a></td>
+  <td>(check repo)</td>
+  <td>Complementary, not competing. Our Phase 4 connector handles the OAuth/personal half of the surface area.</td>
+</tr>
+</table>
+
+<p>All handoffs tracked in <code>ATTRIBUTIONS.md</code> at the skill root. Every newly-surfaced project gets a row there with handle / license / use; the file is a durable credit trail that survives chat-context decay.</p>
 </section>
 
 <section id="sources">
@@ -561,10 +653,34 @@ def parse_build_url(url_or_code):
   <td>meta-build analysis without OAuth</td>
 </tr>
 <tr>
-  <td><a href="https://cdn.poe2db.tw/cache2/">poe2db.tw CDN</a></td>
-  <td>cached item/gem/mod popups indexed by <code>Metadata\</code> internal paths</td>
-  <td>none, scrape with reasonable rate</td>
-  <td>resolve gem stats, unique mods, base item types — the layer GGG hasn't officially exported</td>
+  <td><a href="https://poe2db.tw/us/">poe2db.tw category pages</a></td>
+  <td>inline JSON via <code>new ModsView({...})</code> in each category page (one HTTP GET → regex-extract → <code>json.loads</code>). Mod rows, tier ladders, weights, families, tags.</td>
+  <td>none</td>
+  <td>The PoE 2 item/mod/gem layer GGG hasn't officially exported. <strong>The earlier v0.2 spec assumed a <code>cdn.poe2db.tw/cache2/</code> data CDN — that was wrong. The CDN serves only static assets (CSS/JS/images), all data paths return 403.</strong> Wired in <code>poe2db_client.py</code>; 24h on-disk cache.</td>
+</tr>
+<tr>
+  <td><a href="https://cdn.poe2db.tw/json/">poe2db.tw autocomplete JSON</a></td>
+  <td>gem / item / mod names for autocomplete (content-hashed URL)</td>
+  <td>none</td>
+  <td>Discovered via natwarth's <code>prepare-data.sh</code>. Hash bumps per poe2db update; we follow the "if 404 → bump <code>AUTOCOMPLETE_HASH</code>" pattern in <code>poe2db_client.py</code>.</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/poe-tool-dev/latest-patch-version">poe-tool-dev/latest-patch-version</a></td>
+  <td>current PoE patch version, polled from GGG's patch server by a serverless function</td>
+  <td>none</td>
+  <td>Wired into <code>updater.py</code> for game-version staleness checks. Currently PoE 1 only.</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/NeverSinkDev/NeverSink-Filter-for-PoE2">NeverSinkDev/NeverSink-Filter-for-PoE2</a></td>
+  <td>canonical PoE 2 loot filter (MIT, 2773★)</td>
+  <td>none</td>
+  <td>We do not generate item filters; we point the player at NeverSink with strictness/personalization recommendations for their build. See §6a.</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/Path-of-Tools/poe-item-parser">Path-of-Tools/poe-item-parser</a> + <code>poe-item-display</code></td>
+  <td>parser for ctrl-c item text → structured <code>Item</code>; React renderer (ISC license)</td>
+  <td>none</td>
+  <td>Schema reference for our <code>CHARACTER_*.md</code> item fields. Future browser artifact uses <code>poe-item-display</code> directly. See §6a.</td>
 </tr>
 <tr>
   <td>poe2wiki.net MediaWiki API</td>
@@ -590,44 +706,86 @@ def parse_build_url(url_or_code):
 <h4>Existing MCP server we should not duplicate</h4>
 <p><a href="https://glama.ai/mcp/servers/t0w4w7h26s">sergeyklay/poe2-mcp-server</a> already exists. Tools: <code>poe2_currency_prices</code>, <code>poe2_item_price</code>, <code>poe2_exchange_top</code>, <code>poe2_wiki_search</code>, <code>poe2_db_lookup</code>, <code>poe2_meta_builds</code>. No OAuth required. Built on poe.ninja + poe2db + poe2wiki. The phase 4+ connector we build should be the <em>OAuth complement</em> (personal character data, item filter R/W), not a replacement.</p>
 </div>
+
+<div class="callout good">
+<h4>The full ecosystem we depend on</h4>
+<p>Beyond the data sources above, we lean on several upstream community projects for code patterns and reference architecture. All license-clean (MIT / ISC). See <code>ATTRIBUTIONS.md</code> at the skill root for the durable credit trail, and §6a above for the explicit handoffs.</p>
+<ul>
+  <li><a href="https://github.com/brather1ng/RePoE">brather1ng/RePoE</a> + <a href="https://github.com/repoe-fork/repoe">repoe-fork/repoe</a> — GGPK → JSON pipeline (MIT)</li>
+  <li><a href="https://github.com/poe-tool-dev/dat-schema">poe-tool-dev/dat-schema</a> — canonical .dat schema definitions (MIT)</li>
+  <li><a href="https://github.com/Project-Path-of-Exile-Wiki/PyPoE">Project-Path-of-Exile-Wiki/PyPoE</a> — Python GGPK reader (MIT)</li>
+  <li><a href="https://github.com/maximumstock/poe-stash-indexer">maximumstock/poe-stash-indexer</a> — Rust public-stash river indexer, reference architecture for the day GGG ships a PoE 2 stash API (MIT)</li>
+</ul>
+</div>
 </section>
 
 <section id="skill">
-<h2>8. Skill layout</h2>
+<h2>8. Skill layout <span class="tag verified">actual on disk</span></h2>
 
 <pre><code>poe2-graph/
-├── SKILL.md                  # architectural understanding (the recognitions from this conversation)
-├── parser.py                 # web URL byte decoder + encoder (v7 format)
-├── build_writer.py           # emit .build JSON with markup
-├── build_reader.py           # parse .build JSON
-├── graph.py                  # NetworkX wrapper + canonical queries
-├── stats.py                  # stat string → structured tuple (minimal, the only "rules" we touch)
-├── resolvers.py              # numeric_id ↔ string_id ↔ display_name joins
-├── poe2db_client.py          # CDN lookup wrapper for item/gem/mod resolution
-├── data/
-│   ├── passive-tree.json     # cached from grindinggear fork
-│   ├── atlas-tree.json       # cached from grindinggear fork
-│   ├── manifest.json         # patch version, fetch date, source URLs
-│   └── README.md             # how to refresh after a patch
-├── examples/
-│   ├── stormweaver-dual-spec.md   # the build we decoded tonight (annotated walkthrough)
-│   ├── format-notes-v7.md         # byte format spec with examples
-│   └── titan-warrior.build        # GGG's official .build example, kept for reference
-└── tests/
-    ├── test_parser.py             # parser round-trip against pedro's URL
-    ├── test_graph.py              # known-good shortest paths
-    └── test_buildfile.py          # .build schema validation</code></pre>
+├── SKILL.md                  # entrypoint: thesis, layout, byte format, queries, exile system, self-update
+├── ONBOARDING.md             # the 4-phase player-onboarding runbook (filesystem scan → questions → artifacts → synthesize)
+├── ATTRIBUTIONS.md           # durable credit trail for every surfaced community project
+├── VERSION                   # 0.1.0 — bumped on skill updates
+├── .env.example              # POE_ACCOUNT_NAME placeholder; real .env is gitignored
+├── .gitignore                # protects EXILE/* player data + .env
+├── requirements.txt          # networkx, pyyaml, pytest
 
-<h3>SKILL.md must carry</h3>
+├── parser.py                 # v7 URL codec (parse + encode + round-trip)
+├── build_reader.py           # parse .build JSON (incl. unique/hint/level_interval from natwarth)
+├── build_writer.py           # emit .build JSON with markup helpers
+├── graph.py                  # NetworkX graph + canonical queries + Steiner tree
+├── resolvers.py              # numeric_id ↔ string_id, ascendancy + class lookups, override resolution
+├── stats.py                  # stat string → (template, values, raw) tuple
+├── allocation.py             # mutable Allocation builder (the build-construction API for Claude)
+├── poe2db_client.py          # ModsView JSON extractor + autocomplete fetcher
+├── exile.py                  # PLAYER.md / LEAGUE_*.md / CHARACTER_*.md / EXILE.xml composer + asymptotic confidence math + diff log
+├── filesystem_scanner.py     # detect installed PoB / Awakened PoE Trade / Exilence / ChaosRecipeEnhancer / etc.
+├── updater.py                # self-update + multi-source staleness (skill code, tree data, poe2db cache, game version)
+├── messenger.py              # stub for future WebSocket bridge to natwarth's viewer (license-blocked)
+
+├── data/
+│   ├── passive-tree.json     # 5.3MB, from GepetoinTraining/poe2-skilltree-export
+│   ├── atlas-tree.json       # 1.4MB, from GepetoinTraining/atlastree-export
+│   ├── manifest.json         # skill_version, source commits, fetch dates, protected_paths
+│   └── poe2db_cache/         # 24h-TTL category HTML, gitignored
+├── EXILE/                    # player data — never tracked
+│   ├── DONE                  # marker once onboarding complete
+│   ├── PLAYER.md             # durable: years_played, knowledge, prefs (per-game + general)
+│   ├── PLAYER.initial.md     # snapshot at first synthesis
+│   ├── PLAYER.diffs/         # timestamped state log
+│   ├── LEAGUE_&lt;id&gt;.md        # per-league context (goal, time budget, mechanics)
+│   └── CHARACTER_&lt;slug&gt;.md   # per-character + .build companion
+├── poe2-skilltree-export/    # cloned upstream fork (for updater pulls)
+├── atlastree-export/         # cloned upstream fork
+├── examples/
+│   └── pedro-stormweaver.txt # verified test URL (Sorceress/Stormweaver, 142 nodes, 687 bytes)
+├── example.build             # GGG's reference Titan Warrior example
+└── tests/                    # 103 tests, all green
+    ├── test_parser.py
+    ├── test_resolvers.py
+    ├── test_graph.py
+    ├── test_stats.py
+    ├── test_allocation.py
+    ├── test_build_reader.py (implicit via integration)
+    ├── test_build_writer.py
+    ├── test_integration_example_build.py
+    ├── test_poe2db_client.py
+    ├── test_exile.py
+    ├── test_filesystem_scanner.py
+    └── test_updater.py</code></pre>
+
+<h3>SKILL.md carries <span class="tag verified">done</span></h3>
 
 <ol>
-  <li><strong>The architectural recognitions</strong>: graph-as-schema, sources-collapse-to-stats, choice-coordinates-via-skillOverrides, subgraphs-share-schema, edges-as-first-class-objects</li>
-  <li><strong>The v7 byte format spec</strong> (see §3 above) — fully byte-accurate</li>
-  <li><strong>The <code>.build</code> JSON format</strong> with markup support and the two-ID reality</li>
-  <li><strong>The numeric↔string ID join via tree JSON</strong> — our resolver code keys on this</li>
-  <li><strong>Canonical query playbook</strong>: which graph operation answers which player question</li>
-  <li><strong>Where to refresh data</strong>: forked GGG repos for trees; poe2db CDN for items/gems/mods</li>
-  <li><strong>The non-goals</strong>: we don't simulate damage, we don't replace PoB, we don't compute DPS — we walk the graph and emit annotations</li>
+  <li><strong>The architectural recognitions</strong>: graph-as-schema, sources-collapse-to-stats, choice-coordinates-via-skillOverrides ✓ (corrected: atlas tree does NOT share schema; see §14)</li>
+  <li><strong>The v7 byte format spec</strong> — fully byte-accurate ✓</li>
+  <li><strong>The <code>.build</code> JSON format</strong> with markup support and the two-ID reality ✓ (extended with <code>unique</code>/<code>hint</code>/scalar <code>level_interval</code>)</li>
+  <li><strong>The numeric↔string ID join via tree JSON</strong> ✓ (corrected: dict is keyed by stringified skill hash, not string id; see §14)</li>
+  <li><strong>Canonical query playbook</strong> ✓</li>
+  <li><strong>Where to refresh data</strong>: GepetoinTraining tree forks; poe2db inline JSON (not CDN); poe-tool-dev for game version ✓</li>
+  <li><strong>The non-goals</strong>: no damage sim, no PoB replacement, no DPS — we walk the graph and emit annotations ✓</li>
+  <li><strong>Added beyond v0.2:</strong> EXILE player-profile API surface, self-update mechanism, community handoff philosophy</li>
 </ol>
 
 <p>A future Claude reading this skill cold should be able to do what tonight's conversation did, in one inference, without re-deriving the byte format or re-discovering the graph schema.</p>
@@ -693,26 +851,45 @@ def parse_build_url(url_or_code):
 </section>
 
 <section id="open">
-<h2>11. Open questions <span class="tag verified">most reduced since v0.1</span></h2>
+<h2>11. Open questions <span class="tag verified">v0.3 status</span></h2>
 
-<p>v0.1 had 7 open questions about the byte format. The published v7 spec resolved 5 of them. Remaining:</p>
+<p>v0.1 had 7 open questions; v0.2 closed 5 via the official format spec. v0.3 closes 2 more empirically and reframes the rest as Friday-watch items.</p>
 
 <ol>
-  <li><strong>Flag bits 0b00000100 and above</strong> — none observed in Pedro's URL. Likely reserved for features not yet shipped or features in 0.5 we haven't tested against (Runeforging on uniques, Instilled emotions on amulets, Ancient Runes from Farrow's questline).</li>
-  <li><strong>Weapon set byte values beyond 0/1</strong> — only 0 and 1 observed. Possibly more values exist if GGG plans three weapon sets in future.</li>
-  <li><strong>Other character-class numeric IDs</strong> — Pedro's URL shows class=7 for Sorceress. We need a few more sample URLs across classes to map all 12 class IDs and all ascendancy IDs.</li>
-  <li><strong>Mastery node encoding</strong> — Pedro's build has no allocated masteries. Likely encoded as flags=0x0002 (skill_override carrying the chosen mastery branch). Untested.</li>
-  <li><strong>Ascendancy-Notable encoding for the new ascendancies (Spirit Walker, Martial Artist, Disciple of Varashta)</strong> — different ascendancy IDs but same record structure expected. Sample needed.</li>
-  <li><strong><code>.build</code> file errors</strong> — the docs don't list error semantics. What happens if the file references a passive ID that doesn't exist? Silently ignored? Game refuses to load? Tested-against-game-client behaviour unknown.</li>
+  <li><span class="tag later">untested</span> <strong>Flag bits 0b00000100 and above</strong> — none observed in Pedro's URL. Likely reserved for 0.5 features (Runeforging on uniques, Instilled emotions, Ancient Runes). Friday's first encounters will surface them.</li>
+  <li><span class="tag verified">resolved</span> <strong>Weapon set byte values</strong> — actual values seen: 1 and 2 (1-indexed). Spec v0.2 said "0 or 1." See §14.</li>
+  <li><span class="tag later">partial</span> <strong>Character-class numeric IDs</strong> — confirmed 0-11 from the tree JSON's <code>classes</code> array. Class=7 verified empirically (Sorceress); other 11 verified by structure. Ascendancy IDs are 1-indexed (0 = none).</li>
+  <li><span class="tag later">untested</span> <strong>Mastery node encoding</strong> — Pedro's build has no allocated masteries. Likely <code>flags=0x0002</code> with skill_override carrying the chosen branch. Untested.</li>
+  <li><span class="tag later">untested</span> <strong>Ascendancy-Notable encoding for new ascendancies</strong> (Spirit Walker, Martial Artist, Disciple of Varashta, etc.) — same record structure expected. Sample needed from a 0.5 player.</li>
+  <li><span class="tag later">untested</span> <strong><code>.build</code> file error semantics</strong> — what happens with an unknown passive id? Silently ignored, or game refuses to load? Friday will tell us.</li>
+  <li><span class="tag verified">resolved</span> <strong>poe2db data delivery</strong> — there is NO public data CDN. Inline JSON in main-site HTML. See §14.</li>
+  <li><span class="tag verified">resolved</span> <strong>Atlas tree schema parity</strong> — atlas tree does NOT share schema with passive tree (no <code>id</code>, no <code>edges</code> array). See §14.</li>
 </ol>
 
-<p>Each is a small empirical study. Phase 1's test corpus should include 8-10 build URLs covering different classes, ascendancies, and feature usage, with the parser verified against each.</p>
+<p>Test corpus today: 1 URL (Pedro's Sorceress, all 4 flag combinations exercised). Spec target was 8-10. The remaining 7-9 will come from real players during the league-start week — at which point any untested encoding either parses cleanly or surfaces a test failure we can iterate on.</p>
 </section>
 
 <section id="handoff">
-<h2>12. Handoff to Claude Code</h2>
+<h2>12. Handoff to Claude Code <span class="tag verified">executed</span></h2>
 
 <p>This spec was written by Claude (web) in conversation with Pedro across one extended session. We did the reverse-engineering, the byte-format verification, the architectural recognition, the data-source reconnaissance, and the scope partitioning. What remains is implementation — and that is Claude Code's strength.</p>
+
+<div class="callout good">
+<h4>v0.3: Claude Code has executed Phase 1 and Phase 2</h4>
+<p>The handoff worked. Claude Code, given this spec and Pedro's test URL, in the same calendar day:</p>
+<ul>
+  <li>Built the v7 codec, .build reader/writer, graph + queries, resolvers, stats parser, Allocation builder, poe2db client</li>
+  <li>Built the EXILE per-player profile system (PLAYER.md, LEAGUE_*.md, CHARACTER_*.md, EXILE.xml, asymptotic confidence, dual-game support) — a surface that wasn't in v0.2 but emerged from conversation about the floor-lowering positioning</li>
+  <li>Built the self-update mechanism (skill code + tree data + poe2db cache + game version)</li>
+  <li>Built the filesystem scanner (PoB / Awakened PoE Trade / Exilence / ChaosRecipeEnhancer / game installs)</li>
+  <li>Surfaced and stubbed the future WebSocket messenger for live skill ↔ viewer integration</li>
+  <li>Established the community-handoff pattern + ATTRIBUTIONS.md (NeverSink, natwarth, Path-of-Tools, poe-tool-dev, RePoE)</li>
+  <li>Validated Phase 1 against Pedro's URL: 142 records, 687 bytes, all 4 flag combinations, byte-exact round-trip</li>
+  <li>Validated Phase 2 against GGG's reference Titan Warrior .build: 34 passives all resolve, mixed bare/rich forms preserved, zero validation warnings</li>
+  <li>103 tests green</li>
+</ul>
+<p>v0.3 is the convergence point. What's left for league start is the integration story — wiring goals + guides into the planning loop, running an end-to-end onboarding against Pedro himself, fixing whatever surfaces.</p>
+</div>
 
 <h3>What the implementer Claude needs from us as researchers</h3>
 
@@ -754,6 +931,124 @@ def parse_build_url(url_or_code):
 </blockquote>
 
 <p>The answer becomes our research backlog. Web Claude + Pedro work the backlog; Claude Code writes the code. Two surfaces, one project, each doing what it does.</p>
+</section>
+
+<section id="exile">
+<h2>13. EXILE — the player profile system <span class="tag verified">shipped, added in v0.3</span></h2>
+
+<p>Not in v0.2. Emerged from the design conversation about what makes Claude useful at the floor-lowering scope: generic advice is mediocre advice, and the path to non-generic is per-player context that persists across conversations. CLAUDE.md gives project context; <strong>EXILE.md gives player-in-this-league context</strong>.</p>
+
+<h3>Three-rate-of-change discipline</h3>
+
+<p>Same architectural move as §2's "three rates of change":</p>
+<ul>
+  <li><strong>PLAYER.md</strong> — durable, years. Identity, knowledge surface, playstyle preferences, capacity signals (grind, crafting engagement, peak wealth tier, systems knowledge).</li>
+  <li><strong>LEAGUE_&lt;id&gt;.md</strong> — per league, months. Goal, time budget, mechanics engaged, session log.</li>
+  <li><strong>CHARACTER_&lt;slug&gt;.md</strong> — per playthrough, days/weeks. Class, ascendancy, current level, build URL + companion <code>.build</code> file, archetype/defense/offense tags, milestones.</li>
+</ul>
+
+<p>The three compose into <code>~/.claude/projects/&lt;project-id&gt;/EXILE.xml</code> — an auto-loaded structured index Claude reads on every session. The XML is rebuilt artifact (never hand-edited); the <code>.md</code> files are the editable surface.</p>
+
+<h3>Tag confidence math</h3>
+
+<p>Every tag carries a confidence in <code>[0, 1)</code> where 1.0 is unreachable. Asymptotic Bayesian updates:</p>
+<pre><code>positive delta: new = old + (1 - old) * delta
+negative delta: new = old + old * delta  (delta < 0)
+
+bump_confidence(0.0, 0.5) == 0.5
+bump_confidence(0.5, 0.5) == 0.75
+bump_confidence(0.75, 0.5) == 0.875
+bump_confidence(0.875, 0.5) == 0.9375
+... approaches 1.0 but never reaches it</code></pre>
+
+<p>Calibration table (initial confidences after onboarding evidence):</p>
+<table>
+<tr><th>Evidence type</th><th>Initial confidence</th></tr>
+<tr><td>Filesystem tool present</td><td>0.95</td></tr>
+<tr><td>Single-character archetype</td><td>0.40</td></tr>
+<tr><td>Two characters confirming same archetype</td><td>0.65</td></tr>
+<tr><td>Three+ characters same archetype</td><td>0.85</td></tr>
+<tr><td>Player explicitly confirms in questionnaire</td><td>0.85</td></tr>
+<tr><td>Player explicitly denies</td><td>bump current by −0.5</td></tr>
+<tr><td>Inferred from item modifiers alone</td><td>0.30</td></tr>
+</table>
+
+<h3>Dual-game support</h3>
+
+<p>Most players play both PoE 1 and PoE 2. The system treats them as separate-but-related dimensions:</p>
+<ul>
+  <li>Game-agnostic tags (HC tendency, trade preference, time budget) at the section root</li>
+  <li>Game-specific tags nest by game: <code>knows.poe1.essence_crafting</code>, <code>knows.poe2.spirit_management</code></li>
+  <li>Active/dormant character status is exclusive <em>per game</em> — one PoE 1 character and one PoE 2 character can both be active simultaneously</li>
+</ul>
+
+<h3>The four-phase onboarding flow</h3>
+
+<p>Detailed in <code>ONBOARDING.md</code>. Triggered when <code>EXILE/DONE</code> is absent. Once complete, subsequent sessions skip directly to session-start hooks.</p>
+
+<ol>
+  <li><strong>Filesystem scan</strong> — passive, ~5s. Detect installed PoB / Awakened PoE Trade / Exilence / ChaosRecipeEnhancer / game installs / custom filters. Compresses the questionnaire by eliminating questions whose answers are already evident from disk.</li>
+  <li><strong>Tailored questionnaire</strong> — HTML form artifact. Hard constraints (HC/SC, trade/SSF, time budget, goal), PoE history, trigger questions derived from what the scan found.</li>
+  <li><strong>Artifact requests</strong> — player drops in: account profile screenshot, Standard currency stash (scan for chase categoricals first — Mirror, Mageblood — then quantities), 1 best-equipped character, 1-2 varied characters, atlas tree. Claude extracts structured tags from each.</li>
+  <li><strong>Synthesize</strong> — assemble PLAYER.md draft, player reviews, snapshot to <code>PLAYER.initial.md</code>, write <code>EXILE/DONE</code>, regenerate <code>EXILE.xml</code>.</li>
+</ol>
+
+<p>Re-onboarding triggers: new league starts (new <code>LEAGUE_&lt;id&gt;.md</code>), new character starts, or player explicitly requests "update my profile."</p>
+</section>
+
+<section id="divergences">
+<h2>14. Divergences discovered during build <span class="tag verified">v0.3</span></h2>
+
+<p>Implementation surfaced six places where the v0.2 spec was wrong or under-specified. All caught by tests against real data; all corrected in code; all recorded in agent memory so they don't have to be re-derived.</p>
+
+<table>
+<tr><th>v0.2 said</th><th>Reality</th><th>Surface affected</th></tr>
+<tr>
+  <td>Atlas tree shares schema with passive tree (§2/§4)</td>
+  <td>Atlas nodes have no <code>id</code>, no <code>edges</code> array; only <code>out</code>/<code>in</code> adjacency. <code>isWormhole</code>, <code>reminderText</code>, <code>flavourText</code> are atlas-only fields. <code>grantedSkill</code> and <code>ascendancyId</code> are passive-tree-only.</td>
+  <td><code>graph.build_graph</code> handles both via <code>tree.raw.get("edges")</code> fallback to adjacency walk; <code>resolvers</code> doesn't reuse types across trees.</td>
+</tr>
+<tr>
+  <td><code>cdn.poe2db.tw/cache2/</code> is the data CDN (§7)</td>
+  <td>No data CDN. cdn.poe2db.tw serves only static assets (CSS/JS/images); all data paths return 403. The actual delivery: HTML page with the full structured JSON embedded inline as <code>new ModsView({...})</code>. One HTTP GET → regex-extract → <code>json.loads</code>.</td>
+  <td><code>poe2db_client.py</code> uses the inline-JSON path.</td>
+</tr>
+<tr>
+  <td>Weapon set byte = 0 or 1 (§3)</td>
+  <td>Actually 1 and 2 (1-indexed). Pedro's verified build shows <code>{1: 8, 2: 25}</code> distribution — no zeros. Higher values likely reserved for future GGG features.</td>
+  <td><code>parser.py</code>, <code>allocation.py</code>, <code>graph.summarize.weapon_set_split</code>. Validator no longer rejects values ≥ 2.</td>
+</tr>
+<tr>
+  <td>Ascendancies are strings in <code>tree.classes[i].ascendancies</code></td>
+  <td>They're dicts with <code>name</code> + <code>flavourText</code> + layout fields. Some slots are literal <code>None</code> for unreleased ascendancies (Ranger's middle slot is observed empty).</td>
+  <td><code>resolvers.Tree.ascendancy_name</code> reads <code>.name</code> from the dict.</td>
+</tr>
+<tr>
+  <td>Class start nodes carry single <code>classStartIndex</code> (implied)</td>
+  <td>It's an <strong>array</strong> — paired classes share start positions. PoE 2's three new classes reuse PoE 1's six wheel-starts: Marauder/Warrior (47175), Witch/Sorceress (54447), Ranger/Huntress (50459), Duelist/Mercenary (50986), Shadow/Monk (44683), Templar/Druid (61525).</td>
+  <td><code>graph.class_start_node</code> scans the array.</td>
+</tr>
+<tr>
+  <td>The <code>tree.nodes</code> dict is keyed by string id (implied by §4 schema)</td>
+  <td>Dict is keyed by stringified skill hash (e.g. <code>"42761"</code>); the string id lives inside the node as <code>node.id</code>. A structural <code>"root"</code> entry has neither <code>skill</code> nor <code>id</code>. Net: 5102 dict entries, 5101 real nodes.</td>
+  <td><code>resolvers.Tree</code> exposes three indexes: <code>nodes_by_dict_key</code> (raw), <code>nodes_by_string_id</code> (re-keyed by node.id), <code>nodes_by_skill_hash</code> (re-keyed by node.skill).</td>
+</tr>
+<tr>
+  <td>The passive tree is one connected component (implied by §4 query playbook)</td>
+  <td>It's not. Each ascendancy is its own subgraph. <code>nx.is_connected(g)</code> returns False. Steiner tree and shortest-path code must handle this — restrict to the component containing the relevant terminal or class start.</td>
+  <td><code>graph.steiner_route</code> restricts to the largest component containing the first terminal.</td>
+</tr>
+<tr>
+  <td>Class start nodes are records in the build (implied)</td>
+  <td>They're implicit. The <code>class</code> field in the byte header determines start position; the start node is NOT in the records array. "Witch start → Ancestral Bond = 17 hops" means 17 <em>new</em> allocations on top of the implicit start.</td>
+  <td><code>Allocation.cost_to</code> and <code>Allocation.extend_to</code> exclude implicit start nodes from cost/allocation counts.</td>
+</tr>
+<tr>
+  <td>.build inventory slots have only <code>inventory_id</code> + <code>additional_text</code> (§5)</td>
+  <td>Per natwarth's parser (and confirmed against GGG's docs), slots also accept <code>unique</code> (recommended unique item name) and <code>hint</code> (short inline hint). Supports also accept <code>level_interval</code>. And <code>level_interval</code> can be a single int (start level only), not just a <code>[start, end]</code> pair.</td>
+  <td><code>build_reader.py</code> + <code>build_writer.py</code>.</td>
+</tr>
+</table>
 </section>
 
 <hr>

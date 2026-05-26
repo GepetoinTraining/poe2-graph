@@ -1,0 +1,52 @@
+schema_version: 1
+handle: chacalcoach
+display_name: Chacal Coach
+
+channels:
+  twitch: https://www.twitch.tv/chacalcoach
+  youtube: https://www.youtube.com/@Chacal-OP
+  instagram: https://www.instagram.com/chacalcoach/
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/chacalcoach
+home_url: null
+
+disposition: public
+
+games: [poe2]
+primary_language: pt-br
+
+specialties:
+  - build_coaching
+  - monk
+  - league_starter
+  - leveling_optimization
+
+style_tags:
+  - coaching_oriented
+  - beginner_to_intermediate
+  - short_form
+  - portuguese
+
+style_notes: |
+  ChacalCoach brands explicitly as a build coach: the handle name signals the content
+  promise. They are #2 among PT-BR PoE 2 streamers by viewership (~32k viewer hours
+  in 30 days before 0.5, Twitch Partner). Pre-0.5 stream titles show leveling-sequence
+  focus ("Best Monk leveling for the NEW LEAGUE"), and TikTok and Instagram reels
+  document specific builds such as "Cometa Infinito" (Infinite Comet) and "Warrior Build"
+  for PoE 2. poe.ninja tracks their character (ChacalCoach_TTV, level 84 Inquisitor in
+  Mirage). The coaching angle makes their explanations more step-by-step than
+  Rakin's — useful for players who want a PT-BR human narrating the build decision
+  process rather than watching a top-ladder player execute silently.
+
+transmits:
+  - edge: marginal_capability_thinking
+    confidence: 0.70
+    note: "Coaching frame forces explicit discussion of what a build can and cannot do at each gear tier"
+  - edge: league_phase_awareness
+    confidence: 0.65
+    note: "Leveling-sequence content implies clear model of what matters by when"
+  - edge: time_budget_calibration
+    confidence: 0.60
+    note: "Prep-oriented streams help players understand the upfront effort curve of a new league start"
+
+evidence_url: https://www.twitch.tv/chacalcoach

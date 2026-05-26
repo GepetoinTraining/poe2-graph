@@ -1,0 +1,114 @@
+# Edge taxonomy — the curated list of meta-knowledge tags this skill teaches.
+#
+# These are DISTINCT from mechanic tags (essence_crafting, breach_mechanics).
+# Mechanic tags describe knowledge of game systems; edge tags describe
+# postures, patterns, and timing knowledge that separate skilled players
+# from beginners.
+#
+# Each tag becomes a key in `knows.poe2.<edge_name>` in PLAYER.md, with
+# confidence in [0, 1) per the asymptotic bump rule. Confidence is bumped
+# per scoring dimension hit during case studies (default +0.4 per hit).
+#
+# This list grows. When the skill recognises an edge during play that
+# isn't in this taxonomy, it proposes adding it via a PR-style review.
+
+schema_version: 1
+last_updated: 2026-05-26
+
+edges:
+  - name: market_timing
+    summary: "Reading price charts as accumulation/distribution phases, not snapshots. Knowing the league has rhythms."
+    check: "Case study: present a chart, ask 'buy, sell, or hold, and why.'"
+    category: economic
+
+  - name: volume_reading
+    summary: "Volume direction leads price. Rising price on falling volume = top. Rising price on rising volume = real."
+    check: "Case study: chart with volume mismatch, ask what they read."
+    category: economic
+
+  - name: league_phase_awareness
+    summary: "Week 1, 2, 4, post-month, end-of-league have completely different optimal strategies and prices."
+    check: "Conversation: 'we're week 2 — what should be cheap, what should be expensive, why.'"
+    category: economic
+
+  - name: currency_velocity
+    summary: "Which orbs are flowing out of circulation. Leading indicator for what's about to crash."
+    check: "Case study with poe.ninja data: which currency is draining, what does that mean."
+    category: economic
+
+  - name: option_value_vs_face_value
+    summary: "Mirrors aren't 9k Divines. They're the ability to make a trade most players never make. Some items have option value beyond their cash price."
+    check: "Mirror-drop scenario: 'what's this worth, and what does worth mean.'"
+    category: economic
+
+  - name: downside_discipline
+    summary: "Stop crafting at first sellable outcome. Sunk-cost is the new player's bleed. Halt-and-list beats push-through."
+    check: "Craft scenario: 'you hit +3 Cold instead of +3 Projectile. What now.'"
+    category: crafting
+
+  - name: miss_economy
+    summary: "Calculate expected value across the miss distribution, not just hit probability. Craft selection is itself a function of miss-value."
+    check: "Multi-craft scenario: choose between two crafts, justify by full distribution."
+    category: crafting
+
+  - name: patient_pricing
+    summary: "List above market, wait 24-48h, find the right buyer. Fire-sale pricing donates value to flippers."
+    check: "Listing scenario: player names price, claude shows market median, asks for reasoning."
+    category: economic
+
+  - name: investing_vs_gambling
+    summary: "Knowing the difference between a craft with calculated EV and a craft you're rolling on hope."
+    check: "Craft scenario with hidden EV — does the player do the math or feel the math."
+    category: crafting
+
+  - name: flow_anticipation
+    summary: "What farm becomes profitable next. Reading what builds will mature into needing what items, two weeks ahead."
+    check: "Forward-looking: 'given the meta two weeks in, what's about to become demanded.'"
+    category: economic
+
+  - name: posture_under_drop
+    summary: "The discipline of not selling immediately after a big drop. Securing the item, sleeping on it, thinking about ceiling-changes."
+    check: "The Mirror-drop case study. 'Kid drops a Mirror — what's the conversation.'"
+    category: discipline
+
+  - name: negotiation_posture
+    summary: "Mirror-tier trades happen in messages, not click-buy. How to signal, how to verify, how to counteroffer."
+    check: "Roleplay a trade negotiation in chat."
+    category: trade
+
+  # ----- psychological / self-awareness edges -----
+  # These edges are about the player's relationship to the game itself.
+  # Distinct from economic/crafting/discipline — these are about who the
+  # player IS as a player, and whether they're playing their game or
+  # someone else's. Optimizing the fun out is the failure mode this
+  # category resists.
+
+  - name: time_budget_calibration
+    summary: "Knowing your actual hours-per-week for the league, not your fantasy hours. Strategies must match the budget you have, not the one you wish you had."
+    check: "Conversation: 'how many hours/week do you actually play, honestly.' A concrete number is a hit; 'when I have time' is a miss."
+    category: psychological
+
+  - name: aspirational_calibration
+    summary: "Distinguishing 'I admire this player and want to watch them' from 'I want to play exactly like them.' The former is fine; the latter requires matching their budget AND their joy-source."
+    check: "Player names a content creator they want to emulate; Claude probes whether they want to mimic or admire. A hit requires the player to own the distinction."
+    category: psychological
+
+  - name: playstyle_authenticity
+    summary: "Knowing which aspects of PoE you actually enjoy (gear, bossing, theory, social, completion, currency, atlas, character variety) rather than chasing what you think you should enjoy. Joy is the metric. 'I should' is the warning."
+    check: "Player names 1-2 specific aspects of play they look forward to. 'Whatever the meta says' or 'whatever's optimal' is a miss."
+    category: psychological
+
+  - name: marginal_capability_thinking
+    summary: |
+      Valuing upgrades by what they ENABLE, not by face-appeal or magnitude. The 80/100
+      rule: never commit 80%+ of your liquid currency to a single upgrade unless that
+      upgrade delivers 80%+ more capability. Sequence small chained upgrades over one big
+      stranding purchase. Maintain operational reserve (map sustain, next upgrade,
+      accident fund). The sequence of investment matters more than the magnitude of any
+      one investment.
+    check: |
+      Upgrade scenario: player has X currency, wants Y item costing ~0.8X. Does the
+      player articulate (a) what specific capability the upgrade enables, (b) what
+      operational reserve remains after purchase, (c) whether a sequenced alternative
+      exists, (d) whether the 80/100 rule clears or doesn't?
+    category: discipline

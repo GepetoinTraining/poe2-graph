@@ -5,3 +5,30 @@ __pycache__/
 .claude/
 *.swp
 probe_*.html
+
+# Updater working dirs (git clones from upstream forks, regenerable)
+atlastree-export/
+poe2-skilltree-export/
+
+# Worker + diagnostic logs
+*.log
+
+# Research scraps left over from poe2db client / item-parser bring-up
+amulet*.json
+endgame-items*.html
+
+# Player data — never tracked
+.env
+EXILE/PLAYER.md
+EXILE/PLAYER.initial.md
+EXILE/PLAYER.diffs/
+EXILE/LEAGUE_*.md
+EXILE/LEAGUE_*.initial.md
+EXILE/LEAGUE_*.diffs/
+EXILE/CHARACTER_*.md
+EXILE/CHARACTER_*.initial.md
+EXILE/CHARACTER_*.diffs/
+EXILE/CHARACTER_*.build
+EXILE/DONE
+EXILE/HISTORY.md
+data/poe2db_cache/

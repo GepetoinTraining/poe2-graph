@@ -1,0 +1,57 @@
+schema_version: 1
+handle: onemanaleft
+display_name: OneManaLeft / ConnerConverse
+
+channels:
+  twitch: https://www.twitch.tv/onemanaleft
+  youtube: https://www.youtube.com/@ConnerConverse
+  mobalytics: https://mobalytics.gg/poe-2/profile/connerconverse
+home_url: https://www.twitch.tv/onemanaleft
+build_hub: https://mobalytics.gg/poe-2/profile/connerconverse
+live_status_url: https://decapi.me/twitch/uptime/onemanaleft
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - archmage
+  - mana_stacking
+  - int_stacking
+  - exotic_scaling_mechanics
+  - gemling_legionnaire
+
+style_tags:
+  - mechanically_inventive
+  - enthusiast_voice
+  - explores_weird_scaling
+  - pedro_endorsed
+  - mobalytics_partner
+
+style_notes: |
+  The canonical Archmage / mana-stacking voice in PoE 2. His "Fattest Mana
+  Stacker" Gemling Archmage build is the reference for the archetype.
+  Active variants across Stormweaver, Mercenary/Gemling, and any int-stacking
+  derivative. Enthusiast tone — he genuinely enjoys finding new mana-scaling
+  vectors and walks viewers through the discovery.
+
+  Pedro endorses him explicitly: "he's the bomb" — flag for any Archmage-
+  related guidance the skill surfaces. Surface when player is on Sorceress
+  / Stormweaver, Mercenary / Gemling, or anywhere mana stacking applies, or
+  when the player wants to understand Archmage as a mechanic rather than
+  follow a recipe.
+
+transmits:
+  - edge: aspirational_calibration
+    confidence: 0.7
+    note: "Builds are admirable AND copyable, but require the budget and the joy of theorycraft"
+  - edge: playstyle_authenticity
+    confidence: 0.7
+    note: "Embodies 'play what you find mechanically interesting' rather than meta-following"
+  - edge: marginal_capability_thinking
+    confidence: 0.65
+    note: "Mana-stacking depends on understanding which scalings actually compound"
+  - edge: investing_vs_gambling
+    confidence: 0.6
+    note: "Build investments are calculated, not impulsive; he shows the math"

@@ -1,0 +1,52 @@
+schema_version: 1
+handle: missmikkaa
+display_name: MissMikkaa
+
+channels:
+  twitch: https://www.twitch.tv/missmikkaa
+  youtube: https://www.youtube.com/missmikkaa
+home_url: https://www.twitch.tv/missmikkaa
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/missmikkaa
+
+disposition: public
+
+games: [poe1, poe2, arpg_general]
+primary_language: en
+
+specialties:
+  - arpg_broad
+  - challenge_runs
+  - playthroughs
+  - variety_streamer
+
+style_tags:
+  - high_engagement
+  - varied_content
+  - community_women
+  - provisional
+
+style_notes: |
+  Ranked #2 most-watched female PoE 2 Twitch streamer per Streams Charts
+  (~4.4k hours watched / 7 days at sample). Multi-game ARPG creator with
+  Path of Exile 2 in active rotation alongside other ARPGs. Known for
+  challenge runs in adjacent ARPGs which suggest a similar appetite in
+  PoE 2.
+
+  Catalog entry is **provisional**: specifics on build specialties and
+  edges transmitted aren't yet verified through sustained co-watching.
+  Marked transmits below are inferential from the variety-streamer +
+  challenge-run pattern, not measured against authored content. Refine
+  as the player surfaces concrete MissMikkaa moments.
+
+  Surface as a representation signal for players seeking women creators
+  in PoE 2, or as a variety-streamer option for players who don't want
+  a build-tutorial format.
+
+transmits:
+  - edge: playstyle_authenticity
+    confidence: 0.6
+    note: "Variety-streamer pattern across ARPGs implies authentic exploration over meta-following. Provisional."
+  - edge: league_phase_awareness
+    confidence: 0.5
+    note: "Active engagement with the PoE 2 patch cycle visible in upload cadence. Provisional."

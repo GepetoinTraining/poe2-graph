@@ -1,0 +1,42 @@
+schema_version: 1
+handle: moulei
+display_name: 某雷 (moulei)
+
+channels:
+  bilibili: https://live.bilibili.com/599106
+  youtube: https://www.youtube.com/@moulei
+  twitch: https://www.twitch.tv/moulei
+home_url: null
+build_hub: null
+live_status_url: https://live.bilibili.com/599106
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: zh-cn
+
+specialties:
+  - build_diversity
+  - live_play
+  - endgame_progression
+
+style_tags:
+  - practical
+  - depth_first
+  - cross_lingual
+
+style_notes: |
+  Full-time PoE streamer with 10k+ hours. Streams live on Bilibili and
+  produces VOD-style build content on YouTube. Delivery is practical and
+  depth-first — plays the build on stream before publishing a guide, so
+  viewers see real decision-making under uncertainty. English subtitles on
+  some YouTube uploads make him the most cross-lingual of the CN creators.
+  10k+ hour base means build evaluation is backed by long-run experience.
+
+transmits:
+  - edge: aspirational_calibration
+    confidence: 0.7
+    note: "Long-run playtime grounds his build expectations in realistic performance envelopes."
+  - edge: playstyle_authenticity
+    confidence: 0.65
+    note: "Live-first format rewards personal fit over tier-list conformity."

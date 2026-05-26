@@ -1,0 +1,61 @@
+schema_version: 1
+id: playstyle_calibration_v1
+topic: "Playstyle calibration — playing your game, not someone else's"
+summary: |
+  Most leagues that go wrong for a player don't go wrong because the build
+  was bad. They go wrong because the player tried to play someone else's
+  game. They watched a streamer with 60 hours a week and tried to mirror a
+  strategy designed for 60 hours; they followed a meta they didn't actually
+  enjoy; they optimized themselves out of the parts of PoE they used to
+  love. This guide is the early-league self-check that resists the trap.
+  Time budget honest, joy-source named, aspirational targets calibrated
+  between admire-and-watch versus admire-and-mimic.
+game: poe2
+version_minimum: "0.5.0"
+last_updated: 2026-05-26
+difficulty: foundational
+
+transmits:
+  - time_budget_calibration
+  - aspirational_calibration
+  - playstyle_authenticity
+
+case_studies:
+  - found_fubgun_excitement
+  # TODO: fourth_alt_burnout — player rerolls every week, never finishes a character
+  # TODO: trade_versus_ssf_self_test — player wants to try SSF without budget for it
+  # TODO: endgame_aspiration_vs_campaign_friction — player wants to be at maps but hates leveling
+
+creators:
+  - handle: mathil
+    role: counter_aesthetic
+    note: |
+      Off-meta unique-driven builds. Demonstrates that playing weird things
+      you enjoy is a valid endgame approach — a counter to the
+      everyone-should-play-optimal aesthetic. Useful pointer when a player
+      needs permission to NOT mirror the top-tier optimizer.
+  - handle: captainlance9
+    role: counter_aesthetic_primary
+    note: |
+      The canonical voice for "play what's mechanically interesting." His
+      off-meta builds (Reverse Chill Stormweaver, Meteor Bear Druid, Spirit
+      Walker Beast Tamer) demonstrate that the meta isn't a ceiling — it's
+      one local maximum. Surface when player worries they "should" be
+      playing the top build.
+  - handle: pohx
+    role: accessibility_primary
+    note: |
+      Explicit accessibility-conscious builds — minimal-button, defensive-first,
+      patient-scaling. The canonical pointer for players who need permission
+      to play slow-and-safe, have RSI / motor considerations, or are tired
+      of twitchy / APM-heavy builds. Calibrates time-budget and joy-source
+      questions concretely.
+  - handle: onemanaleft
+    role: theorycraft_passion
+    note: |
+      Models authentic engagement with the mechanical-discovery side of PoE.
+      Useful when a player thinks they should follow a meta build but
+      actually lights up when discussing mechanics — naming that misalignment
+      is the calibration move.
+
+prerequisites: []

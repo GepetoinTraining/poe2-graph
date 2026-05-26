@@ -1,0 +1,162 @@
+# Case study: the player has just discovered Fubgun (or any maximally-efficient
+# high-time-budget streamer) and arrives with "I want to play like this."
+#
+# The risk this case study resists: the player adopts a playstyle designed for
+# 60 hours/week and ~10 years of game-state mental model, fails to make it
+# work on their actual budget, optimizes the fun out of the game, and burns
+# out by week 3.
+#
+# This is the most foundational psychological edge — comes up every league,
+# every player, every time a new aspirational target enters the scene. The
+# specific creator name is interchangeable (Fubgun, Lightee, Steelmage,
+# Empyrian); the conversation shape is the same.
+
+schema_version: 1
+id: found_fubgun_excitement
+guide: playstyle_calibration_v1
+edge_tags:
+  - time_budget_calibration
+  - aspirational_calibration
+  - playstyle_authenticity
+
+prerequisites: []
+estimated_time: "8-12 min conversation"
+
+setup:
+  scenario: |
+    Player has just watched a Fubgun stream or VOD — the all-in HC SSF
+    optimization style, or one of the deep "X currency/hr juiced strategy"
+    breakdowns. They come into the conversation excited, saying some
+    version of: "I want to learn to do what he does this league. Where do
+    I start?"
+  live_data: null
+    # No external data needed; this case study runs on the player's words.
+  player_state: |
+    Excited, slightly intimidated. Anchored on a high-skill,
+    high-time-budget player whose joy-source they haven't examined.
+    Has not yet articulated: their own hours/week, the parts of PoE they
+    actually enjoy, or whether efficiency-as-aesthetic resonates with them
+    or they're chasing someone else's pleasure circuit.
+
+decision_point: |
+  Player says some version of "Fubgun does <strategy>. I want to do that
+  this league. Where do I start?"
+
+  What do you tell them?
+
+scoring_dimensions:
+  - dimension: named_their_hours
+    edge: time_budget_calibration
+    check: |
+      Did the player name (or get asked and name) their actual hours-per-week
+      budget? Hit requires a concrete number: "10 hours" / "20 hours" / "I
+      can do 4 hours weeknights and 8 weekends." Miss: "when I have time" /
+      "as much as I can" / "depends on work." Fubgun's playstyle assumes
+      50-80 hr/wk; the player needs to know the gap.
+
+  - dimension: distinguished_admire_from_mimic
+    edge: aspirational_calibration
+    check: |
+      Did the player articulate that "I want to watch Fubgun" and "I want
+      to play like Fubgun" are two different statements? A hit means the
+      player explicitly owns this — "I like watching it, but I don't think
+      I want to live in spreadsheets." Miss: they treat watching and
+      mimicry as the same posture.
+
+  - dimension: named_their_actual_fun
+    edge: playstyle_authenticity
+    check: |
+      Did the player name what aspect of PoE they actually enjoy? Concrete
+      hits: "I love seeing gear come together" / "I want to kill bosses I
+      couldn't last league" / "I like trying weird builds" / "currency
+      flipping is the puzzle for me" / "I just want to map and turn brain
+      off after work." Miss: "I want to be good at the game" / "whatever's
+      optimal" / "I don't know, that's why I'm asking." (Soft miss — if
+      they say I-don't-know, Claude prompts again rather than scoring.)
+
+  - dimension: picked_one_thing
+    edge: aspirational_calibration
+    check: |
+      Did the player commit to learning ONE aspect of Fubgun's play this
+      league rather than the whole stack? Hits: "I'll learn his loot
+      filter approach" / "I'll watch him solve one specific layout each
+      week and try that one layout" / "I want to copy his pacing for the
+      first 24 hours of the league, then go off-script." Miss: "I'll
+      learn everything he does." The mental move is: Fubgun-as-cafeteria,
+      not Fubgun-as-blueprint.
+
+  - dimension: acknowledged_burnout_risk
+    edge: playstyle_authenticity
+    check: |
+      Did the player acknowledge that copying a higher-time-budget
+      player's playstyle has a burnout cost, and name a concrete check-in
+      trigger? Hit: "If I stop wanting to log in by week 3, I drop the
+      strategy and play whatever I want." Miss: no acknowledgement, or
+      vague "I'll just see how it goes."
+
+claude_response_template: |
+  1. Affirm the content. Fubgun's videos are good. Watching is valid. Do
+     not trash the creator, do not trash the player's instinct to want to
+     learn from a top-tier player.
+
+  2. Ask the time question, plain and concrete. "How many hours a week do
+     you actually have for this league? Honest answer. Watching streams
+     and reading guides counts as game time, fantasy hours don't."
+
+  3. Reframe the joy-source. "Fubgun's playstyle is the joy of optimization
+     itself — the spreadsheet, the layout solve, the currency-per-hour
+     math IS the fun for him. Some players love that. Most love something
+     else — progress, gear identity, build-craft, bossing, maps as
+     decompression. What do YOU actually look forward to when you sit
+     down to play?"
+
+  4. Offer the cafeteria framing. "Pick ONE thing of his to learn this
+     league. Not the strategy. ONE thing. The loot filter approach. The
+     layout-reading discipline. The currency target structure. Anything
+     concrete and bounded. The other 30 hours of his play stays
+     admiration, not mimicry."
+
+  5. Set the burnout-signal explicitly. "Week 3 check-in: do you still
+     want to log in? If the answer is 'I should but I don't,' the strategy
+     is wrong, not you. Drop it and play whatever you actually want."
+
+  6. Do not over-warn. The player isn't fragile. They want to grow. The
+     point is calibration, not protection. Sound like an older friend
+     who's done this five times, not a therapist.
+
+tag_bumps_per_dimension_hit: 0.4
+tag_bumps_per_dimension_miss: 0.0
+
+follow_up:
+  delay_hours: 504    # 3 weeks
+  prompt: |
+    "Three weeks ago you said you wanted to learn from Fubgun this league.
+    How's it going? Are you still enjoying logging in? Did you actually
+    pick ONE thing or did the whole-stack ambition creep back?"
+  bumps_on_still_enjoying:
+    - edge: playstyle_authenticity
+      delta: 0.4
+    - edge: aspirational_calibration
+      delta: 0.3
+  bumps_on_burnout_signal_and_pivot:
+    # Bigger bump than enjoying — catching the burnout AND pivoting away
+    # is the real lesson, not avoiding it altogether.
+    - edge: playstyle_authenticity
+      delta: 0.5
+    - edge: time_budget_calibration
+      delta: 0.4
+    - edge: aspirational_calibration
+      delta: 0.3
+
+attribution:
+  author: claude + pedro (seed)
+  source: |
+    Pedro's framing 2026-05-26: "efficiency vs. fun — optimizing the fun
+    out of the game (the yaml for warning the player what it is they're
+    getting into when they find fubgun and think that's what they want to
+    do during the league)."
+  notes: |
+    The specific creator name in the scenario is interchangeable —
+    "Fubgun" is the archetype, not the target. When this case study fires
+    in a real conversation, Claude substitutes whichever high-time-budget
+    creator the player has just discovered.

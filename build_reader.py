@@ -12,12 +12,17 @@ from pathlib import Path
 from typing import Any, Optional, Union
 
 
+# level_interval can be either a single int (start level only) or a [start, end] pair.
+# Per the GGG developer docs and natwarth's parser, both forms are valid.
+LevelInterval = Union[int, list[int]]
+
+
 @dataclass
 class PassiveEntry:
     """One entry under `passives`. Either a bare string id or a richer object."""
     id: str
     additional_text: Optional[str] = None
-    level_interval: Optional[list[int]] = None
+    level_interval: Optional[LevelInterval] = None
     weapon_set: Optional[int] = None
 
 
@@ -25,6 +30,7 @@ class PassiveEntry:
 class SupportSkill:
     id: str
     additional_text: Optional[str] = None
+    level_interval: Optional[LevelInterval] = None
 
 
 @dataclass
@@ -32,12 +38,16 @@ class SkillEntry:
     id: str
     support_skills: list[SupportSkill] = field(default_factory=list)
     additional_text: Optional[str] = None
+    level_interval: Optional[LevelInterval] = None
 
 
 @dataclass
 class InventorySlot:
     inventory_id: str
     additional_text: Optional[str] = None
+    unique: Optional[str] = None         # specific unique item the slot recommends
+    hint: Optional[str] = None           # short hint text rendered alongside the slot
+    level_interval: Optional[LevelInterval] = None
 
 
 @dataclass
@@ -66,7 +76,11 @@ def _coerce_passive(entry: Union[str, dict[str, Any]]) -> PassiveEntry:
 def _coerce_support(entry: Union[str, dict[str, Any]]) -> SupportSkill:
     if isinstance(entry, str):
         return SupportSkill(id=entry)
-    return SupportSkill(id=entry["id"], additional_text=entry.get("additional_text"))
+    return SupportSkill(
+        id=entry["id"],
+        additional_text=entry.get("additional_text"),
+        level_interval=entry.get("level_interval"),
+    )
 
 
 def _coerce_skill(entry: dict[str, Any]) -> SkillEntry:
@@ -74,6 +88,7 @@ def _coerce_skill(entry: dict[str, Any]) -> SkillEntry:
         id=entry["id"],
         support_skills=[_coerce_support(s) for s in entry.get("support_skills", [])],
         additional_text=entry.get("additional_text"),
+        level_interval=entry.get("level_interval"),
     )
 
 
@@ -81,6 +96,9 @@ def _coerce_inventory(entry: dict[str, Any]) -> InventorySlot:
     return InventorySlot(
         inventory_id=entry["inventory_id"],
         additional_text=entry.get("additional_text"),
+        unique=entry.get("unique"),
+        hint=entry.get("hint"),
+        level_interval=entry.get("level_interval"),
     )
 
 

@@ -1,0 +1,49 @@
+schema_version: 1
+handle: octavia_o
+display_name: Octavia_O
+
+channels:
+  twitch: https://www.twitch.tv/octavia_o
+home_url: https://www.twitch.tv/octavia_o
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/octavia_o
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: ro
+
+specialties:
+  - romanian_language
+  - poe2_main
+  - long_form_streamer
+
+style_tags:
+  - romanian
+  - community_women
+  - regional_voice
+  - provisional
+
+style_notes: |
+  Romanian-language Path of Exile 2 streamer. Ranked #18 for Path of
+  Exile 2 on Twitch globally and #17 among Romanian-language channels at
+  sample. Streaming since 2018; ~23k Twitch followers. PoE 2 is the main
+  category.
+
+  Catalog entry is **provisional**: specifics on build specialties and
+  edges transmitted aren't yet verified through co-watching. The
+  transmits below are inferential from the sustained-PoE-2-streamer
+  pattern. Refine as the player surfaces concrete Octavia_O moments.
+
+  Surface for: Romanian-language players who want native-language PoE 2
+  content; representation signal for players seeking women creators;
+  alternative regional voice when the larger Romanian-Canadian creator
+  (Kripparrian) feels too YouTube-first for what they want.
+
+transmits:
+  - edge: league_phase_awareness
+    confidence: 0.55
+    note: "Long-running PoE 2 channel implies engagement with the league cycle. Provisional."
+  - edge: playstyle_authenticity
+    confidence: 0.55
+    note: "Sustained PoE 2 focus over years suggests authentic engagement, not meta-chasing. Provisional."

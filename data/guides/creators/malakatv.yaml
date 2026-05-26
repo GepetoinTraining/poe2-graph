@@ -1,0 +1,52 @@
+schema_version: 1
+handle: malakatv
+display_name: MalakaTV
+
+channels:
+  twitch: https://www.twitch.tv/malakatv
+  youtube: https://www.youtube.com/@MalakaTV
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/malakatv
+home_url: null
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: pt-br
+
+specialties:
+  - meta_analysis
+  - patch_discussion
+  - economy_theory
+  - harvest_crafting
+  - post_patch_debate
+
+style_tags:
+  - analytical
+  - discussion_format
+  - opinion_driven
+  - portuguese
+
+style_notes: |
+  MalakaTV occupies the analyst/commentator niche in the PT-BR PoE scene — #3 among
+  PT-BR PoE 2 streamers (~10.7k viewer hours in 30 days, Twitch Partner). Stream
+  titles lean toward post-patch theory: "Analyses, Debates and Theories after PATCH"
+  is a recurring format. A Twitch VOD from 2023 shows them transitioning from Diablo 4
+  into PoE and learning Harvest and Metamorph crafting while playing ToxicRain with
+  140+ divines invested — signalling a player who engages with the economy layer deeply.
+  poe.ninja tracks a PoE 2 Oracle character (TWITCHMALAKA, level 97, Fate of the Vaal
+  league). Useful for players who want PT-BR interpretation of patch notes, meta shifts,
+  and build-vs-economy trade-offs rather than step-by-step build tutorials.
+
+transmits:
+  - edge: market_timing
+    confidence: 0.65
+    note: "Post-patch debate format trains attention to when the meta and prices shift"
+  - edge: option_value_vs_face_value
+    confidence: 0.60
+    note: "Harvest-crafting coverage implies discussion of item optionality and craft decisions"
+  - edge: investing_vs_gambling
+    confidence: 0.65
+    note: "Economy-first lens distinguishes informed investment from speculative plays"
+
+evidence_url: https://m.twitch.tv/videos/1916929641

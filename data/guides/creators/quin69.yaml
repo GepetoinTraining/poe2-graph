@@ -1,0 +1,46 @@
+schema_version: 1
+handle: quin69
+display_name: Quin69
+
+channels:
+  twitch: https://www.twitch.tv/quin69
+  youtube: https://www.youtube.com/@Quin69TV
+home_url: https://www.twitch.tv/quin69
+build_hub: null
+live_status_url: https://decapi.me/twitch/uptime/quin69
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: en
+
+specialties:
+  - hardcore
+  - league_start
+  - boss_progression
+  - viewer_interaction
+  - entertainment
+
+style_tags:
+  - high_energy
+  - unscripted
+  - HC_focused
+  - subathon_culture
+
+style_notes: |
+  NZ streamer. Chaotic-entertaining rather than tutorial-focused. Plays live and
+  raw — you learn by watching him push limits, die, adapt, and rage. Doesn't
+  pause to teach; ideal for players who absorb by osmosis. PoE 2 content
+  documented through late 2025 (136+ stream episodes), still actively streaming
+  into 2026.
+
+transmits:
+  - edge: downside_discipline
+    confidence: 0.7
+    note: "HC context forces him to articulate why he dies and what he'd do differently."
+  - edge: league_phase_awareness
+    confidence: 0.6
+    note: "Subathon and league-start runs reveal timing instincts implicitly."
+  - edge: posture_under_drop
+    confidence: 0.65
+    note: "Live reactions to big finds are unscripted; viewers see composure (or lack thereof) in real time."

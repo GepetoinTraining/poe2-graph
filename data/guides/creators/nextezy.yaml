@@ -1,0 +1,53 @@
+schema_version: 1
+handle: nextezy
+display_name: "Nextezy"
+
+channels:
+  youtube: https://www.youtube.com/channel/UCNmdBhyaYYtHRfb92xp04-A
+  twitch: https://www.twitch.tv/nextezy1
+  telegram: https://t.me/nextezy
+live_status_url: https://decapi.me/twitch/uptime/nextezy1
+build_hub: https://pobarchives.com/builds/T4JamXAX
+home_url: null
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: ru
+
+specialties:
+  - build_guides
+  - league_start
+  - meta_analysis
+  - patch_preview
+  - commentary
+
+style_tags:
+  - analytical
+  - opinionated
+  - meta_aware
+  - patch_notes_depth
+
+style_notes: |
+  Russian build guide and meta-commentary channel. Self-deprecating channel tagline
+  ("my builds are trash, but at least I stole them") masks careful patch analysis —
+  Nextezy publishes pre-league speculation and patch breakdown videos reliably before
+  each league, covering 0.5 changes and league-start options in Russian. Appears in
+  multi-creator podcasts with other RU creators (Qordes, Schellme). Style is talkative
+  and analytical, more theory-oriented than raw demonstration. Builds are catalogued on
+  POB Archives. Evidence of PoE 2 content active through May 2026.
+
+transmits:
+  - edge: league_phase_awareness
+    confidence: 0.7
+    note: "Pre-league analysis and patch-note breakdowns per release"
+  - edge: aspirational_calibration
+    confidence: 0.6
+    note: "Explicit tier commentary — what to realistically target at league start vs endgame"
+  - edge: option_value_vs_face_value
+    confidence: 0.55
+    note: "Identifies under-evaluated skills/ascendancies in patch preview content"
+
+# Evidence: PoE 2 0.5 league discussion video from May 2026; podcast appearance 2025;
+# POB Archives profile active; YouTube channel UCNmdBhyaYYtHRfb92xp04-A
+evidence_url: https://www.youtube.com/watch?v=BITk5RpbIBc

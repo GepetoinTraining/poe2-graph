@@ -1,0 +1,43 @@
+schema_version: 1
+handle: sentence_poe
+display_name: せんてんす (Sentence)
+
+channels:
+  twitch: https://www.twitch.tv/sen10ce3
+  twitter: https://x.com/sen10ce_twitch
+home_url: https://www.twitch.tv/sen10ce3
+build_hub: null
+live_status_url: null
+
+disposition: public
+
+games: [poe1, poe2]
+primary_language: ja
+
+specialties:
+  - poe2_introductory_content
+  - multi_genre_streamer
+  - new_player_guidance
+
+style_tags:
+  - accessible
+  - explanatory
+  - cross_genre
+
+style_notes: |
+  Japanese multi-genre streamer (ARPG, LoL, Apex, FFXIV) who covers PoE 2 with
+  accessible educational commentary; posted PoE 2 map-entry guidance in December
+  2024. Ranked #2 by viewership hours for Japanese-language PoE on Twitch
+  (2,531 viewer-hours, May 2026). Content leans toward explaining systems to
+  newcomers rather than theory-crafting. Multi-genre audience means PoE 2 is
+  one of several titles rather than a singular focus. Good pointer for
+  Japanese-speaking players arriving from adjacent games (FFXIV, Apex).
+  Re-verify continued PoE 2 activity against 0.5 launch.
+
+transmits:
+  - edge: aspirational_calibration
+    confidence: 0.6
+    note: "New-player framing tends to set realistic expectations about early-game power curves."
+  - edge: playstyle_authenticity
+    confidence: 0.55
+    note: "Multi-genre audience creates incentive to explain why PoE plays differently from other ARPGs, surfacing authentic preference-matching."

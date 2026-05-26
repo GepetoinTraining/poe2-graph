@@ -92,6 +92,59 @@ def test_validate_passes_for_real_ids():
     assert bw.validate(bf, tree) == []
 
 
+def test_inventory_slot_unique_and_hint_fields():
+    """natwarth's parser handles unique + hint + level_interval on inventory slots."""
+    slot = bw.InventorySlot(
+        inventory_id="Weapon1",
+        unique="Mageblood",
+        hint="Get this around level 75",
+        level_interval=[75, 90],
+    )
+    d = slot.to_dict()
+    assert d["unique"] == "Mageblood"
+    assert d["hint"] == "Get this around level 75"
+    assert d["level_interval"] == [75, 90]
+
+
+def test_support_skill_level_interval():
+    s = bw.SupportSkill(id="Metadata/X", level_interval=30)
+    d = s.to_dict()
+    assert isinstance(d, dict)
+    assert d["level_interval"] == 30
+
+
+def test_skill_entry_level_interval():
+    sk = bw.SkillEntry(id="Metadata/Y", level_interval=[1, 30])
+    d = sk.to_dict()
+    assert d["level_interval"] == [1, 30]
+
+
+def test_passive_level_interval_scalar_is_preserved():
+    """level_interval can be a single int (start level only), not just a pair."""
+    p = bw.PassiveEntry(id="intelligence11", level_interval=42)
+    d = p.to_dict()
+    assert isinstance(d, dict)
+    assert d["level_interval"] == 42
+
+
+def test_roundtrip_inventory_slot_extended_fields():
+    bf = bw.BuildFile(
+        inventory_slots=[
+            bw.InventorySlot(
+                inventory_id="Amulet1",
+                unique="Aul's Uprising",
+                hint="Drop only from Aul",
+                level_interval=80,
+            )
+        ]
+    )
+    encoded = bf.to_json()
+    decoded = br.parse(json.loads(encoded))
+    assert decoded.inventory_slots[0].unique == "Aul's Uprising"
+    assert decoded.inventory_slots[0].hint == "Drop only from Aul"
+    assert decoded.inventory_slots[0].level_interval == 80
+
+
 def test_annotations_apply():
     tree = resolvers.load_passive_tree()
     build = parser.parse(PEDRO_URL)
