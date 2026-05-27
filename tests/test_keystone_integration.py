@@ -27,14 +27,14 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import allocation  # noqa: E402
-import build_writer  # noqa: E402
+from graph import allocation  # noqa: E402
+from graph import build_writer  # noqa: E402
 import docs as docs_mod  # noqa: E402
 import exile  # noqa: E402
 import goals  # noqa: E402
-import graph as graph_mod  # noqa: E402
+from graph import network as graph_mod  # noqa: E402
 import guides  # noqa: E402
-import resolvers  # noqa: E402
+from graph import resolvers  # noqa: E402
 
 
 # ----- fixtures -----

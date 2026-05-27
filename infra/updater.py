@@ -24,7 +24,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 MANIFEST_PATH = DATA_DIR / "manifest.json"
 VERSION_PATH = ROOT / "VERSION"

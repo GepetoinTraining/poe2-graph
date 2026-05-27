@@ -14,9 +14,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import build_reader  # noqa: E402
-import build_writer  # noqa: E402
-import resolvers  # noqa: E402
+from graph import build_reader  # noqa: E402
+from graph import build_writer  # noqa: E402
+from graph import resolvers  # noqa: E402
 
 
 EXAMPLE = ROOT / "example.build"

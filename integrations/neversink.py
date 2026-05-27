@@ -36,7 +36,7 @@ NEVERSINK_RELEASES_API = f"https://api.github.com/repos/{NEVERSINK_REPO}/release
 # release page. Filenames follow NeverSink's convention:
 #   "NeverSink's filter 2 - {N}-{STRICTNESS}.filter"
 # where N is 0..6 and STRICTNESS matches STRICTNESS_LEVELS (uppercased + hyphenated).
-LOCAL_FORK_PATH = Path(__file__).parent / "tools" / "neversink-poe2"
+LOCAL_FORK_PATH = Path(__file__).resolve().parents[1] / "tools" / "neversink-poe2"
 
 # NeverSink's PoE2 strictness ladder. Adjust if the upstream taxonomy shifts;
 # this list is canonical as of NeverSink-Filter-for-PoE2 0.5-era releases.

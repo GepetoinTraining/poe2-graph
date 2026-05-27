@@ -7,9 +7,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 import exile  # noqa: E402
-import resolvers  # noqa: E402
-import graph as graph_mod  # noqa: E402
-from allocation import Allocation  # noqa: E402
+from graph import resolvers  # noqa: E402
+from graph import network as graph_mod  # noqa: E402
+from graph.allocation import Allocation  # noqa: E402
 import goals  # noqa: E402
 
 

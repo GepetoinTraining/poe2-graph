@@ -24,8 +24,8 @@ from typing import Any, Optional, Union
 
 import networkx as nx
 
-from allocation import Allocation
-from resolvers import Tree
+from graph.allocation import Allocation
+from graph.resolvers import Tree
 import exile
 
 

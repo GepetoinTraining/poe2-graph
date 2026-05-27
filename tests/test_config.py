@@ -10,7 +10,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import config  # noqa: E402
+from infra import config  # noqa: E402
 
 
 def _write_config(tmp_path: Path, data: dict) -> Path:

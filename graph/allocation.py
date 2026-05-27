@@ -21,8 +21,8 @@ from typing import Iterable, Iterator, Optional, Union
 
 import networkx as nx
 
-import graph as _graph
-from parser import (
+from graph import network as _graph
+from graph.parser import (
     Build,
     NodeRecord,
     FLAG_WEAPON_SET,
@@ -30,7 +30,7 @@ from parser import (
     SUPPORTED_VERSION,
     encode_url,
 )
-from resolvers import Tree
+from graph.resolvers import Tree
 
 
 NodeKey = Union[int, str]  # accept skill hash OR string id
@@ -80,7 +80,7 @@ class Allocation:
 
     @classmethod
     def from_url(cls, url_or_code: str, tree: Tree, g: nx.Graph) -> "Allocation":
-        from parser import parse
+        from graph.parser import parse
         return cls.from_build(parse(url_or_code), tree, g)
 
     # ----- key resolution -----

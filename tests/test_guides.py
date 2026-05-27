@@ -6,9 +6,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import resolvers  # noqa: E402
-import graph as graph_mod  # noqa: E402
+from graph import resolvers  # noqa: E402
+from graph import network as graph_mod  # noqa: E402
 import guides  # noqa: E402
+from catalog import gem as gem_module  # noqa: E402
 
 
 def _world():
@@ -115,3 +116,105 @@ def test_intent_to_allocation_handles_multiple_targets():
 
     alloc = guides.intent_to_allocation(intent, tree, g)
     assert len(alloc) >= 2
+
+
+# ===== gem-name validation =====
+
+def test_intent_with_real_gem_names_passes():
+    tree, _ = _world()
+    gem_module.clear_cache()
+    intent = guides.GuideIntent(
+        source="real-gems",
+        character_class="Sorceress",
+        ascendancy="Stormweaver",
+        main_skill="Spark",                  # real skill gem
+        support_gems=["Acrimony"],           # real support gem
+        extra_skills=["Herald of Ash"],      # real spirit gem (also in skill)
+    )
+    warnings = guides.validate(intent, tree)
+    assert warnings == []
+
+
+def test_intent_with_unknown_main_skill_warns():
+    tree, _ = _world()
+    gem_module.clear_cache()
+    intent = guides.GuideIntent(
+        source="x",
+        character_class="Sorceress",
+        main_skill="Fakeball The Phantom Skill",
+    )
+    warnings = guides.validate(intent, tree)
+    assert any("Fakeball" in w and "main skill" in w for w in warnings)
+
+
+def test_intent_with_unknown_support_warns():
+    tree, _ = _world()
+    gem_module.clear_cache()
+    intent = guides.GuideIntent(
+        source="x",
+        character_class="Sorceress",
+        support_gems=["DefinitelyNotASupport"],
+    )
+    warnings = guides.validate(intent, tree)
+    assert any("DefinitelyNotASupport" in w and "support gem" in w for w in warnings)
+
+
+def test_intent_with_unknown_extra_skill_warns():
+    tree, _ = _world()
+    gem_module.clear_cache()
+    intent = guides.GuideIntent(
+        source="x",
+        character_class="Sorceress",
+        extra_skills=["Phantom Skill Of Doom"],
+    )
+    warnings = guides.validate(intent, tree)
+    assert any("Phantom Skill Of Doom" in w and "extra skill" in w for w in warnings)
+
+
+def test_main_skill_resolves_as_spirit_gem():
+    """Heralds live in the spirit catalog but should be valid as a main_skill."""
+    tree, _ = _world()
+    gem_module.clear_cache()
+    intent = guides.GuideIntent(
+        source="herald-build",
+        character_class="Sorceress",
+        main_skill="Herald of Ash",          # spirit gem
+    )
+    warnings = guides.validate(intent, tree)
+    assert warnings == []
+
+
+def test_validate_gems_false_skips_all_gem_checks():
+    tree, _ = _world()
+    gem_module.clear_cache()
+    intent = guides.GuideIntent(
+        source="x",
+        character_class="Sorceress",
+        main_skill="Total Nonsense",
+        support_gems=["More Nonsense"],
+        extra_skills=["Even More"],
+    )
+    warnings = guides.validate(intent, tree, validate_gems=False)
+    assert warnings == []
+
+
+def test_gem_validation_skipped_when_catalog_unreachable(monkeypatch):
+    """Cold cache + no network must not emit false-positive 'unknown gem' warnings."""
+    tree, _ = _world()
+    gem_module.clear_cache()
+
+    def fail_load(gem_class):
+        raise RuntimeError("simulated network failure")
+
+    monkeypatch.setattr("guides.load_catalog", fail_load)
+
+    intent = guides.GuideIntent(
+        source="x",
+        character_class="Sorceress",
+        main_skill="Anything",
+        support_gems=["Whatever", "Stuff"],
+        extra_skills=["More"],
+    )
+    warnings = guides.validate(intent, tree)
+    # No gem warnings — checks were silently skipped because catalogs failed to load
+    assert not any("gem" in w.lower() or "skill" in w.lower() for w in warnings)

@@ -35,11 +35,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterable, Optional, TextIO
 
-ROOT = Path(__file__).parent
-sys.path.insert(0, str(ROOT))
+# Inside the infra package, so siblings are reached via relative imports.
+ROOT = Path(__file__).resolve().parents[1]  # repo root, for path-derived constants
 
-import config  # noqa: E402
-import updater  # noqa: E402
+from infra import config  # noqa: E402
+from infra import updater  # noqa: E402
 
 
 _DURATION_RE = re.compile(r"^(\d+)\s*([smhd])$", re.IGNORECASE)

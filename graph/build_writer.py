@@ -21,8 +21,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional, Union
 
-from parser import Build
-from resolvers import Tree
+from graph.parser import Build
+from graph.resolvers import Tree
 
 
 # ----- markup helpers -----

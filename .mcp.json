@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "poe2-graph": {
+      "command": "python",
+      "args": ["-m", "mcp_server.server"],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}

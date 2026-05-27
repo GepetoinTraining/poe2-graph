@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 
-DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 
 @dataclass

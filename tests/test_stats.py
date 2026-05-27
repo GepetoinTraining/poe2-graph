@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import stats  # noqa: E402
+from graph import stats  # noqa: E402
 
 
 def test_strip_brackets_link_form():

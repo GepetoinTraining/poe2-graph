@@ -13,8 +13,8 @@ from typing import Iterable, Optional
 import networkx as nx
 from networkx.algorithms.approximation import steiner_tree
 
-from parser import Build, NodeRecord
-from resolvers import Tree
+from graph.parser import Build, NodeRecord
+from graph.resolvers import Tree
 
 
 def build_graph(tree: Tree) -> nx.Graph:

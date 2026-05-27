@@ -24,7 +24,7 @@ from typing import Optional
 import yaml
 
 
-CONFIG_PATH = Path(__file__).parent / "config.yaml"
+CONFIG_PATH = Path(__file__).resolve().parents[1] / "config.yaml"
 
 
 # ----- dataclass schema -----

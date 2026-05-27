@@ -25,8 +25,9 @@ from xml.sax.saxutils import escape as xml_escape
 import networkx as nx
 import yaml
 
-from allocation import Allocation
-from resolvers import Tree
+from catalog.gem import GemCatalog, load_catalog
+from graph.allocation import Allocation
+from graph.resolvers import Tree
 import goals as goals_module
 
 
@@ -73,8 +74,16 @@ class GuideValidationError(ValueError):
     pass
 
 
-def validate_intent(intent: GuideIntent, tree: Tree) -> list[str]:
-    """Return validation warnings; empty means clean."""
+def validate_intent(
+    intent: GuideIntent, tree: Tree, *, validate_gems: bool = True,
+) -> list[str]:
+    """Return validation warnings; empty means clean.
+
+    `validate_gems=True` cross-checks main_skill / support_gems / extra_skills
+    against the catalog/ gem index. If the catalog can't load (cold cache +
+    no network), gem validation is silently skipped rather than producing
+    false-positive "unknown gem" warnings for every name.
+    """
     warnings: list[str] = []
     class_id = _resolve_class(intent.character_class, tree)
     if class_id is None:
@@ -88,11 +97,56 @@ def validate_intent(intent: GuideIntent, tree: Tree) -> list[str]:
     for name in intent.key_notables + intent.key_keystones:
         if _resolve_node_by_name_or_id(name, tree) is None:
             warnings.append(f"node not found in tree: {name!r}")
+    if validate_gems:
+        warnings.extend(_validate_intent_gems(intent))
     return warnings
 
 
 # Back-compat alias for the older API name.
 validate = validate_intent
+
+
+def _try_load_gem_catalog(gem_class: str) -> Optional[GemCatalog]:
+    """Best-effort load; returns None on network / parse failure."""
+    try:
+        return load_catalog(gem_class)
+    except Exception:
+        return None
+
+
+def _validate_intent_gems(intent: GuideIntent) -> list[str]:
+    """Check main_skill / support_gems / extra_skills against the gem catalogs.
+
+    Active skills can resolve to either the skill catalog (most skills) or
+    the spirit catalog (Heralds, Auras, Meta-gems). Supports must resolve
+    against the support catalog specifically.
+
+    Missing catalogs (cold cache + no network) cause the corresponding
+    checks to be skipped without warning.
+    """
+    out: list[str] = []
+    skill_cat = _try_load_gem_catalog("skill")
+    spirit_cat = _try_load_gem_catalog("spirit")
+    support_cat = _try_load_gem_catalog("support")
+
+    active_names: Optional[set[str]] = None
+    if skill_cat is not None and spirit_cat is not None:
+        active_names = skill_cat.names() | spirit_cat.names()
+
+    if active_names is not None:
+        if intent.main_skill and intent.main_skill not in active_names:
+            out.append(f"unknown main skill: {intent.main_skill!r}")
+        for name in intent.extra_skills:
+            if name not in active_names:
+                out.append(f"unknown extra skill: {name!r}")
+
+    if support_cat is not None:
+        support_names = support_cat.names()
+        for name in intent.support_gems:
+            if name not in support_names:
+                out.append(f"unknown support gem: {name!r}")
+
+    return out
 
 
 def intent_to_allocation(

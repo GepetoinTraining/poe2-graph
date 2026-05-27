@@ -12,8 +12,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import worker  # noqa: E402
-import updater  # noqa: E402
+from infra import worker  # noqa: E402
+from infra import updater  # noqa: E402
 
 
 # ----- parse_duration -----
@@ -147,7 +147,7 @@ def test_run_once_logs_to_file(monkeypatch, tmp_path):
 def test_run_once_default_scopes_to_continuous_tools(monkeypatch):
     """Without --only or --all, worker only fires for tools whose update_cycle.mode
     is 'continuous' per config."""
-    import config
+    from infra import config
 
     # Synthetic config with one continuous tool, one scheduled
     fake_cfg = config.Config(tools=[
@@ -178,7 +178,7 @@ def test_run_once_default_scopes_to_continuous_tools(monkeypatch):
 def test_run_once_interval_gate_respects_per_tool_intervals(monkeypatch):
     """When interval_gate dict is provided, tools whose next-check is in the
     future are skipped; tools that fire have their next-check updated."""
-    import config
+    from infra import config
 
     fake_cfg = config.Config(tools=[
         config.ToolEntry(name="fast", type="bundled_fork", submodule_path="tools/fast",

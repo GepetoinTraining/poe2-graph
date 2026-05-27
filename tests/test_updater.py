@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import updater  # noqa: E402
+from infra import updater  # noqa: E402
 
 
 def test_version_file_exists_and_parses():

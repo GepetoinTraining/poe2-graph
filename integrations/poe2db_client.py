@@ -26,7 +26,7 @@ from typing import Any, Optional  # noqa: F401  (Optional used in fetch_autocomp
 
 USER_AGENT = "poe2-graph/0.1 (https://github.com/GepetoinTraining/poe2-graph; contact via repo issues)"
 BASE_URL = "https://poe2db.tw/us"
-CACHE_DIR = Path(__file__).parent / "data" / "poe2db_cache"
+CACHE_DIR = Path(__file__).resolve().parents[1] / "data" / "poe2db_cache"
 CACHE_TTL_SECONDS = 24 * 60 * 60  # match upstream Cache-Control: max-age=86400
 
 # poe2db ships a content-hashed autocomplete JSON at cdn.poe2db.tw/json/.

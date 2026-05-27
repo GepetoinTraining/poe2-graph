@@ -6,10 +6,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import parser  # noqa: E402
-import resolvers  # noqa: E402
-import graph  # noqa: E402
-from allocation import Allocation  # noqa: E402
+from graph import parser  # noqa: E402
+from graph import resolvers  # noqa: E402
+from graph import network as graph  # noqa: E402
+from graph.allocation import Allocation  # noqa: E402
 
 
 PEDRO_URL = (ROOT / "examples" / "pedro-stormweaver.txt").read_text().strip()

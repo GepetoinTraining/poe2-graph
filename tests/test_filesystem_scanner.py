@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import filesystem_scanner as fs  # noqa: E402
+from integrations import filesystem_scanner as fs  # noqa: E402
 
 
 def _fake_probes(tmp_path) -> list[fs.Probe]:
