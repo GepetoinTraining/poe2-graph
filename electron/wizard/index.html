@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>poe2-graph setup</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="wizard-root">
+    <header id="wizard-header">
+      <div class="brand">poe2-graph</div>
+      <div class="subtitle">first-time setup</div>
+    </header>
+
+    <nav id="wizard-progress">
+      <!-- step markers injected by renderer.js -->
+    </nav>
+
+    <main id="wizard-body">
+      <!-- active page injected by renderer.js -->
+    </main>
+
+    <footer id="wizard-controls">
+      <button id="btn-back" class="btn ghost">← Back</button>
+      <div class="spacer"></div>
+      <button id="btn-cancel" class="btn ghost">Cancel</button>
+      <button id="btn-next" class="btn primary">Next →</button>
+    </footer>
+  </div>
+
+  <script type="module" src="renderer.js"></script>
+</body>
+</html>

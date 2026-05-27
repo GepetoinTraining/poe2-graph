@@ -1,0 +1,218 @@
+:root {
+  --bg: #0e1016;
+  --bg-elevated: #181c26;
+  --bg-input: #20242f;
+  --border: #2a2f3a;
+  --text: #d9dde3;
+  --text-dim: #9398a1;
+  --text-faint: #5d626a;
+  --accent: #c9a86a;
+  --accent-hover: #d8b677;
+  --good: #4caf50;
+  --bad: #e53935;
+  --warn: #f9a825;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+#wizard-root {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+}
+
+/* ----- header ----- */
+#wizard-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+#wizard-header .brand {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+#wizard-header .subtitle {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* ----- progress strip ----- */
+#wizard-progress {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 24px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.step.current {
+  background: rgba(201, 168, 106, 0.15);
+  color: var(--accent);
+}
+.step.done {
+  color: var(--good);
+}
+.step .step-num {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  text-align: center;
+  line-height: 18px;
+  font-size: 11px;
+}
+.step.current .step-num { background: var(--accent); color: var(--bg); }
+.step.done .step-num { background: var(--good); color: var(--bg); }
+
+/* ----- body ----- */
+#wizard-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.page h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+.page h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 4px;
+}
+.page p {
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.page ul { padding-left: 20px; color: var(--text-dim); line-height: 1.6; }
+.page code, .page kbd {
+  font-family: 'Consolas', 'Cascadia Code', monospace;
+  font-size: 12px;
+  background: rgba(255,255,255,0.06);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+/* ----- inputs ----- */
+input[type=text], input[type=number] {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  width: 100%;
+  font-family: inherit;
+}
+input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+label.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ----- prereq rows ----- */
+.prereq-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.prereq-row .icon {
+  text-align: center;
+  font-size: 16px;
+  line-height: 1;
+}
+.prereq-row.ok    .icon { color: var(--good); }
+.prereq-row.warn  .icon { color: var(--warn); }
+.prereq-row.bad   .icon { color: var(--bad); }
+.prereq-row .name { font-weight: 500; color: var(--text); }
+.prereq-row .detail { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.prereq-row .action-link {
+  color: var(--accent);
+  font-size: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+}
+.prereq-row .action-link:hover { color: var(--accent-hover); }
+
+/* ----- buttons ----- */
+#wizard-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+#wizard-controls .spacer { flex: 1; }
+.btn {
+  background: var(--bg-input);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+}
+.btn:hover { border-color: var(--accent); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.primary {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn.ghost { background: transparent; }
+
+/* ----- log box (used by long-running pages: clone, install_deps) ----- */
+.log-box {
+  background: #000;
+  color: #b4b8c1;
+  font-family: 'Consolas', 'Cascadia Code', monospace;
+  font-size: 11px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  border: 1px solid var(--border);
+}

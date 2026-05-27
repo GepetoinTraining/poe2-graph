@@ -10,12 +10,15 @@ probe_*.html
 atlastree-export/
 poe2-skilltree-export/
 
+
 # Worker + diagnostic logs
 *.log
 
 # Research scraps left over from poe2db client / item-parser bring-up
 amulet*.json
 endgame-items*.html
+endgame-items.html
+endgame-items2.html
 
 # Player data — never tracked
 .env
@@ -32,3 +35,8 @@ EXILE/CHARACTER_*.build
 EXILE/DONE
 EXILE/HISTORY.md
 data/poe2db_cache/
+
+# Node modules for electron client
+
+electron/node_modules/
+electron/dist

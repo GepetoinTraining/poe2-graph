@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>poe2-graph overlay</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="root">
+    <header id="overlay-header">
+      <div class="title">poe2-graph</div>
+      <div id="ws-indicator" class="status status-connecting">connecting…</div>
+      <button id="hide-button" type="button" title="Hide overlay (Ctrl+Alt+Space)">×</button>
+    </header>
+
+    <main id="views-container">
+      <!-- Active views render here. Phase 2 just lists them; Phase 3 will
+           swap in real components from poe-item-display / poe-item-hover-react
+           via the routing table in renderer.js. -->
+      <div id="placeholder" class="placeholder">
+        <p>Overlay connected to <code>poe2-graph</code> MCP bridge.</p>
+        <p>Press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Space</kbd> to toggle this window.</p>
+        <p>Trigger a view from any connected Claude:</p>
+        <pre>display_item_tooltip(clipboard_text)
+display_goal_tracker()
+display_next_action_card()
+start_map_timer(240)</pre>
+      </div>
+    </main>
+
+    <footer id="overlay-footer">
+      <span id="active-view-count">0 active views</span>
+      <span id="event-log-link" title="Most recent events">no events yet</span>
+    </footer>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

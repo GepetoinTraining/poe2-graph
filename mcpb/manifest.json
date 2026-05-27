@@ -1,0 +1,84 @@
+{
+  "manifest_version": "0.3",
+  "name": "poe2-graph",
+  "version": "0.1.0",
+  "description": "Path of Exile 2 build planning, goal decomposition, item parsing, and in-game overlay tools. Wraps the poe2-graph toolkit (passive-tree graph, goal DAG, edge taxonomy, 62 system guides, gem/mod catalogs) as MCP tools.",
+  "author": {
+    "name": "Pedro Garcia",
+    "url": "https://github.com/GepetoinTraining/poe2-graph"
+  },
+  "homepage": "https://github.com/GepetoinTraining/poe2-graph",
+  "license": "MIT",
+  "server": {
+    "type": "python",
+    "entry_point": "bootstrap.py",
+    "mcp_config": {
+      "command": "python",
+      "args": ["${__dirname}/bootstrap.py"],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "POE2_GRAPH_ROOT": "${user_config.poe2_graph_root}",
+        "POE2_MCP_WS_PORT": "${user_config.ws_port}"
+      }
+    }
+  },
+  "user_config": {
+    "poe2_graph_root": {
+      "type": "directory",
+      "title": "poe2-graph repository root",
+      "description": "Absolute path to your local poe2-graph checkout (the directory containing mcp_server/, catalog/, items/, etc.). The bundle is a thin wrapper that imports the toolkit from this location, so the repo stays the source of truth for code + data + EXILE/ profile state.",
+      "required": true
+    },
+    "ws_port": {
+      "type": "string",
+      "title": "Electron overlay WebSocket port (optional)",
+      "description": "Set to a free port (e.g. 8889) to enable the in-game Electron overlay bridge. Leave blank to run MCP-tools-only without the overlay.",
+      "required": false,
+      "default": ""
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=1.0.0",
+    "platforms": ["win32", "darwin", "linux"],
+    "runtimes": {
+      "python": ">=3.11"
+    }
+  },
+  "tools": [
+    { "name": "welcome", "description": "Session-start payload: onboarding state, staleness flags, active goal tracker, suggested next intents." },
+    { "name": "recommend_next_action", "description": "The flagship — composes active player goal + next actionable sub-goal + relevant system guides / creators / case studies for tonight's session." },
+    { "name": "render_goal_tracker", "description": "WoW-quest-tracker rendering of the active PlayerGoal." },
+    { "name": "active_goal", "description": "Return the active PlayerGoal (or None)." },
+    { "name": "next_actionable", "description": "Leaf-most available sub-goal of the active PlayerGoal." },
+    { "name": "propose_goal_switch", "description": "Switch-intervention if the active goal has open sub-goals." },
+    { "name": "read_player", "description": "PLAYER.md frontmatter + body." },
+    { "name": "read_active_character", "description": "Active character frontmatter + body for a given game." },
+    { "name": "read_character", "description": "Frontmatter + body for one named character." },
+    { "name": "read_league", "description": "Frontmatter + body for one league." },
+    { "name": "list_characters", "description": "Character ids, optionally filtered by game." },
+    { "name": "list_leagues", "description": "All league ids." },
+    { "name": "active_character", "description": "The active character id for a game (or any game)." },
+    { "name": "active_characters", "description": "{game: character_id} for each game with an active character." },
+    { "name": "set_active_character", "description": "Mark a character active (per-game exclusivity)." },
+    { "name": "parse_clipboard_item", "description": "Parse a Ctrl+C in-game item dump into a structured Item with catalog hydration." },
+    { "name": "query_gem", "description": "Look up a gem by name across skill / support / spirit catalogs." },
+    { "name": "query_mod_pool", "description": "ModTier candidates for an item category + iLvl + affix class." },
+    { "name": "validate_intent", "description": "Validate a GuideIntent: class, ascendancy, key nodes, gem names." },
+    { "name": "load_system_guide", "description": "Per-mechanic teaching guide by id." },
+    { "name": "list_system_guides", "description": "All system guides, optionally filtered by game." },
+    { "name": "system_guides_for_edge", "description": "Guides that transmit a given edge." },
+    { "name": "load_creator", "description": "One creator profile by handle." },
+    { "name": "list_creators", "description": "All creators, with optional community filter." },
+    { "name": "creators_who_transmit", "description": "Creators who transmit a given edge above a confidence threshold." },
+    { "name": "load_case_study", "description": "One case study by id." },
+    { "name": "list_case_studies", "description": "All case studies." },
+    { "name": "load_edge_taxonomy", "description": "The 16-edge taxonomy (postures + patterns that distinguish skilled play)." },
+    { "name": "staleness_report", "description": "Three-layer staleness check (skill version, data sources, tool submodules)." },
+    { "name": "display_item_tooltip", "description": "Parse a clipboard item dump and push it to the Electron overlay." },
+    { "name": "display_goal_tracker", "description": "Render the WoW-tracker in the overlay." },
+    { "name": "display_next_action_card", "description": "Push the recommend_next_action output as an overlay card." },
+    { "name": "start_map_timer", "description": "Start a map-completion timer in the overlay." },
+    { "name": "dismiss_view", "description": "Dismiss an overlay view by id." },
+    { "name": "overlay_status", "description": "Report whether the overlay WebSocket bridge is configured + live." }
+  ]
+}

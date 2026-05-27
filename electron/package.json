@@ -1,0 +1,53 @@
+{
+  "name": "poe2-graph-overlay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron overlay client + first-run setup wizard for the poe2-graph MCP server.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "start:wizard": "electron . --force-wizard",
+    "start:overlay": "electron . --force-overlay",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win portable",
+    "dist:mac": "electron-builder --mac dmg",
+    "dist:linux": "electron-builder --linux AppImage"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.gepetointraining.poe2-graph",
+    "productName": "poe2-graph",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "overlay/**/*",
+      "wizard/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.games"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Game"
+    }
+  }
+}
