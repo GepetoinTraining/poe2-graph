@@ -8,7 +8,7 @@ authoritative comments on each field. Unknown keys are tolerated and ignored;
 missing keys fall back to dataclass defaults.
 
 Importing modules:
-    from config import load
+    from infra.config import load
     cfg = load()
     for tool in cfg.tools:
         if tool.update_cycle.mode == "continuous":

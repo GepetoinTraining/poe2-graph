@@ -18,7 +18,10 @@ from __future__ import annotations
 import json
 import re
 import shutil
+import time
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
@@ -28,6 +31,12 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 MANIFEST_PATH = DATA_DIR / "manifest.json"
 VERSION_PATH = ROOT / "VERSION"
+
+# Cache for report_cached() — see its docstring for the full contract.
+CACHE_DIR = ROOT / ".cache"
+STALENESS_CACHE_PATH = CACHE_DIR / "staleness.json"
+STALENESS_CACHE_TTL_SECONDS = 3600  # 1 hour
+STALENESS_DEADLINE_SECONDS = 2.0    # hard ceiling for the session-start path
 
 USER_AGENT = "poe2-graph-updater/0.1 (https://github.com/GepetoinTraining/poe2-graph)"
 
@@ -130,6 +139,7 @@ class StalenessReport:
     poe2db_cache_age_days: Optional[float]
     upstream_game_version: Optional[str] = None  # from poe-tool-dev/latest-patch-version
     tool_submodules: list[SourceStatus] = field(default_factory=list)
+    cache_stale: bool = False  # True if served from a stale on-disk cache (refresh missed deadline)
 
     @property
     def any_stale(self) -> bool:
@@ -337,6 +347,149 @@ def report() -> StalenessReport:
         poe2db_cache_age_days=poe2db_cache_age_days(),
         upstream_game_version=latest_game_version(),
         tool_submodules=check_tool_submodules(),
+    )
+
+
+# ----- cached, deadline-bounded report for session-start -----
+
+def report_cached(
+    *,
+    deadline: float = STALENESS_DEADLINE_SECONDS,
+    max_age: float = STALENESS_CACHE_TTL_SECONDS,
+) -> StalenessReport:
+    """Disk-cached, deadline-bounded `report()` for session-start callers.
+
+    `welcome()` and similar tools must return in well under a second even when
+    the network is flaky; `report()` synchronously fires 4+ HTTPS calls, each
+    with a 10-15s timeout, so a fresh `report()` on session start can hang 60+
+    seconds. This wrapper:
+
+    1. Returns the on-disk cache as-is if it's no older than `max_age`.
+    2. Otherwise submits `report()` to a background thread with a hard
+       `deadline`. On success, refreshes the cache and returns the fresh
+       report (`cache_stale=False`).
+    3. On deadline / network error, falls back to the cached report with
+       `cache_stale=True` — the daemon thread keeps running in the
+       background and may populate the cache for a later call.
+    4. With no cache AND no fresh data, returns a sentinel "unknown" report
+       (also `cache_stale=True`) rather than raising.
+
+    The cache lives at `<repo>/.cache/staleness.json` so all Claude surfaces
+    (Code, desktop, Electron) share it across Python process restarts.
+    """
+    cached = _read_staleness_cache()
+    if cached is not None and _cache_age_seconds(cached) <= max_age:
+        return _staleness_from_dict(cached["report"], cache_stale=False)
+
+    # Run the slow report in a daemon thread so the deadline is enforceable.
+    # ThreadPoolExecutor with max_workers=1 + non-blocking shutdown via context
+    # manager: when the with-block exits, the executor's thread keeps running
+    # if it hasn't completed, but cleanup happens on process exit.
+    executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="staleness-refresh")
+    fut = executor.submit(report)
+    executor.shutdown(wait=False)  # don't block on the worker; let it run
+    try:
+        fresh = fut.result(timeout=deadline)
+        _write_staleness_cache(fresh)
+        return fresh
+    except FutureTimeoutError:
+        pass
+    except Exception:
+        pass
+
+    if cached is not None:
+        return _staleness_from_dict(cached["report"], cache_stale=True)
+    return _empty_staleness_report(cache_stale=True)
+
+
+def invalidate_staleness_cache() -> bool:
+    """Remove the on-disk staleness cache. Returns True if a file was deleted."""
+    try:
+        STALENESS_CACHE_PATH.unlink()
+        return True
+    except FileNotFoundError:
+        return False
+    except OSError:
+        return False
+
+
+def _read_staleness_cache() -> Optional[dict]:
+    try:
+        return json.loads(STALENESS_CACHE_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _write_staleness_cache(r: StalenessReport) -> None:
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        payload = {"saved_at": time.time(), "report": _staleness_to_dict(r)}
+        STALENESS_CACHE_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    except OSError:
+        # Read-only filesystem, perms issue, etc. — non-fatal; we still return
+        # the fresh result, the next call will just re-fetch.
+        pass
+
+
+def _cache_age_seconds(cache: dict) -> float:
+    return time.time() - float(cache.get("saved_at", 0.0))
+
+
+def _staleness_to_dict(r: StalenessReport) -> dict:
+    return {
+        "skill": _sourcestatus_to_dict(r.skill),
+        "passive_tree": _sourcestatus_to_dict(r.passive_tree),
+        "atlas_tree": _sourcestatus_to_dict(r.atlas_tree),
+        "poe2db_cache_age_days": r.poe2db_cache_age_days,
+        "upstream_game_version": r.upstream_game_version,
+        "tool_submodules": [_sourcestatus_to_dict(s) for s in r.tool_submodules],
+    }
+
+
+def _sourcestatus_to_dict(s: SourceStatus) -> dict:
+    return {
+        "name": s.name,
+        "local_ref": s.local_ref,
+        "remote_ref": s.remote_ref,
+        "stale": s.stale,
+        "note": s.note,
+    }
+
+
+def _staleness_from_dict(d: dict, *, cache_stale: bool) -> StalenessReport:
+    def src(sd: dict) -> SourceStatus:
+        return SourceStatus(
+            name=sd["name"],
+            local_ref=sd["local_ref"],
+            remote_ref=sd.get("remote_ref"),
+            stale=bool(sd.get("stale", False)),
+            note=sd.get("note", ""),
+        )
+    return StalenessReport(
+        skill=src(d["skill"]),
+        passive_tree=src(d["passive_tree"]),
+        atlas_tree=src(d["atlas_tree"]),
+        poe2db_cache_age_days=d.get("poe2db_cache_age_days"),
+        upstream_game_version=d.get("upstream_game_version"),
+        tool_submodules=[src(s) for s in d.get("tool_submodules", [])],
+        cache_stale=cache_stale,
+    )
+
+
+def _empty_staleness_report(*, cache_stale: bool) -> StalenessReport:
+    """Sentinel report when there's neither a cache nor a fresh fetch."""
+    unknown = SourceStatus(
+        name="unknown", local_ref="unknown", remote_ref=None,
+        stale=False, note="staleness report unavailable",
+    )
+    return StalenessReport(
+        skill=unknown,
+        passive_tree=unknown,
+        atlas_tree=unknown,
+        poe2db_cache_age_days=None,
+        upstream_game_version=None,
+        tool_submodules=[],
+        cache_stale=cache_stale,
     )
 
 

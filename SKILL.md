@@ -44,48 +44,103 @@ We trust GGG's canonical graph data and only do graph operations on it. Maintena
 
 | User asks / mentions | Read | Modules |
 |---|---|---|
-| Build URL (paste, parse, decode) | `DOCS/byte-format.md` | `parser`, `resolvers` |
-| Construct / extend / emit a build | `DOCS/build-construction.md` | `allocation`, `build_writer` |
-| Graph paths / distances / Steiner | `DOCS/graph-queries.md` | `graph` |
+| Build URL (paste, parse, decode) | `DOCS/byte-format.md` | `graph.parser`, `graph.resolvers` |
+| Construct / extend / emit a build | `DOCS/build-construction.md` | `graph.allocation`, `graph.build_writer` |
+| Graph paths / distances / Steiner | `DOCS/graph-queries.md` | `graph.network` |
 | Set / change / decompose goals; "what to do tonight" | `DOCS/goals.md` | `goals` |
 | Teach a mechanic / edge / case study | `DOCS/guides.md` | `guides`, `systems` |
 | Reference a content creator | `DOCS/guides.md` § creators | `guides.load_creator` |
-| Items / mods / tiers (poe2db) | `DOCS/poe2db.md` | `poe2db_client` |
+| Items / mods / tiers (poe2db) | `DOCS/poe2db.md` | `integrations.poe2db_client`, `catalog.poe2db_loader` |
+| Parse an in-game item (Ctrl+C) | `DOCS/poe2db.md` § parsing | `items.parser`, `catalog.hydrate` |
+| Gems — what color, what attribute, what role | (module docstring `catalog.gem`) | `catalog.gem`, `catalog.gem_loader` |
+| Per-character inventory + stash | (module docstring `items`) | `items.inventory`, `items.stash` |
 | Player profile / confidence / EXILE state | `DOCS/exile.md` | `exile` |
-| First-time setup | `ONBOARDING.md` | `exile`, `filesystem_scanner` |
-| Update / staleness / patch version | `DOCS/updater.md` | `updater` |
-| Item filter / loot filter (NeverSink) | `data/systems/tool_neversink_filter.md` | `neversink` |
+| First-time setup | `ONBOARDING.md` | `exile`, `integrations.filesystem_scanner` |
+| Update / staleness / patch version | `DOCS/updater.md` | `infra.updater` |
+| Item filter / loot filter (NeverSink) | `data/systems/tool_neversink_filter.md` | `integrations.neversink` |
 | Plan tonight's next action (keystone) | `DOCS/guides.md` § keystone | `guides.recommend_next_action` |
-| Install / recommend / explain a tool (PoB, Awakened PoE Trade, etc.) | `data/systems/tool_overview.md` + `tool_*.md` siblings | `filesystem_scanner` |
-| Change skill behavior (update cadence, cache caps, worker settings) | `config.yaml` (user-editable) | `config` |
+| Install / recommend / explain a tool (PoB, Awakened PoE Trade, etc.) | `data/systems/tool_overview.md` + `tool_*.md` siblings | `integrations.filesystem_scanner` |
+| Change skill behavior (update cadence, cache caps, worker settings) | `config.yaml` (user-editable) | `infra.config` |
 | Look up player history (past leagues, completed goals, donations) | `EXILE/HISTORY.md` (Claude-only writes) | `history` |
+| Expose toolkit as MCP tools (Claude Code, desktop bundle, overlay) | `DOCS/mcp-server.md` | `mcp_server` |
+| In-game overlay window (Electron) | `DOCS/electron.md` | `electron/` (Node app) |
+| Install in Claude desktop / app | `DOCS/mcpb.md` | `mcpb/` (bundle) |
 | Community projects we depend on | `ATTRIBUTIONS.md` | — |
+
+## Package layout
+
+The Python code is grouped into five domain packages plus the `mcp_server`
+surface, with a few standalone modules for cross-cutting concerns:
+
+```
+graph/         build graph + URL codec + .build IO + stat strings
+items/         per-character item INSTANCE state (this Diamond Wand with these mods)
+catalog/       item + gem SCHEMA — what mods CAN roll, what bases / gems exist
+infra/         config.yaml loader + updater + worker (skill infrastructure, not game data)
+integrations/  bridges to external tools — neversink, filesystem_scanner, poe2db_client, messenger
+mcp_server/    FastMCP wrapper exposing the toolkit as MCP tools + WS bridge to overlay
+electron/      Node app — Wizard installer + Overlay window (Ctrl+Alt+Space)
+mcpb/          Thin .mcpb bundle for Claude desktop / app
+goals.py       five goal types + decomposition DAG + WoW tracker (top-level)
+guides.py      system guides + case studies + edge taxonomy + creators
+exile.py       PLAYER / LEAGUE / CHARACTER state + confidence math
+systems.py     legacy per-topic systems guides (predates guides.py)
+creators.py    back-compat shim over guides.Creator
+docs.py        DOCS.xml composer over DOCS/*.md frontmatter
+history.py     append-only journal at EXILE/HISTORY.md
+```
+
+`items/` and `catalog/` are deliberately split: `catalog` is the dictionary
+(what mods CAN roll on a Wand at ilvl 82), `items` is the instance (this
+specific Diamond Wand on this character with these rolled mods). `catalog`
+loads from poe2db; `items` parses from the in-game clipboard.
 
 ## Modules at a glance
 
 | Module | One-line |
 |---|---|
-| `parser.py` | v7 URL byte codec — parse + encode + round-trip |
-| `build_reader.py` | `.build` JSON → typed dataclasses |
-| `build_writer.py` | typed dataclasses → `.build` JSON with markup |
-| `resolvers.py` | tree JSON loader + numeric/string ID joins |
-| `graph.py` | NetworkX wrapper + canonical queries + Steiner |
-| `allocation.py` | mutable build builder — the construction API |
-| `stats.py` | stat string → (template, values, raw) tuple |
-| `poe2db_client.py` | poe2db.tw ModsView fetcher + autocomplete |
-| `exile.py` | PLAYER/LEAGUE/CHARACTER + EXILE.xml composer + confidence math |
-| `goals.py` | five goal types + decomposition DAG + switch intervention + WoW tracker |
-| `guides.py` | system guides + case studies + edge taxonomy + creators + GUIDES.xml |
-| `systems.py` | legacy per-topic systems guides (precedes `guides.py`) |
-| `creators.py` | back-compat shim over `guides.Creator` |
-| `filesystem_scanner.py` | detect installed tools (PoB, Awakened PoE Trade, etc.) |
-| `updater.py` | three-layer staleness + protected paths |
-| `messenger.py` | stub for future WebSocket bridge to natwarth's viewer |
-| `docs.py` | DOCS.xml composer over `DOCS/*.md` frontmatter |
-| `neversink.py` | filter strictness + customization recommender (NeverSink handoff) |
-| `config.py` | loads `config.yaml` — user-editable skill settings (tool tracking, update cycles, cache caps, worker defaults) |
-| `history.py` | append-only journal at `EXILE/HISTORY.md` — leagues played, goals completed, case studies, donations |
-| `worker.py` | league-launch update worker — polls forks for upstream changes + pulls submodules |
+| `graph.parser` | v7 URL byte codec — parse + encode + round-trip |
+| `graph.build_reader` | `.build` JSON → typed dataclasses |
+| `graph.build_writer` | typed dataclasses → `.build` JSON with markup |
+| `graph.resolvers` | tree JSON loader + numeric/string ID joins |
+| `graph.network` | NetworkX wrapper + canonical queries + Steiner |
+| `graph.allocation` | mutable build builder — the construction API |
+| `graph.stats` | stat string → (template, values, raw) tuple |
+| `items.parser` | Ctrl+C in-game clipboard text → `Item` |
+| `items.item` | `Item` dataclass: base + modifiers + sockets + crafting state |
+| `items.modifier` | `Modifier` (rolled instance) + value/template helpers |
+| `items.socket` | `Socket`, `Rune`, `SoulCore` (socketable content) |
+| `items.inventory` | per-character `slot → Item` mapping (`SLOT_IDS`) |
+| `items.stash` | broader item collection (placeholder for trade ops) |
+| `catalog.mod_tier` | `ModTier` schema + `AFFIX_CLASSES` |
+| `catalog.base_type` | `BaseType` (item-base schema) |
+| `catalog.mod_pool` | per-category mod catalog + `possible_mods(ilvl, …)` |
+| `catalog.poe2db_loader` | parse poe2db ModsView JSON → `ModPool` |
+| `catalog.hydrate` | backfill family + tier on a parsed `Item` |
+| `catalog.gem` | `Gem`, `GemCatalog` (skill / support / spirit) |
+| `catalog.gem_loader` | parse poe2db Skill / Support / Spirit Gem pages |
+| `integrations.poe2db_client` | poe2db.tw ModsView fetcher + autocomplete |
+| `integrations.filesystem_scanner` | detect installed tools (PoB, Awakened PoE Trade, etc.) |
+| `integrations.neversink` | filter strictness + customization recommender (NeverSink handoff) |
+| `integrations.messenger` | stub for future WebSocket bridge to natwarth's viewer |
+| `infra.config` | loads `config.yaml` — user-editable skill settings |
+| `infra.updater` | three-layer staleness + protected paths |
+| `infra.worker` | league-launch update worker — polls forks for upstream + pulls submodules |
+| `mcp_server.server` | FastMCP entry — registers every `tools_*.py` function as an MCP tool |
+| `mcp_server.tools_session` | `welcome`, `staleness_report` |
+| `mcp_server.tools_goals` | `recommend_next_action`, `active_goal`, `render_goal_tracker`, `propose_goal_switch` |
+| `mcp_server.tools_state` | `read_player`, `list_characters`, `read_active_character`, `set_active_character`, … |
+| `mcp_server.tools_items` | `parse_clipboard_item`, `query_gem`, `query_mod_pool`, `validate_intent` |
+| `mcp_server.tools_guides` | system guides, creators, case studies, edge taxonomy |
+| `mcp_server.tools_views` | `display_*` push tools targeting the Electron overlay |
+| `mcp_server.transport_ws` | localhost WebSocket bridge to the overlay (env-gated) |
+| `goals` | five goal types + decomposition DAG + switch intervention + WoW tracker |
+| `guides` | system guides + case studies + edge taxonomy + creators + GUIDES.xml |
+| `systems` | legacy per-topic systems guides (precedes `guides`) |
+| `creators` | back-compat shim over `guides.Creator` |
+| `exile` | PLAYER/LEAGUE/CHARACTER + EXILE.xml composer + confidence math |
+| `docs` | DOCS.xml composer over `DOCS/*.md` frontmatter |
+| `history` | append-only journal at `EXILE/HISTORY.md` |
 
 ## Hard rules
 
@@ -101,5 +156,9 @@ We trust GGG's canonical graph data and only do graph operations on it. Maintena
 - `ONBOARDING.md` — the 4-phase first-time flow (filesystem scan → questionnaire → artifacts → synthesize)
 - `ATTRIBUTIONS.md` — durable credit trail for every community project we build on
 - `poe2-graph-spec.html` + `poe2-graph-goals-guides-spec.html` — the design specs
-- `DOCS/` — chapters, loaded on demand via DOCS.xml
-- `tests/` — 276 tests, all green
+- `DOCS/` — chapters, loaded on demand via DOCS.xml. New since v1.2.0:
+  `DOCS/mcp-server.md`, `DOCS/electron.md`, `DOCS/mcpb.md`
+- `electron/README.md` + `mcpb/README.md` — same content as the DOCS chapters,
+  kept next to the code for repo-browser convenience
+- `BUGS.md` — current bug-hunter punch list (refreshed 2026-05-27)
+- `tests/` — pytest suite covering every package

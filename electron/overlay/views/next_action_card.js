@@ -1,38 +1,83 @@
-// "Next action" card — rendered from guides.recommend_next_action output.
+// "Next action" card — rendered from goals.recommend_next_action output.
+//
+// Audience-aware: 1pct shows the rationale + next subgoal only. 30pct adds
+// the learning goal, the count of relevant system guides, and the top
+// confidence-gap chips. The audience-marker left border is applied by
+// renderer.js, not here.
 
 export function renderNextActionCard(container, data, meta) {
   if (!data) {
     container.textContent = '(no recommendation)';
     return;
   }
+
   const audience = (meta && meta.audience) || '30pct';
-  const rationale = data.rationale || '(no rationale)';
-  const subgoal = data.next_subgoal || null;
-  const learning = data.next_learning_goal || null;
-  const guideCount = (data.relevant_system_guides || []).length;
-  const gaps = data.confidence_gaps || [];
+  const show30 = audience !== '1pct';
 
-  const parts = [`<p style="margin:0 0 8px">${escapeHtml(rationale)}</p>`];
+  const root = document.createElement('div');
+  root.className = 'next-action';
 
-  if (subgoal) {
-    parts.push(`<div><strong>Next:</strong> ${escapeHtml(subgoal.statement || subgoal.id || '(unnamed subgoal)')}</div>`);
-    if (subgoal.kind) parts.push(`<div style="color:var(--text-dim);font-size:11px">kind: ${escapeHtml(subgoal.kind)}</div>`);
+  // Rationale — always shown.
+  const rationale = document.createElement('p');
+  rationale.className = 'rationale';
+  rationale.textContent = data.rationale || '(no rationale)';
+  root.appendChild(rationale);
+
+  // Next subgoal — always shown.
+  if (data.next_subgoal) {
+    const wrap = document.createElement('div');
+    const label = document.createElement('span');
+    label.className = 'label-inline';
+    label.textContent = 'Next: ';
+    const strong = document.createElement('strong');
+    strong.textContent = data.next_subgoal.statement || data.next_subgoal.id || '(unnamed subgoal)';
+    wrap.append(label, strong);
+    if (data.next_subgoal.kind) {
+      const kind = document.createElement('div');
+      kind.className = 'kind';
+      kind.textContent = `kind: ${data.next_subgoal.kind}`;
+      wrap.appendChild(kind);
+    }
+    root.appendChild(wrap);
   }
-  if (learning && audience !== '1pct') {
-    parts.push(`<div style="margin-top:6px"><strong>Learning:</strong> ${escapeHtml(learning.topic || learning.id || '(unnamed)')}</div>`);
+
+  if (show30 && data.next_learning_goal) {
+    const wrap = document.createElement('div');
+    const label = document.createElement('span');
+    label.className = 'label-inline';
+    label.textContent = 'Learning: ';
+    const topic = document.createElement('span');
+    topic.className = 'learning-topic';
+    topic.textContent = data.next_learning_goal.topic || data.next_learning_goal.id || '(unnamed)';
+    wrap.append(label, topic);
+    root.appendChild(wrap);
   }
-  if (audience !== '1pct') {
-    parts.push(`<div style="margin-top:6px;color:var(--text-dim);font-size:11px">${guideCount} relevant guide${guideCount === 1 ? '' : 's'}</div>`);
-    if (gaps.length) {
-      const gapList = gaps.slice(0, 3).map(g => `${escapeHtml(String(g[0]))} (${(g[1] * 100).toFixed(0)}%)`).join(', ');
-      parts.push(`<div style="color:var(--warn);font-size:11px">confidence gaps: ${gapList}</div>`);
+
+  if (show30) {
+    const guides = data.relevant_system_guides || [];
+    if (guides.length) {
+      const meta = document.createElement('div');
+      meta.className = 'guides-meta';
+      meta.textContent = `${guides.length} relevant guide${guides.length === 1 ? '' : 's'}`;
+      root.appendChild(meta);
     }
   }
-  container.innerHTML = parts.join('');
-}
 
-function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, (ch) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  }[ch]));
+  if (show30) {
+    const gaps = data.confidence_gaps || [];
+    if (gaps.length) {
+      const row = document.createElement('div');
+      row.className = 'gap-row';
+      gaps.slice(0, 3).forEach(([domain, value]) => {
+        const chip = document.createElement('div');
+        chip.className = 'gap-chip';
+        const pct = Math.round(Number(value) * 100);
+        chip.textContent = `${domain} (${pct}%)`;
+        row.appendChild(chip);
+      });
+      root.appendChild(row);
+    }
+  }
+
+  container.replaceChildren(root);
 }

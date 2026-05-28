@@ -23,6 +23,7 @@ The schema/loader split mirrors mod_pool / poe2db_loader:
 
 from __future__ import annotations
 
+import threading
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -99,9 +100,14 @@ class GemCatalog:
         return [g for g in self.gems if g.slug == slug]
 
     def by_name(self, name: str) -> Optional[Gem]:
-        """Return the first gem matching `name` (display name, not slug)."""
+        """Return the first gem matching `name` (display name, not slug).
+
+        Case-insensitive — clipboard text and user-typed queries don't always
+        match poe2db's exact casing of "Herald of Ash" / "Spark" / etc.
+        """
+        target = name.casefold()
         for g in self.gems:
-            if g.name == name:
+            if g.name.casefold() == target:
                 return g
         return None
 
@@ -120,48 +126,62 @@ class GemCatalog:
 
 # ---- module-level cache + loader ----
 
+# Concurrent first-call by two threads would otherwise double-fetch and
+# last-write-wins; the lock serializes the (rare) miss path. Hits read the
+# dict outside the lock — CPython dict reads are atomic.
 _CATALOG_CACHE: dict[str, GemCatalog] = {}
+_CATALOG_LOCK = threading.Lock()
 
 
 def load_catalog(gem_class: str) -> GemCatalog:
     """Load (and cache) the GemCatalog for `gem_class`.
 
     On cache miss: fetch via integrations.poe2db_client, parse via
-    catalog.gem_loader, store.
+    catalog.gem_loader, store. Thread-safe — concurrent first-misses
+    serialize through the module lock, after which all callers see the
+    same populated catalog.
     """
-    if gem_class in _CATALOG_CACHE:
-        return _CATALOG_CACHE[gem_class]
+    cached = _CATALOG_CACHE.get(gem_class)
+    if cached is not None:
+        return cached
     if gem_class not in _GEM_CLASS_TO_SLUG:
         raise ValueError(
             f"unknown gem_class {gem_class!r}; expected {tuple(_GEM_CLASS_TO_SLUG)}"
         )
-    # Lazy imports break the catalog.gem <-> catalog.gem_loader cycle and
-    # defer the integrations dependency until first network call.
-    from catalog.gem_loader import catalog_from_page
-    from integrations import poe2db_client
-    html = poe2db_client.fetch_category_html(_GEM_CLASS_TO_SLUG[gem_class])
-    catalog = catalog_from_page(gem_class, html)
-    _CATALOG_CACHE[gem_class] = catalog
-    return catalog
+    with _CATALOG_LOCK:
+        # Re-check under lock — another thread may have populated meanwhile.
+        cached = _CATALOG_CACHE.get(gem_class)
+        if cached is not None:
+            return cached
+        # Lazy imports break the catalog.gem <-> catalog.gem_loader cycle and
+        # defer the integrations dependency until first network call.
+        from catalog.gem_loader import catalog_from_page
+        from integrations import poe2db_client
+        html = poe2db_client.fetch_category_html(_GEM_CLASS_TO_SLUG[gem_class])
+        catalog = catalog_from_page(gem_class, html)
+        _CATALOG_CACHE[gem_class] = catalog
+        return catalog
 
 
 def clear_cache() -> None:
     """Drop all cached catalogs. Useful in tests or after a poe2db cache refresh."""
-    _CATALOG_CACHE.clear()
+    with _CATALOG_LOCK:
+        _CATALOG_CACHE.clear()
 
 
 def is_known_gem(name: str, gem_class: Optional[str] = None) -> bool:
     """True if `name` matches a known gem.
 
     Searches the given gem_class only, or all classes if gem_class is None.
-    Returns False on network/parse failures (best-effort).
+    Case-insensitive. Returns False on network/parse failures (best-effort).
     """
+    target = name.casefold()
     classes = (gem_class,) if gem_class else GEM_CLASSES
     for cls in classes:
         try:
             cat = load_catalog(cls)
         except Exception:
             continue
-        if name in cat.names():
+        if any(g.name.casefold() == target for g in cat.gems):
             return True
     return False

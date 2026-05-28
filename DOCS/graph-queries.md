@@ -17,7 +17,7 @@ when_to_read: |
 ## Loading the graph
 
 ```python
-import resolvers, graph
+from graph import resolvers, network as graph
 tree = resolvers.load_passive_tree()
 g = graph.build_graph(tree)
 # → NetworkX undirected graph, 5102 nodes, 6021 edges

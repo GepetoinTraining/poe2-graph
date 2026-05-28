@@ -25,21 +25,33 @@ export function renderDone(container, ctx, api) {
     </div>
   `;
 
-  // Write the install marker NOW (not at "Finish" — already at the last step
-  // so we can guarantee subsequent launches skip the wizard).
-  (async () => {
-    try {
-      await window.poe2Wizard.complete({
-        repoDir: ctx.installDir,
-        wsPort: ctx.wsPort,
-      });
+  // Kick off the install-marker write immediately so it has time to settle
+  // before the user clicks Finish. onNext below awaits it as a safety net so
+  // a fast-clicking user can't race window.close() ahead of the IPC write.
+  const completePromise = window.poe2Wizard
+    .complete({ repoDir: ctx.installDir, wsPort: ctx.wsPort })
+    .then((result) => {
       ctx.installComplete = true;
-    } catch (err) {
-      console.error('failed to write install marker', err);
-    }
-  })();
+      return result;
+    });
 
-  return { canNext: () => true };
+  return {
+    canNext: () => true,
+    onNext: async () => {
+      try {
+        await completePromise;
+        return true;
+      } catch (err) {
+        console.error('failed to write install marker', err);
+        alert(
+          'Setup could not finalize: ' +
+          (err && err.message ? err.message : String(err)) +
+          '\n\nThe wizard will stay open so you can retry.'
+        );
+        return false;  // veto Finish — keep wizard open
+      }
+    },
+  };
 }
 
 function escapeHtml(s) {

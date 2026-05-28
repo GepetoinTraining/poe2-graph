@@ -14,9 +14,9 @@ const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const { promisify } = require('util');
-const execP = promisify(exec);
+const execFileP = promisify(execFile);
 
 module.exports = async function createShortcut({ label }) {
   const desktopPath = app.getPath('desktop');
@@ -41,23 +41,43 @@ module.exports = async function createShortcut({ label }) {
 async function createWindowsShortcut({ desktopPath, target, args, cwd, label }) {
   const lnkPath = path.join(desktopPath, `${label}.lnk`);
   const argString = args.join(' ');
-  // PowerShell one-liner via WScript.Shell. Quote everything carefully.
-  const ps = [
-    `$s = New-Object -ComObject WScript.Shell;`,
-    `$sc = $s.CreateShortcut('${lnkPath.replace(/'/g, "''")}');`,
-    `$sc.TargetPath = '${target.replace(/'/g, "''")}';`,
-    `$sc.Arguments = '${argString.replace(/'/g, "''")}';`,
-    `$sc.WorkingDirectory = '${cwd.replace(/'/g, "''")}';`,
-    `$sc.IconLocation = '${target.replace(/'/g, "''")}';`,
-    `$sc.Save();`,
-  ].join(' ');
-  await execP(`powershell -NoProfile -ExecutionPolicy Bypass -Command "${ps.replace(/"/g, '\\"')}"`, {
-    timeout: 30_000,
-  });
+
+  // Write the PowerShell to a temp .ps1 and invoke with -File. This avoids the
+  // quote-escape minefield of -Command "<inline string>": single quotes inside
+  // the script don't need to survive a CreateProcess command-line parse.
+  const psScript = [
+    `$s = New-Object -ComObject WScript.Shell`,
+    `$sc = $s.CreateShortcut(${psString(lnkPath)})`,
+    `$sc.TargetPath = ${psString(target)}`,
+    `$sc.Arguments = ${psString(argString)}`,
+    `$sc.WorkingDirectory = ${psString(cwd)}`,
+    `$sc.IconLocation = ${psString(target)}`,
+    `$sc.Save()`,
+  ].join('\n');
+
+  const tmpFile = path.join(os.tmpdir(), `poe2-graph-shortcut-${process.pid}-${Date.now()}.ps1`);
+  fs.writeFileSync(tmpFile, psScript, 'utf8');
+
+  try {
+    await execFileP('powershell', [
+      '-NoProfile',
+      '-ExecutionPolicy', 'Bypass',
+      '-File', tmpFile,
+    ], { timeout: 30_000 });
+  } finally {
+    try { fs.unlinkSync(tmpFile); } catch { /* ignore */ }
+  }
+
   if (!fs.existsSync(lnkPath)) {
     return { ok: false, error: 'shortcut creation reported success but .lnk is missing' };
   }
   return { ok: true, path: lnkPath };
+}
+
+// PowerShell single-quoted string literal: ' is the only metacharacter, doubled
+// to escape. Embedded $/`/"/% are literal inside single quotes.
+function psString(s) {
+  return `'${String(s).replace(/'/g, "''")}'`;
 }
 
 async function createMacShortcut({ desktopPath, target, args, cwd, label }) {

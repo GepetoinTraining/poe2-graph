@@ -11,6 +11,7 @@ Hydration of parsed items lives in `catalog.hydrate`.
 from __future__ import annotations
 
 import re
+import threading
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -25,16 +26,39 @@ class ModPool:
 
     # ---- query ----
 
-    def possible_mods(self, ilvl: int, rarity: str = "rare", *, affix_class: Optional[str] = None) -> list[ModTier]:
+    def possible_mods(
+        self,
+        ilvl: int,
+        rarity: str = "rare",
+        *,
+        affix_class: Optional[str] = None,
+        include_implicit: bool = False,
+        include_corruption: bool = False,
+        include_unique: bool = False,
+    ) -> list[ModTier]:
         """Return tier candidates eligible for an item at this iLvl + rarity.
 
-        Filters by min_ilvl <= ilvl AND (affix_class matches OR affix_class is None).
+        Filters by `min_ilvl <= ilvl`. When `affix_class` is None (the common
+        case — "what could roll on this rare?") implicit-only, corruption-only,
+        and unique-only affix classes are excluded by default so the result
+        reflects only mods a standard craft could actually produce. Set the
+        `include_*` flags to opt those back in.
+
         Magic items have a smaller allowed pool than rares but we don't enforce
         that here — caller decides.
         """
         out = [t for t in self.tiers if t.min_ilvl <= ilvl]
         if affix_class is not None:
-            out = [t for t in out if t.affix_class == affix_class]
+            return [t for t in out if t.affix_class == affix_class]
+        excluded: set[str] = set()
+        if not include_implicit:
+            excluded |= {"implicit_base", "implicit_corrupted"}
+        if not include_corruption:
+            excluded.add("corruption")
+        if not include_unique:
+            excluded.add("unique")
+        if excluded:
+            out = [t for t in out if t.affix_class not in excluded]
         return out
 
     def by_family(self, family: str) -> list[ModTier]:
@@ -60,37 +84,61 @@ class ModPool:
 
 # ---- module-level cache + loader ----
 
-# Cache loaded ModPools per category to avoid re-parsing on every query.
+# Cache loaded ModPools per category. Lock serializes first-miss fetches so
+# concurrent callers don't double-parse the same poe2db response; hits read
+# the dict outside the lock (CPython dict reads are atomic).
 _POOL_CACHE: dict[str, ModPool] = {}
+_POOL_LOCK = threading.Lock()
 
 
 def load_pool(category: str) -> ModPool:
     """Load (and cache) the ModPool for `category`.
 
     On cache miss: fetch via integrations.poe2db_client, parse, store.
+    Thread-safe — concurrent first-misses serialize on `_POOL_LOCK`.
     """
-    if category in _POOL_CACHE:
-        return _POOL_CACHE[category]
-    # Lazy imports break the catalog.mod_pool <-> catalog.poe2db_loader cycle
-    # and defer the integrations dependency until first network call.
-    from catalog.poe2db_loader import pool_from_modsview
-    from integrations import poe2db_client
-    raw = poe2db_client.fetch_category(category)
-    pool = pool_from_modsview(category, raw)
-    _POOL_CACHE[category] = pool
-    return pool
+    cached = _POOL_CACHE.get(category)
+    if cached is not None:
+        return cached
+    with _POOL_LOCK:
+        cached = _POOL_CACHE.get(category)
+        if cached is not None:
+            return cached
+        # Lazy imports break the catalog.mod_pool <-> catalog.poe2db_loader cycle
+        # and defer the integrations dependency until first network call.
+        from catalog.poe2db_loader import pool_from_modsview
+        from integrations import poe2db_client
+        raw = poe2db_client.fetch_category(category)
+        pool = pool_from_modsview(category, raw)
+        _POOL_CACHE[category] = pool
+        return pool
 
 
 def clear_cache() -> None:
     """Drop all cached pools. Useful in tests or after a poe2db cache refresh."""
-    _POOL_CACHE.clear()
+    with _POOL_LOCK:
+        _POOL_CACHE.clear()
 
 
 def possible_mods(
-    category: str, ilvl: int, rarity: str = "rare", *, affix_class: Optional[str] = None,
+    category: str,
+    ilvl: int,
+    rarity: str = "rare",
+    *,
+    affix_class: Optional[str] = None,
+    include_implicit: bool = False,
+    include_corruption: bool = False,
+    include_unique: bool = False,
 ) -> list[ModTier]:
     """Convenience: load pool + query in one call."""
-    return load_pool(category).possible_mods(ilvl, rarity, affix_class=affix_class)
+    return load_pool(category).possible_mods(
+        ilvl,
+        rarity,
+        affix_class=affix_class,
+        include_implicit=include_implicit,
+        include_corruption=include_corruption,
+        include_unique=include_unique,
+    )
 
 
 # ---- template normalisation ----

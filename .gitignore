@@ -14,11 +14,10 @@ poe2-skilltree-export/
 # Worker + diagnostic logs
 *.log
 
-# Research scraps left over from poe2db client / item-parser bring-up
-amulet*.json
-endgame-items*.html
-endgame-items.html
-endgame-items2.html
+# Note: amulet.json, amulets_modsview.json, endgame-items*.html are tracked
+# test fixtures for tests/test_poe2db_client.py — they look like research
+# scraps but are load-bearing. Do NOT add ignore patterns for them; git
+# preserves tracked files anyway but the pattern is misleading.
 
 # Player data — never tracked
 .env
@@ -35,6 +34,22 @@ EXILE/CHARACTER_*.build
 EXILE/DONE
 EXILE/HISTORY.md
 data/poe2db_cache/
+
+# Disk-backed caches managed by infra.updater (regenerable on session start)
+.cache/
+
+# v2 runtime state — local-only, never tracked
+# - .queue/        clipboard listener queue (events awaiting drain into a cycle)
+# - poe2_graph.db  unified SQLite store (build/farm/craft/guide graphs)
+.queue/
+poe2_graph.db
+poe2_graph.db-journal
+poe2_graph.db-wal
+poe2_graph.db-shm
+
+# Pip stdout accidentally captured as a file (e.g. `pip install mcp >=1.27`
+# without proper quoting leaves a `=1.27` artifact at root)
+=*
 
 # Node modules for electron client
 

@@ -23,7 +23,10 @@ from pathlib import Path
 
 
 def main() -> int:
-    root_raw = os.environ.get("POE2_GRAPH_ROOT") or os.environ.get("POE2_GRAPH_HOME")
+    # Only POE2_GRAPH_ROOT is supported — POE2_GRAPH_HOME was an undocumented
+    # fallback that surprised users whose env had it set for another tool.
+    # Strip whitespace so a UI paste with trailing spaces still resolves.
+    root_raw = (os.environ.get("POE2_GRAPH_ROOT") or "").strip()
     if not root_raw:
         print(
             "ERROR: POE2_GRAPH_ROOT is not set. The .mcpb bundle needs you to "

@@ -9,13 +9,30 @@ import { renderItemTooltip } from './views/item_tooltip.js';
 import { renderGoalTracker } from './views/goal_tracker.js';
 import { renderNextActionCard } from './views/next_action_card.js';
 import { renderMapTimer } from './views/map_timer.js';
+import { renderCycleStatus } from './views/cycle_status.js';
+import { renderClassifyAlert } from './views/classify_alert.js';
+import { renderReconcileWarning } from './views/reconcile_warning.js';
+import { renderCycleSummary } from './views/cycle_summary.js';
 
 const RENDERERS = {
   item_tooltip: renderItemTooltip,
   goal_tracker: renderGoalTracker,
   next_action_card: renderNextActionCard,
   map_timer: renderMapTimer,
+  cycle_status: renderCycleStatus,
+  classify_alert: renderClassifyAlert,
+  reconcile_warning: renderReconcileWarning,
+  cycle_summary: renderCycleSummary,
 };
+
+// Views whose visual treatment changes with audience. The audience-1pct /
+// audience-30pct left-border marker is applied only to these; map_timer and
+// item_tooltip render the same payload either way and shouldn't carry the
+// chip-color hint.
+const AUDIENCE_AWARE_VIEWS = new Set([
+  'goal_tracker', 'next_action_card',
+  'cycle_status', 'classify_alert', 'reconcile_warning', 'cycle_summary',
+]);
 
 // ---- DOM refs ----
 const wsIndicator = document.getElementById('ws-indicator');
@@ -73,7 +90,7 @@ function onViewRender(payload) {
   if (!entry) {
     const element = makeViewCard(view, id, audience);
     viewsContainer.appendChild(element);
-    entry = { element, view, audience, data };
+    entry = { element, view, audience, data, cleanup: null };
     activeViews.set(id, entry);
   } else {
     entry.data = data;
@@ -82,7 +99,11 @@ function onViewRender(payload) {
     if (audience) entry.element.classList.add(`audience-${audience}`);
   }
   const bodyEl = entry.element.querySelector('.view-card-body');
-  renderer(bodyEl, data, { audience });
+  // Re-render replaces the body; run the previous cleanup so timers /
+  // observers from the prior render don't outlive their DOM.
+  runCleanup(entry);
+  const result = renderer(bodyEl, data, { audience });
+  entry.cleanup = (result && typeof result.cleanup === 'function') ? result.cleanup : null;
   updateActiveViewCount();
 }
 
@@ -94,37 +115,80 @@ function onViewUpdate(payload) {
   const renderer = RENDERERS[entry.view];
   if (renderer) {
     const bodyEl = entry.element.querySelector('.view-card-body');
-    renderer(bodyEl, entry.data, { audience: entry.audience });
+    runCleanup(entry);
+    const result = renderer(bodyEl, entry.data, { audience: entry.audience });
+    entry.cleanup = (result && typeof result.cleanup === 'function') ? result.cleanup : null;
   }
 }
 
 function onViewDismiss(payload) {
-  const entry = activeViews.get(payload.id);
+  // Server-driven dismiss (e.g. Claude-side `dismiss_view` MCP tool, voice
+  // command in a future iteration). Mirrors the user-click path below — the
+  // single dismissView() funnel ensures cleanup runs either way.
+  dismissView(payload.id, { notifyServer: false });
+}
+
+function dismissView(id, { notifyServer }) {
+  const entry = activeViews.get(id);
   if (!entry) return;
+  runCleanup(entry);
   entry.element.remove();
-  activeViews.delete(payload.id);
+  activeViews.delete(id);
   updateActiveViewCount();
+  if (notifyServer) {
+    window.overlay.send({
+      event: 'input.event',
+      payload: { id, kind: 'view_dismissed', view: entry.view, data: {} },
+    });
+  }
+}
+
+function runCleanup(entry) {
+  if (typeof entry.cleanup !== 'function') return;
+  try { entry.cleanup(); }
+  catch (err) { console.warn('view cleanup failed', err); }
+  entry.cleanup = null;
 }
 
 function makeViewCard(view, id, audience) {
+  // Build via DOM APIs rather than innerHTML — `view` and `id` come from
+  // server payloads and would be HTML-injectable if interpolated into a
+  // template string. textContent renders them as literal text.
   const el = document.createElement('div');
-  el.className = `view-card${audience ? ' audience-' + audience : ''}`;
+  const showAudience = audience && AUDIENCE_AWARE_VIEWS.has(view);
+  el.className = `view-card${showAudience ? ' audience-' + audience : ''}`;
   el.dataset.viewId = id;
-  el.innerHTML = `
-    <div class="view-card-header">
-      <span class="view-type">${view}</span>
-      <span class="view-id">${id}</span>
-      <button class="dismiss" title="Dismiss">×</button>
-    </div>
-    <div class="view-card-body"></div>
-  `;
-  el.querySelector('.dismiss').addEventListener('click', () => {
-    // Local dismissal — also notify the server so its view state stays consistent.
-    el.remove();
-    activeViews.delete(id);
-    updateActiveViewCount();
-    window.overlay.send({ event: 'input.event', payload: { id, kind: 'view_dismissed', view, data: {} } });
+
+  const header = document.createElement('div');
+  header.className = 'view-card-header';
+
+  const typeSpan = document.createElement('span');
+  typeSpan.className = 'view-type';
+  typeSpan.textContent = view;
+
+  const idSpan = document.createElement('span');
+  idSpan.className = 'view-id';
+  idSpan.textContent = id;
+
+  const dismissBtn = document.createElement('button');
+  dismissBtn.className = 'dismiss';
+  dismissBtn.title = 'Dismiss';
+  dismissBtn.textContent = '×';
+
+  header.append(typeSpan, idSpan, dismissBtn);
+
+  const body = document.createElement('div');
+  body.className = 'view-card-body';
+
+  el.append(header, body);
+
+  dismissBtn.addEventListener('click', () => {
+    // Local dismissal — also notify the server so its view state stays
+    // consistent. Server may want to log the dismiss for analytics or to
+    // suppress an auto-redisplay rule.
+    dismissView(id, { notifyServer: true });
   });
+
   return el;
 }
 

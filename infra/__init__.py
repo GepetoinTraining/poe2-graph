@@ -15,7 +15,8 @@ from infra.config import (
 )
 from infra.updater import (
     SourceStatus, StalenessReport,
-    report, load_manifest, local_version,
+    report, report_cached, invalidate_staleness_cache,
+    load_manifest, local_version,
     check_skill_version, check_data_source, latest_game_version,
     check_tool_submodule, check_tool_submodules,
     update_tool_submodule, update_all_tool_submodules,
@@ -23,6 +24,7 @@ from infra.updater import (
     update_data_source, update_skill_code, invalidate_poe2db_cache,
     poe2db_cache_age_days,
     PROTECTED_PATHS,
+    STALENESS_CACHE_PATH, STALENESS_CACHE_TTL_SECONDS, STALENESS_DEADLINE_SECONDS,
 )
 
 __all__ = [
@@ -33,7 +35,8 @@ __all__ = [
     "tools_by_name", "enabled_tools", "bundled_forks", "continuous_tools",
     "CONFIG_PATH",
     "SourceStatus", "StalenessReport",
-    "report", "load_manifest", "local_version",
+    "report", "report_cached", "invalidate_staleness_cache",
+    "load_manifest", "local_version",
     "check_skill_version", "check_data_source", "latest_game_version",
     "check_tool_submodule", "check_tool_submodules",
     "update_tool_submodule", "update_all_tool_submodules",
@@ -41,4 +44,5 @@ __all__ = [
     "update_data_source", "update_skill_code", "invalidate_poe2db_cache",
     "poe2db_cache_age_days",
     "PROTECTED_PATHS",
+    "STALENESS_CACHE_PATH", "STALENESS_CACHE_TTL_SECONDS", "STALENESS_DEADLINE_SECONDS",
 ]

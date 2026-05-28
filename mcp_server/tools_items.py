@@ -27,13 +27,19 @@ def parse_clipboard_item(text: str) -> dict[str, Any]:
         item = item_parser.parse_clipboard(text)
     except ValueError as exc:
         return {"ok": False, "error": str(exc)}
-    # Best-effort hydration — fill in mod families + tiers from the catalog
+    # Best-effort hydration — fill in mod families + tiers from the catalog.
+    # The count of mods that didn't match the catalog surfaces in the response
+    # so callers can warn the user about partial data.
+    unhydrated: Optional[int] = None
     try:
         from catalog.hydrate import hydrate_item
-        hydrate_item(item)
+        _, unhydrated = hydrate_item(item)
     except Exception:
         pass
-    return {"ok": True, "item": to_jsonable(item)}
+    result: dict[str, Any] = {"ok": True, "item": to_jsonable(item)}
+    if unhydrated is not None:
+        result["unhydrated_mod_count"] = unhydrated
+    return result
 
 
 def query_gem(name: str, gem_class: Optional[str] = None) -> dict[str, Any]:

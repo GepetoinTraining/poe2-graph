@@ -75,7 +75,15 @@ class Inventory:
         return self.items[slot]
 
     def __iter__(self):
-        return iter(self.items.items())
+        """Iterate over filled slot ids — matches `slot in inventory` semantics.
+
+        Use `.entries()` for `(slot, item)` pairs.
+        """
+        return iter(self.items)
+
+    def entries(self):
+        """Iterate over `(slot, item)` pairs in insertion order."""
+        return self.items.items()
 
     # ---- mutation ----
 

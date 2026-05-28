@@ -12,6 +12,7 @@ wraps this together with the integrations/poe2db_client cache.
 
 from __future__ import annotations
 
+import html
 import re
 from html.parser import HTMLParser
 from typing import Optional
@@ -20,7 +21,18 @@ from catalog.mod_pool import ModPool
 from catalog.mod_tier import ModTier
 
 
-_VALUE_RANGE_RE = re.compile(r"\(?(-?\d+(?:\.\d+)?)\s*[—–-]\s*(-?\d+(?:\.\d+)?)\)?")
+# Range syntax in poe2db's `str` field: optional outer sign + paren-wrapped
+# bounds. The outer sign (when `-`) is absorbed into both bounds so the
+# stored ranges carry the full numeric sign — that way `aggregate_stats`
+# and tier-template comparisons all agree on the math. A `+` outer sign is
+# preserved in the template instead so `+#` renders correctly.
+_VALUE_RANGE_RE = re.compile(
+    r"(?P<outer>[-+]?)\(\s*"
+    r"(?P<lo>[-+]?\d+(?:\.\d+)?)\s*"
+    r"[—–-]\s*"
+    r"(?P<hi>[-+]?\d+(?:\.\d+)?)"
+    r"\s*\)"
+)
 
 
 def pool_from_modsview(category: str, modsview_json: dict) -> ModPool:
@@ -82,7 +94,9 @@ class _HTMLStripper(HTMLParser):
 def _strip_html(s: str) -> str:
     parser = _HTMLStripper()
     parser.feed(s)
-    return parser.get_text()
+    # html.unescape covers named (&amp;) + numeric (&#39;) + hex (&#xA0;) refs
+    # that HTMLParser doesn't decode inside attribute or untagged text.
+    return html.unescape(parser.get_text())
 
 
 def _strip_link_brackets(s: str) -> str:
@@ -101,24 +115,36 @@ def _entry_to_modtier(entry: dict, affix_bucket: str) -> Optional[ModTier]:
 
     # Strip HTML + link brackets, then extract value ranges + build template
     text = _strip_link_brackets(_strip_html(raw_str)).strip()
-    ranges = []
-    template_parts = []
+    ranges: list[tuple[float, float]] = []
+    template_parts: list[str] = []
     last_end = 0
     for m in _VALUE_RANGE_RE.finditer(text):
-        lo, hi = float(m.group(1)), float(m.group(2))
+        lo = float(m.group("lo"))
+        hi = float(m.group("hi"))
+        outer = m.group("outer")
+        if outer == "-":
+            # Absorb the outer minus into the bounds — keeps the sign on the
+            # stored data so aggregate_stats sums correctly. Template drops it.
+            lo, hi = -lo, -hi
         ranges.append((lo, hi))
         template_parts.append(text[last_end:m.start()])
-        template_parts.append("#")
+        # Preserve a leading `+` in the template so `+# to maximum Life` renders
+        # with the sign; the `-` case absorbed it into the bounds above.
+        template_parts.append("+#" if outer == "+" else "#")
         last_end = m.end()
     template_parts.append(text[last_end:])
     template = "".join(template_parts).strip()
 
-    # Also catch single-value templates like "+# to maximum Life" (no range
-    # because both ends are the same): replace bare numbers with '#'.
-    if "#" not in template:
+    # Single-value fallback: when no `(low-high)` ranges were found, the entry
+    # may be a fixed-value mod (always rolls the same number). Replace bare
+    # numerics with `#` only if the template has a stat-shape signal (sign,
+    # percentage, or "X to Y" structure) — without that signal, the digits
+    # are likely fixed mechanical text ("Gain 1 charge") that shouldn't
+    # become a placeholder.
+    if "#" not in template and _looks_like_stat_template(template):
         single_value_re = re.compile(r"[-+]?\d+(?:\.\d+)?")
-        new_template_parts = []
-        new_ranges = []
+        new_template_parts: list[str] = []
+        new_ranges: list[tuple[float, float]] = []
         last_end = 0
         for m in single_value_re.finditer(template):
             v = float(m.group(0))
@@ -131,15 +157,19 @@ def _entry_to_modtier(entry: dict, affix_bucket: str) -> Optional[ModTier]:
             template = "".join(new_template_parts).strip()
             ranges = new_ranges
 
-    # Heuristic for tier number: trailing digit in Name field ("IncreasedLife1" → tier 9 [worst],
-    # "IncreasedLife9" → tier 1 [best]? Or opposite? poe2db convention is ascending = better
-    # in some places, descending in others. For v1 we use the trailing digit directly as the
-    # tier and let the catalog be the source of truth.
+    # Tier number: poe2db doesn't ship an explicit tier field, so we infer
+    # from the trailing digits of `Name` (`IncreasedLife10` → 10). Names
+    # without trailing digits (`AddedFireDamageFlat1H` — the `1H` is a
+    # one-hand suffix, not a tier) get tier=0 as a sentinel for "unknown"
+    # rather than colliding with real T1.
     name = entry.get("Name") or ""
     tier_match = re.search(r"(\d+)$", name)
-    tier_num = int(tier_match.group(1)) if tier_match else 1
+    tier_num = int(tier_match.group(1)) if tier_match else 0
 
-    min_ilvl = int(entry.get("Level") or 1)
+    # `or 1` would coerce a legitimate Level=0 to 1; use is-None instead so
+    # baseline mods (Level=0 / any iLvl) survive correctly.
+    level_raw = entry.get("Level")
+    min_ilvl = int(level_raw) if level_raw is not None else 1
     weight = int(entry.get("DropChance") or 0)
 
     # Affix class mapping
@@ -155,9 +185,13 @@ def _entry_to_modtier(entry: dict, affix_bucket: str) -> Optional[ModTier]:
     }
     affix_class = affix_class_map.get(affix_bucket, "normal")
 
-    # Prefix/suffix: ModGenerationTypeID is 1 = prefix, 2 = suffix per poe2db convention
-    gen_type = entry.get("ModGenerationTypeID")
-    is_prefix = (gen_type == 1) if isinstance(gen_type, int) else True
+    # ModGenerationTypeID: 1 = prefix, 2 = suffix per poe2db. Coerce via int()
+    # so float 1.0 from any upstream JSON variance still classifies correctly.
+    gen_type_raw = entry.get("ModGenerationTypeID")
+    try:
+        is_prefix = int(gen_type_raw) == 1
+    except (TypeError, ValueError):
+        is_prefix = True  # safe default; rares can place either type
 
     if not template:
         return None
@@ -172,3 +206,17 @@ def _entry_to_modtier(entry: dict, affix_bucket: str) -> Optional[ModTier]:
         is_prefix=is_prefix,
         affix_class=affix_class,
     )
+
+
+def _looks_like_stat_template(template: str) -> bool:
+    """True if `template` carries a stat-shape signal (`+`/`-`/`%`/` to `).
+
+    Used to gate the single-value fallback so fixed mechanical numbers in
+    flavour-text templates ("Gain 1 charge") don't get turned into `#`
+    placeholders and collide with unrelated tier templates.
+    """
+    if "+" in template or "%" in template:
+        return True
+    if " to " in template.lower():
+        return True
+    return False

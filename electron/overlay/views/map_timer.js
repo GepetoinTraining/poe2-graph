@@ -1,5 +1,6 @@
-// Map-timer renderer — only view in Phase 2 that maintains its own animation
-// state. Server sends start event; renderer ticks locally; view.dismiss stops it.
+// Map-timer renderer — only view that maintains its own animation state.
+// Server sends start event; renderer ticks locally; renderer.js's dismiss
+// path calls the returned `cleanup` to stop the ticker.
 
 const tickers = new Map();   // container DOM element → interval handle
 
@@ -8,27 +9,59 @@ export function renderMapTimer(container, data, _meta) {
     container.textContent = '(no timer data)';
     return;
   }
-  const startedAtMs = (data.started_at_epoch || 0) * 1000;
+  // Server sends `started_at` as ISO 8601 (see mcp_server/protocol.md).
+  // Fall back to `started_at_epoch` for backwards compat with older payloads.
+  const startedAtMs = data.started_at
+    ? new Date(data.started_at).getTime()
+    : (data.started_at_epoch || 0) * 1000;
   const target = data.target_seconds || 0;
 
-  // Stop any previous ticker on this container (re-render)
+  // Defensive: stop any previous ticker on this container before starting a
+  // new one. Renderer.js also runs the prior cleanup on re-render, but the
+  // self-check costs nothing and survives manual reuse of this module.
   stopTicker(container);
 
   const display = document.createElement('div');
   display.className = 'timer-display';
-  container.replaceChildren(display);
+
+  const progress = document.createElement('div');
+  progress.className = 'timer-progress';
+  const fill = document.createElement('div');
+  fill.className = 'timer-progress-fill';
+  progress.appendChild(fill);
+
+  const meta = document.createElement('div');
+  meta.className = 'timer-meta';
+
+  container.replaceChildren(display, progress, meta);
+  // The progress bar only makes sense when there's a target.
+  if (target <= 0) progress.style.display = 'none';
 
   function paint() {
     const elapsed = Math.max(0, Math.floor((Date.now() - startedAtMs) / 1000));
     const remaining = target - elapsed;
-    if (target > 0 && remaining <= 0) {
-      display.classList.add('expired');
+    const expired = target > 0 && remaining <= 0;
+    const warn = !expired && target > 0 && remaining <= 60;
+
+    display.classList.toggle('expired', expired);
+    display.classList.toggle('warn', warn);
+    fill.classList.toggle('expired', expired);
+    fill.classList.toggle('warn', warn);
+
+    if (expired) {
       display.textContent = `+${formatMMSS(-remaining)} over`;
     } else if (target > 0) {
-      display.classList.remove('expired');
       display.textContent = formatMMSS(remaining);
     } else {
       display.textContent = formatMMSS(elapsed);
+    }
+
+    if (target > 0) {
+      const pct = Math.min(100, (elapsed / target) * 100);
+      fill.style.width = `${pct}%`;
+      meta.textContent = `${elapsed}s elapsed · ${target}s target`;
+    } else {
+      meta.textContent = `${elapsed}s elapsed`;
     }
   }
 
@@ -36,18 +69,9 @@ export function renderMapTimer(container, data, _meta) {
   const handle = setInterval(paint, 1000);
   tickers.set(container, handle);
 
-  // Best-effort cleanup if the container is removed by view.dismiss.
-  // The MutationObserver watches the container's parent for removal.
-  const parent = container.parentElement;
-  if (parent) {
-    const obs = new MutationObserver(() => {
-      if (!document.contains(container)) {
-        stopTicker(container);
-        obs.disconnect();
-      }
-    });
-    obs.observe(parent, { childList: true, subtree: true });
-  }
+  // The renderer (and Claude-side dismiss_view through the WS bridge) calls
+  // this to stop the tick and release the interval handle.
+  return { cleanup: () => stopTicker(container) };
 }
 
 function stopTicker(container) {

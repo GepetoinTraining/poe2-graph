@@ -8,7 +8,10 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="root">
+  <!-- data-surface="overlay" flips the shared tokens to their translucent
+       overlay variants (see electron/shared/tokens.css). Without it, this
+       window would render with the wizard's opaque surfaces. -->
+  <div id="root" data-surface="overlay">
     <header id="overlay-header">
       <div class="title">poe2-graph</div>
       <div id="ws-indicator" class="status status-connecting">connecting…</div>
@@ -16,13 +19,12 @@
     </header>
 
     <main id="views-container">
-      <!-- Active views render here. Phase 2 just lists them; Phase 3 will
-           swap in real components from poe-item-display / poe-item-hover-react
-           via the routing table in renderer.js. -->
+      <!-- Active views render here. Item tooltip stays a placeholder until
+           poe-item-display lands; the other four views are production. -->
       <div id="placeholder" class="placeholder">
         <p>Overlay connected to <code>poe2-graph</code> MCP bridge.</p>
         <p>Press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Space</kbd> to toggle this window.</p>
-        <p>Trigger a view from any connected Claude:</p>
+        <p class="label-caps">Trigger a view from any connected Claude</p>
         <pre>display_item_tooltip(clipboard_text)
 display_goal_tracker()
 display_next_action_card()
@@ -36,6 +38,6 @@ start_map_timer(240)</pre>
     </footer>
   </div>
 
-  <script src="renderer.js"></script>
+  <script type="module" src="renderer.js"></script>
 </body>
 </html>

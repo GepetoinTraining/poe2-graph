@@ -58,6 +58,7 @@ class Item:
     # Crafting state
     corrupted: bool = False
     mirrored: bool = False              # the item is itself a Mirror copy of another
+    unidentified: bool = False          # explicit mods present as roll-ranges, not scalars
 
     # Inferred + free-form
     requirements: dict[str, int] = field(default_factory=dict)  # {"Level": 78, "Int": 320, ...}
@@ -68,9 +69,23 @@ class Item:
             raise ValueError(f"rarity must be one of {RARITIES}, got {self.rarity!r}")
         if self.item_level < 1:
             raise ValueError(f"item_level must be >= 1, got {self.item_level}")
-        if not (0 <= self.quality <= 30):
-            # 30% allowed by some perfect-quality crafts; cap to be safe
-            raise ValueError(f"quality must be in [0, 30], got {self.quality}")
+        # Quality ceiling is 50 to accommodate catalysed jewellery and similar
+        # mechanics that stack quality above the baseline 20–30 range.
+        if not (0 <= self.quality <= 50):
+            raise ValueError(f"quality must be in [0, 50], got {self.quality}")
+        # Affix-count caps per rarity. Uniques use their fixed mod set so the
+        # generic ceiling of 6 in MAX_PREFIXES/MAX_SUFFIXES is a safe pass-through;
+        # rare/magic/normal are strict.
+        max_p = MAX_PREFIXES.get(self.rarity, 0)
+        max_s = MAX_SUFFIXES.get(self.rarity, 0)
+        if len(self.prefixes) > max_p:
+            raise ValueError(
+                f"{self.rarity} item has {len(self.prefixes)} prefixes, max is {max_p}"
+            )
+        if len(self.suffixes) > max_s:
+            raise ValueError(
+                f"{self.rarity} item has {len(self.suffixes)} suffixes, max is {max_s}"
+            )
 
     # ---- mod accessors ----
 

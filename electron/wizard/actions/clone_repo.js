@@ -1,11 +1,11 @@
 // git clone — idempotent. Treats an existing dir with a .git subfolder as
 // "already cloned" rather than failing.
 
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const { promisify } = require('util');
 const fs = require('fs');
 const path = require('path');
-const execP = promisify(exec);
+const execFileP = promisify(execFile);
 
 module.exports = async function cloneRepo({ repoUrl, targetDir }) {
   if (!repoUrl || !targetDir) {
@@ -24,8 +24,9 @@ module.exports = async function cloneRepo({ repoUrl, targetDir }) {
 
   try {
     fs.mkdirSync(path.dirname(targetDir), { recursive: true });
-    const { stdout, stderr } = await execP(
-      `git clone --recurse-submodules "${repoUrl}" "${targetDir}"`,
+    const { stdout, stderr } = await execFileP(
+      'git',
+      ['clone', '--recurse-submodules', repoUrl, targetDir],
       { timeout: 600_000 }
     );
     return {

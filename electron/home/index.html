@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>poe2-graph</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<!-- Default surface (wizard tokens) — opaque chrome, no backdrop blur.
+     The home is the always-visible control room; the overlay is the
+     in-game HUD. They share design tokens, not visual posture. -->
+<body>
+  <header id="home-header">
+    <h1 class="brand">poe2-graph</h1>
+    <span class="version" id="version-label">—</span>
+  </header>
+
+  <main id="home-body">
+
+    <section class="panel" id="panel-server">
+      <header class="panel-header">
+        <span class="dot" id="server-dot" data-state="unknown"></span>
+        <h2>Server</h2>
+        <span class="state-label" id="server-state">connecting…</span>
+      </header>
+      <div class="panel-body">
+        <div class="kv"><span class="k">PID</span><span class="v" id="server-pid">—</span></div>
+        <div class="kv"><span class="k">Respawn</span><span class="v" id="server-respawn">0 / 5</span></div>
+        <div class="kv"><span class="k">Last exit</span><span class="v" id="server-last-exit">—</span></div>
+      </div>
+      <div class="panel-actions">
+        <button id="btn-restart-server">Restart server</button>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-ws">
+      <header class="panel-header">
+        <span class="dot" id="ws-dot" data-state="unknown"></span>
+        <h2>WebSocket bridge</h2>
+        <span class="state-label" id="ws-state-label">—</span>
+      </header>
+      <div class="panel-body">
+        <div class="kv"><span class="k">Port</span><span class="v" id="ws-port">—</span></div>
+        <div class="kv"><span class="k">Clients</span><span class="v" id="ws-clients">—</span></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-repo">
+      <header class="panel-header">
+        <h2>Repo</h2>
+      </header>
+      <div class="panel-body">
+        <div class="kv"><span class="k">Root</span><span class="v mono" id="repo-root">—</span></div>
+        <div class="kv"><span class="k">Source</span><span class="v" id="repo-source">—</span></div>
+      </div>
+      <div class="panel-actions">
+        <button id="btn-open-folder">Open install folder</button>
+        <button id="btn-reset-install" class="danger">Reset install</button>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-overlay">
+      <header class="panel-header">
+        <span class="dot" id="overlay-dot" data-state="hidden"></span>
+        <h2>Overlay</h2>
+        <span class="state-label" id="overlay-state">hidden</span>
+      </header>
+      <div class="panel-body">
+        <div class="kv"><span class="k">Hotkey</span><span class="v" id="overlay-hotkey">—</span></div>
+      </div>
+      <div class="panel-actions">
+        <button id="btn-show-overlay">Show overlay</button>
+        <button id="btn-hide-overlay">Hide overlay</button>
+        <button id="btn-restart-overlay">Restart overlay</button>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-views">
+      <header class="panel-header">
+        <h2>Active views</h2>
+        <span class="state-label" id="views-count">0</span>
+      </header>
+      <ul class="views-list" id="views-list"></ul>
+    </section>
+
+    <section class="panel panel-tall" id="panel-log">
+      <header class="panel-header">
+        <h2>Log</h2>
+        <div class="filter-chips" role="tablist" aria-label="Log level filter">
+          <button class="chip active" data-filter="all">all</button>
+          <button class="chip" data-filter="INFO">info</button>
+          <button class="chip" data-filter="WARNING">warn</button>
+          <button class="chip" data-filter="ERROR">error</button>
+        </div>
+        <button class="state-label as-button" id="btn-copy-log" title="Copy visible log to clipboard">copy</button>
+      </header>
+      <pre class="log-box" id="log-box"></pre>
+    </section>
+
+    <section class="panel" id="panel-onboarding">
+      <header class="panel-header">
+        <h2>Onboarding</h2>
+        <span class="state-label" id="onboarding-state">not started</span>
+      </header>
+      <div class="panel-body">
+        <p class="onboarding-text">Walk through your player profile — game,
+          league, current character — so the skill knows what to plan
+          against.</p>
+      </div>
+      <div class="panel-actions">
+        <button id="btn-run-onboarding">Run onboarding</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="home-footer">
+    <span class="footer-meta mono" id="footer-marker">—</span>
+    <button id="btn-quit" class="danger ghost">Quit poe2-graph</button>
+  </footer>
+
+  <script type="module" src="renderer.js"></script>
+</body>
+</html>

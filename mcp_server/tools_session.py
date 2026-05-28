@@ -31,7 +31,11 @@ def welcome() -> dict[str, Any]:
 
     staleness_summary: Optional[dict[str, Any]] = None
     try:
-        report = updater.report()
+        # report_cached enforces a hard deadline + serves a stale on-disk cache
+        # as fallback so the session-start path can't hang on flaky network.
+        # The report's `cache_stale` flag tells the caller whether the data
+        # may be out of date.
+        report = updater.report_cached()
         staleness_summary = to_jsonable(report)
     except Exception as exc:
         staleness_summary = {"error": f"staleness check failed: {exc}"}

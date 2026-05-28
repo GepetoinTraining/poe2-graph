@@ -3,11 +3,11 @@
 // Uses whatever `python` resolves to on PATH (the prereq check has already
 // validated it). Captures combined stdout+stderr to surface in the UI.
 
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const { promisify } = require('util');
 const path = require('path');
 const fs = require('fs');
-const execP = promisify(exec);
+const execFileP = promisify(execFile);
 
 module.exports = async function installPythonDeps({ repoDir }) {
   const requirements = path.join(repoDir, 'requirements.txt');
@@ -15,8 +15,9 @@ module.exports = async function installPythonDeps({ repoDir }) {
     return { ok: false, error: `requirements.txt not found at ${requirements}` };
   }
   try {
-    const { stdout, stderr } = await execP(
-      `python -m pip install -r "${requirements}"`,
+    const { stdout, stderr } = await execFileP(
+      'python',
+      ['-m', 'pip', 'install', '-r', requirements],
       { cwd: repoDir, timeout: 600_000, maxBuffer: 4 * 1024 * 1024 }
     );
     return { ok: true, log: (stdout || '') + (stderr || '') };

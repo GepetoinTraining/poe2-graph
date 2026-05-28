@@ -25,7 +25,7 @@ URL slugs use plural snake-case: `Amulets`, `Rings`, `Belts`, `Body_Armours`, `H
 ## Module surface
 
 ```python
-import poe2db_client as p2db
+from integrations import poe2db_client as p2db
 
 # One-shot fetch
 data = p2db.fetch_category("Amulets")              # extracts ModsView JSON

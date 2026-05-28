@@ -1,10 +1,10 @@
 // Run mcpb/pack.py to produce the .mcpb bundle.
 
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const { promisify } = require('util');
 const path = require('path');
 const fs = require('fs');
-const execP = promisify(exec);
+const execFileP = promisify(execFile);
 
 module.exports = async function packMcpb({ repoDir }) {
   const mcpbDir = path.join(repoDir, 'mcpb');
@@ -13,7 +13,7 @@ module.exports = async function packMcpb({ repoDir }) {
     return { ok: false, error: `pack.py not found at ${packScript}` };
   }
   try {
-    const { stdout, stderr } = await execP(`python pack.py`, {
+    const { stdout, stderr } = await execFileP('python', ['pack.py'], {
       cwd: mcpbDir,
       timeout: 120_000,
     });

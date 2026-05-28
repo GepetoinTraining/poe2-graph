@@ -1,0 +1,200 @@
+/*
+ * poe2-graph Design System — Canonical Token File
+ *
+ * Imported by both overlay/styles.css and wizard/styles.css.
+ *
+ * Token namespacing:
+ *   --c-*       colors
+ *   --text-*    type sizes + families
+ *   --space-*   spacing
+ *   --radius-*  border radii
+ *
+ * Backward-compat aliases (--bg, --text, --accent, etc.) are defined at
+ * the bottom so existing CSS continues to work without edits.
+ *
+ * Two surfaces:
+ *   Default (wizard) — opaque, normal chrome
+ *   [data-surface="overlay"] — translucent backgrounds, backdrop blur
+ *
+ * Source: Claude Design handoff `poe2-graph-design-system/colors_and_type.css`
+ * (2026-05-27). Edit there first; this file mirrors the canonical token set.
+ */
+
+/* ─────────────────────────────────────────
+   BASE TOKENS (wizard = default values)
+   ───────────────────────────────────────── */
+:root {
+
+  /* ── Color: Base surfaces ── */
+  --c-bg-base:          #0e1016;
+  --c-bg-elevated-hex:  #181c26;
+  --c-bg-input:         #20242f;
+
+  /* Default surface (wizard): opaque */
+  --c-bg:               #0e1016;
+  --c-bg-elevated:      #181c26;
+
+  /* Overlay translucency knobs (used by [data-surface="overlay"] below) */
+  --c-bg-alpha:         0.92;
+  --c-bg-elevated-alpha: 0.95;
+
+  /* ── Color: Borders ── */
+  --c-border:           #2a2f3a;
+  --c-border-subtle:    rgba(120, 120, 140, 0.25);   /* overlay hairline */
+
+  /* ── Color: Text ── */
+  --c-text:             #d9dde3;
+  --c-text-dim:         #9398a1;
+  --c-text-faint:       #5d626a;
+
+  /* ── Color: Accent (PoE magic-item yellow) ── */
+  --c-accent:           #c9a86a;    /* DO NOT CHANGE — canonical PoE yellow */
+  --c-accent-hover:     #d8b677;
+  --c-accent-glow:      rgba(201, 168, 106, 0.15);
+
+  /* ── Color: Semantic ── */
+  --c-good:             #4caf50;
+  --c-good-bg:          rgba(76, 175, 80, 0.15);
+  --c-bad:              #e53935;
+  --c-bad-bg:           rgba(229, 57, 53, 0.15);
+  --c-warn:             #f9a825;
+  --c-warn-bg:          rgba(249, 168, 37, 0.15);
+
+  /* ── Typography: Font families ── */
+  --font-ui:    'Segoe UI', system-ui, -apple-system, Tahoma, sans-serif;
+  --font-mono:  'Consolas', 'Cascadia Code', monospace;
+  /*
+   * Fontin SmallCaps is the canonical PoE tooltip font (Jos Buivenga / exljbris, free).
+   * Ship locally in electron/overlay/fonts/ via @font-face once .woff2 files are
+   * obtained. Cinzel is left in the stack as a closer substitute than plain
+   * serif; falls through to serif if neither is installed.
+   * FLAG: Replace with shipped Fontin SmallCaps for production parity.
+   */
+  --font-item:  'Fontin SmallCaps', 'Fontin', 'Cinzel', serif;
+
+  /* ── Typography: Size scale ── */
+  --text-xs:       11px;   /* captions, chips, step labels      */
+  --text-sm:       12px;   /* secondary text, log output         */
+  --text-base:     13px;   /* body default                       */
+  --text-md:       14px;   /* subheads, emphasized body          */
+  --text-lg:       18px;   /* page h1                            */
+  --text-xl:       20px;   /* brand / overlay title              */
+  --text-display:  28px;   /* map timer; raise to 40–48px later  */
+
+  /* ── Typography: Line heights ── */
+  --leading-tight:    1.3;
+  --leading-normal:   1.5;
+  --leading-relaxed:  1.65;
+
+  /* ── Typography: Letter spacing ── */
+  --tracking-brand:  0.02em;   /* brand name, accent headers */
+  --tracking-label:  0.05em;   /* uppercase labels */
+
+  /* ── Spacing: 4px grid ── */
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+
+  /* ── Radii ── */
+  --radius-sm:      3px;    /* inline code, kbd, small chips      */
+  --radius-md:      4px;    /* inputs, buttons, wizard cards      */
+  --radius-lg:      6px;    /* overlay view cards                 */
+  --radius-xl:      8px;    /* overlay root window                */
+  --radius-pill:  999px;    /* progress steps, audience chips     */
+  --radius-circle:  50%;    /* step number badges                 */
+
+  /* ── Effects ── */
+  --backdrop-blur:   blur(6px);   /* overlay root only */
+
+  /* ── Transitions ── */
+  --transition-fast:    0.12s ease;
+  --transition-normal:  0.2s ease;
+
+  /* ── Z-index scale ── */
+  --z-base:     1;
+  --z-dropdown: 100;
+  --z-overlay:  1000;
+
+
+  /* ─────────────────────────────────────────
+     BACKWARD-COMPAT ALIASES
+     These map the old --bg / --text / --accent names used in the existing
+     overlay/styles.css and wizard/styles.css. Remove once both files are
+     fully migrated to --c-* tokens.
+     ───────────────────────────────────────── */
+
+  --bg:            var(--c-bg);
+  --bg-elevated:   var(--c-bg-elevated);
+  --bg-input:      var(--c-bg-input);
+  --border:        var(--c-border);
+  --text:          var(--c-text);
+  --text-dim:      var(--c-text-dim);
+  --text-faint:    var(--c-text-faint);
+  --accent:        var(--c-accent);
+  --accent-hover:  var(--c-accent-hover);
+  --good:          var(--c-good);
+  --bad:           var(--c-bad);
+  --warn:          var(--c-warn);
+}
+
+
+/* ─────────────────────────────────────────
+   OVERLAY SURFACE OVERRIDES
+   Apply [data-surface="overlay"] to the #root element in overlay/index.html.
+   Switches opaque surfaces to translucent, enables backdrop blur.
+   ───────────────────────────────────────── */
+[data-surface="overlay"] {
+  --c-bg:               rgba(14, 16, 22,  var(--c-bg-alpha));
+  --c-bg-elevated:      rgba(24, 28, 38,  var(--c-bg-elevated-alpha));
+  --c-border:           var(--c-border-subtle);
+
+  /* Re-propagate aliases */
+  --bg:         var(--c-bg);
+  --bg-elevated: var(--c-bg-elevated);
+  --border:     var(--c-border);
+}
+
+
+/* ─────────────────────────────────────────
+   UTILITY CLASSES (light, composable)
+   For use in both overlay and wizard.
+   ───────────────────────────────────────── */
+
+* { box-sizing: border-box; }
+
+/* Text color helpers */
+.c-text        { color: var(--c-text); }
+.c-text-dim    { color: var(--c-text-dim); }
+.c-text-faint  { color: var(--c-text-faint); }
+.c-accent      { color: var(--c-accent); }
+.c-good        { color: var(--c-good); }
+.c-bad         { color: var(--c-bad); }
+.c-warn        { color: var(--c-warn); }
+
+/* Font helpers */
+.font-ui   { font-family: var(--font-ui); }
+.font-mono { font-family: var(--font-mono); }
+.font-item { font-family: var(--font-item); }
+
+/* Size helpers */
+.text-xs      { font-size: var(--text-xs); }
+.text-sm      { font-size: var(--text-sm); }
+.text-base    { font-size: var(--text-base); }
+.text-md      { font-size: var(--text-md); }
+.text-lg      { font-size: var(--text-lg); }
+.text-xl      { font-size: var(--text-xl); }
+.text-display { font-size: var(--text-display); }
+
+/* Uppercase label style */
+.label-caps {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--c-text-dim);
+}

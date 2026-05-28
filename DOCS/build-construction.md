@@ -19,8 +19,8 @@ when_to_read: |
 `allocation.Allocation` is the API Claude uses when *constructing* a build (either from scratch or extending an existing one).
 
 ```python
-import resolvers, graph
-from allocation import Allocation
+from graph import resolvers, network as graph
+from graph.allocation import Allocation
 
 tree = resolvers.load_passive_tree()
 g = graph.build_graph(tree)
@@ -114,10 +114,10 @@ Discovered via natwarth's parser; supports also accept `level_interval`.
 `build_writer` exposes the markup wrapping functions:
 
 ```python
-from build_writer import red, green, blue, gold, silver, grey, orange, yellow
-from build_writer import bold, italic, underline
-from build_writer import small, medium, large
-from build_writer import rgb, tag
+from graph.build_writer import red, green, blue, gold, silver, grey, orange, yellow
+from graph.build_writer import bold, italic, underline
+from graph.build_writer import small, medium, large
+from graph.build_writer import rgb, tag
 
 medium(red("Strength +5 is recommended"))
 # → "<m>{<red>{Strength +5 is recommended}}"
@@ -128,7 +128,7 @@ Wrap braces are mandatory — `<red>text` is a no-op; `<red>{text}` renders.
 ## Emitting a `.build` from an Allocation
 
 ```python
-from build_writer import from_build, BuildFile, PassiveEntry, InventorySlot
+from graph.build_writer import from_build, BuildFile, PassiveEntry, InventorySlot
 
 bf = from_build(
     alloc.to_build(),

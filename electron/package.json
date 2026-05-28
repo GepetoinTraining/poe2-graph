@@ -14,6 +14,7 @@
     "dist:linux": "electron-builder --linux AppImage"
   },
   "dependencies": {
+    "tree-kill": "^1.2.2",
     "ws": "^8.18.0"
   },
   "devDependencies": {
@@ -30,6 +31,8 @@
       "main.js",
       "overlay/**/*",
       "wizard/**/*",
+      "home/**/*",
+      "shared/**/*",
       "package.json"
     ],
     "win": {

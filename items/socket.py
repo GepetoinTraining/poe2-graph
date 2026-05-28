@@ -34,7 +34,14 @@ class SocketContent:
 class Rune(SocketContent):
     """A common socketable. Cheap, broad-coverage mods. Removable only by
     replacement (which destroys the previous rune)."""
-    pass
+
+    def __hash__(self) -> int:
+        # Default frozen-dataclass hash uses field values only, so Rune("x", "y")
+        # and SoulCore("x", "y") hash equal even though `==` is False — fine for
+        # sets, but dict.get(rune_x) on a dict keyed by soul_core_x would
+        # collide-and-miss. Include the class name in the hash to keep buckets
+        # disjoint.
+        return hash((type(self).__name__, self.name, self.family, self.values))
 
 
 @dataclass(frozen=True)
@@ -42,7 +49,10 @@ class SoulCore(SocketContent):
     """A rare socketable from the Trial of Chaos. Wider mod pool than Runes,
     includes spirit / item rarity / movement speed at magnitudes runes can't
     reach. Once socketed, cannot be removed (only replaced; original destroyed)."""
-    pass
+
+    def __hash__(self) -> int:
+        # See Rune.__hash__ for the rationale.
+        return hash((type(self).__name__, self.name, self.family, self.values))
 
 
 @dataclass

@@ -50,8 +50,8 @@ import re
 from typing import Optional
 
 from catalog.base_type import BaseType, max_sockets_for_class
-from items.item import Item
-from items.modifier import Modifier, extract_values, to_template
+from items.item import Item, MAX_PREFIXES, MAX_SUFFIXES
+from items.modifier import Modifier, extract_values, extract_value_ranges, to_template
 from items.socket import Socket
 
 
@@ -112,6 +112,11 @@ def parse_clipboard(text: str) -> Item:
 
     Raises ValueError if the text is unrecognizable (no Rarity, no Item Class).
     """
+    # Normalize line endings and strip a leading BOM. Both arise on Windows
+    # clipboard pipes and would otherwise break the anchored regexes below
+    # (CR survives as part of the captured line; BOM shifts column 0).
+    text = text.lstrip("﻿").replace("\r\n", "\n").replace("\r", "\n")
+
     sections = _split_sections(text)
     if not sections:
         raise ValueError("no parseable sections in input")
@@ -133,37 +138,61 @@ def parse_clipboard(text: str) -> Item:
     # ---- Scan remaining sections for the standard fields ----
     full_text = "\n".join(sections)
 
-    item_level = int(_ITEM_LEVEL_RE.search(full_text).group(1)) if _ITEM_LEVEL_RE.search(full_text) else 1
+    if (m := _ITEM_LEVEL_RE.search(full_text)):
+        item_level = int(m.group(1))
+    else:
+        item_level = 1
+
     quality_match = _QUALITY_RE.search(full_text)
     quality = int(quality_match.group(1)) if quality_match else 0
 
+    # Requirements live in their own section; scope the regex search there so a
+    # stray "Str: 5" inside a mod template can't leak into the requirements.
     requirements: dict[str, int] = {}
-    if (m := _REQ_LEVEL_RE.search(full_text)):
-        requirements["Level"] = int(m.group(1))
-    for attr_match in _REQ_ATTR_RE.finditer(full_text):
-        requirements[attr_match.group(1)] = int(attr_match.group(2))
+    req_section = _find_section(sections, "Requirements:")
+    if req_section is not None:
+        if (m := _REQ_LEVEL_RE.search(req_section)):
+            requirements["Level"] = int(m.group(1))
+        for attr_match in _REQ_ATTR_RE.finditer(req_section):
+            requirements[attr_match.group(1)] = int(attr_match.group(2))
 
-    corrupted = bool(_CORRUPTED_RE.search(full_text))
-    mirrored = bool(_MIRRORED_RE.search(full_text))
+    # Corrupted / Mirrored / Unidentified are single-line footer sections.
+    # Match the section content exactly so a mod template that happens to
+    # contain the word "Corrupted" can't trip the flag.
+    section_singletons = {sec.strip() for sec in sections}
+    corrupted = "Corrupted" in section_singletons
+    mirrored = "Mirrored" in section_singletons
+    unidentified = "Unidentified" in section_singletons
 
     sockets = _parse_sockets(full_text, item_class)
 
     # ---- Mod sections ----
-    # The mod sections come after Item Level. We classify each section's lines:
-    # if the section's first line looks like a mod template + value, it's mods.
-    # Implicit and explicit sections look identical from the syntax — game
-    # distinguishes by position. We use a heuristic: the first mod section
-    # after Item Level is implicits (if it has 1-2 lines on certain item classes
-    # that ship with implicits); subsequent sections are explicits.
     implicits, explicits = _split_implicits_and_explicits(sections, item_class)
 
-    prefixes: list[Modifier] = []
-    suffixes: list[Modifier] = []
-    # Without the catalog we can't tell prefix from suffix. Default everything
-    # explicit to prefix; the hydration step will reclassify when ModPool lookup
-    # provides is_prefix. Better than dropping the data.
-    for mod in explicits:
-        prefixes.append(mod)
+    # Range syntax in any modifier also flags the item as unidentified — the
+    # game prints `(low-high)` only when the item hasn't been ID'd.
+    if not unidentified and any(m.value_ranges for m in implicits + explicits):
+        unidentified = True
+
+    # Without catalog info we can't tell prefix from suffix on parsed mods.
+    # Split explicits roughly in half (favouring prefixes for odd counts),
+    # bounded by the rarity caps; the catalog hydration step reclassifies
+    # via ModPool.gen_type when it runs.
+    max_p = MAX_PREFIXES.get(rarity, 0)
+    max_s = MAX_SUFFIXES.get(rarity, 0)
+    if len(explicits) > max_p + max_s:
+        raise ValueError(
+            f"{rarity} item has {len(explicits)} explicit mods, max is {max_p + max_s}"
+        )
+    n_prefix = min(max_p, (len(explicits) + 1) // 2)
+    n_suffix = len(explicits) - n_prefix
+    if n_suffix > max_s:
+        # More suffixes than the cap → push the excess back into prefixes
+        # (room exists thanks to the total check above).
+        n_prefix += n_suffix - max_s
+        n_suffix = max_s
+    prefixes = explicits[:n_prefix]
+    suffixes = explicits[n_prefix:n_prefix + n_suffix]
 
     base = BaseType(
         name=base_name,
@@ -185,6 +214,7 @@ def parse_clipboard(text: str) -> Item:
         sockets=sockets,
         corrupted=corrupted,
         mirrored=mirrored,
+        unidentified=unidentified,
         requirements=requirements,
     )
 
@@ -226,16 +256,18 @@ def _parse_sockets(full_text: str, item_class: str) -> list[Socket]:
     (catalog hydration step handles that)."""
     match = _SOCKETS_RE.search(full_text)
     if not match:
-        # No sockets line. If the item class supports sockets, return empty list
-        # (matching "0 sockets currently"). If not, also empty.
         return []
     socket_str = match.group(1).strip()
-    # PoE 2 sockets: text describes what's slotted, e.g. "B" or "S" or per-socket markers.
-    # For v1 we just count the visible socket markers (uppercase letters or specific glyphs).
-    count = len([c for c in socket_str if c.isalpha() or c == "·" or c == "•"])
-    if count == 0:
-        # Fallback: just count spaces+1 as separator-based count
-        count = len(socket_str.split())
+    # PoE prints socket markers as single-letter color codes separated by
+    # spaces (and dashes for links). Token-count first; only fall back to
+    # alpha-char count if split returns nothing (defensive — counting each
+    # alpha char in a multi-word string like "Body Rune of Iron" would
+    # report 14 sockets).
+    parts = socket_str.split()
+    if parts:
+        count = len(parts)
+    else:
+        count = sum(1 for c in socket_str if c.isalpha())
     return [Socket(index=i + 1) for i in range(count)]
 
 
@@ -256,6 +288,13 @@ def _split_implicits_and_explicits(
         if _ITEM_LEVEL_RE.search(sec):
             item_level_idx = i
             break
+
+    # No Item Level marker → no reliable anchor for the mod sections. Bail
+    # rather than walk the whole input from section 0 (which would scan the
+    # header for mod lines and misclassify "+1 Bow"-style unique name lines
+    # as modifiers).
+    if item_level_idx == -1:
+        return [], []
 
     # Mod sections come after the Item Level section
     mod_sections: list[list[str]] = []
@@ -317,19 +356,35 @@ def _line_to_modifier(line: str, is_implicit: bool) -> Modifier:
             is_corrupted_implicit = True
         line = line[: flag_match.start()].strip()
 
-    values = extract_values(line)
+    value_ranges = extract_value_ranges(line)
+    # Range syntax means the mod is unidentified — leave `values` empty and
+    # let the owning Item.unidentified flag mark the state.
+    values = [] if value_ranges else extract_values(line)
     template = to_template(line)
 
     return Modifier(
         family="unknown",       # populated by catalog.hydrate.hydrate_item
         tier=0,                 # populated by catalog.hydrate.hydrate_item
         values=values,
+        value_ranges=value_ranges,
         template=template,
         is_implicit=is_implicit,
         is_corrupted_implicit=is_corrupted_implicit,
         is_crafted=is_crafted,
         is_fractured=is_fractured,
     )
+
+
+def _find_section(sections: list[str], header_prefix: str) -> Optional[str]:
+    """Return the first section whose stripped text starts with `header_prefix`.
+
+    Used to scope regex searches to a specific section (e.g. "Requirements:")
+    so a coincidental match elsewhere in the input can't leak across.
+    """
+    for sec in sections:
+        if sec.strip().startswith(header_prefix):
+            return sec
+    return None
 
 
 def _category_from_class(item_class: str) -> str:

@@ -1,7 +1,7 @@
 {
   "manifest_version": "0.3",
   "name": "poe2-graph",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Path of Exile 2 build planning, goal decomposition, item parsing, and in-game overlay tools. Wraps the poe2-graph toolkit (passive-tree graph, goal DAG, edge taxonomy, 62 system guides, gem/mod catalogs) as MCP tools.",
   "author": {
     "name": "Pedro Garcia",
@@ -13,7 +13,7 @@
     "type": "python",
     "entry_point": "bootstrap.py",
     "mcp_config": {
-      "command": "python",
+      "command": "python3",
       "args": ["${__dirname}/bootstrap.py"],
       "env": {
         "PYTHONUNBUFFERED": "1",
@@ -79,6 +79,31 @@
     { "name": "display_next_action_card", "description": "Push the recommend_next_action output as an overlay card." },
     { "name": "start_map_timer", "description": "Start a map-completion timer in the overlay." },
     { "name": "dismiss_view", "description": "Dismiss an overlay view by id." },
-    { "name": "overlay_status", "description": "Report whether the overlay WebSocket bridge is configured + live." }
+    { "name": "overlay_status", "description": "Report whether the overlay WebSocket bridge is configured + live." },
+    { "name": "farm_declare_cycle", "description": "Declare a new farming cycle. Status starts as DECLARED." },
+    { "name": "farm_open_cycle", "description": "Transition a DECLARED cycle to ACTIVE. Records the starting currency snapshot." },
+    { "name": "farm_record_output", "description": "Append an output node to an ACTIVE cycle." },
+    { "name": "farm_classify_outputs", "description": "Run the mod-regex classification pass over all outputs in a cycle." },
+    { "name": "farm_reconcile_cycle", "description": "Double-booked reconciliation check for a cycle." },
+    { "name": "farm_close_cycle", "description": "Transition an ACTIVE cycle to CLOSED. Computes roi, hit_rate, and div_per_hour summary edges." },
+    { "name": "farm_get_cycle", "description": "Return the full cycle dict including outputs and summary edges." },
+    { "name": "farm_list_cycles", "description": "List farming cycles, optionally filtered by status and/or farm_target." },
+    { "name": "farm_export_cycle_bundle", "description": "Export a closed cycle to a .farm.graph bundle (zip)." },
+    { "name": "market_currency_overview", "description": "Return currency pricing from poe.ninja for the given league." },
+    { "name": "market_get_chaos_value", "description": "Return the chaos equivalent for a named currency from poe.ninja." },
+    { "name": "market_unique_overview", "description": "Return unique item pricing from poe.ninja for the given league and category." },
+    { "name": "market_builds_meta", "description": "Return raw build-meta JSON from poe.ninja for the given league." },
+    { "name": "trade_search", "description": "Execute a search on the official PoE 2 Trade API." },
+    { "name": "trade_fetch_listings", "description": "Fetch up to 10 listing details from the Trade API." },
+    { "name": "trade_search_and_fetch", "description": "Convenience: run a trade search then fetch the first N listings." },
+    { "name": "market_clear_cache", "description": "Wipe both poe.ninja and trade_api disk caches." },
+    { "name": "clipboard_queue_status", "description": "Report the current state of the clipboard event queue." },
+    { "name": "clipboard_drain_into_cycle", "description": "Read queued clipboard events and ingest them into the given ACTIVE cycle." },
+    { "name": "clipboard_peek_queue", "description": "Peek at the head of the clipboard queue without consuming any files." },
+    { "name": "clipboard_clear_queue", "description": "Delete all queued clipboard events." },
+    { "name": "display_cycle_status", "description": "Push a cycle status card to the Electron overlay." },
+    { "name": "display_classify_alert", "description": "Push a 'this drop hit price_me — check Trade' alert to the overlay." },
+    { "name": "display_reconcile_warning", "description": "Push a reconcile audit card if the cycle has a gap; no-op if clean." },
+    { "name": "display_cycle_summary", "description": "Push the close-cycle summary card (ROI, hit rate, div/hour) to the overlay." }
   ]
 }

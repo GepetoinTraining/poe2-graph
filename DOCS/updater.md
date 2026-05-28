@@ -33,7 +33,7 @@ Declared in `data/manifest.json` under `protected_paths` — declarative, not bu
 ## Module surface
 
 ```python
-import updater
+from infra import updater
 
 updater.report() -> StalenessReport
 # Composes: skill_version vs remote, tree-data commits vs upstream,

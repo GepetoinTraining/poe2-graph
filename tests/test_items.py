@@ -139,8 +139,9 @@ def test_item_rejects_zero_item_level():
 
 
 def test_item_rejects_excessive_quality():
+    # Cap is 50 to accommodate catalysed jewellery; 60 is over.
     with pytest.raises(ValueError, match="quality must be in"):
-        Item(base=_diamond_wand_base(), rarity="normal", quality=50)
+        Item(base=_diamond_wand_base(), rarity="normal", quality=60)
 
 
 def test_item_open_slots_by_rarity():
@@ -338,10 +339,13 @@ Corrupted"""
     assert item.base.item_class == "Ring"
     assert item.item_level == 80
     assert item.corrupted is True
-    # Two mods, both treated as prefixes for now (catalog hydration would split)
-    assert len(item.prefixes) == 2
-    # One mod is crafted
-    assert any(m.is_crafted for m in item.prefixes)
+    # Without catalog info the parser splits explicits ~50/50 across prefixes
+    # and suffixes; the catalog hydration step reclassifies via gen_type.
+    assert len(item.explicit_mods) == 2
+    assert len(item.prefixes) == 1
+    assert len(item.suffixes) == 1
+    # One mod is crafted (either bucket — depends on the 50/50 split)
+    assert any(m.is_crafted for m in item.explicit_mods)
 
 
 def test_parse_clipboard_normal_item_no_name():

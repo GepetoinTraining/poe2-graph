@@ -26,7 +26,7 @@ schema_version: 1
 #
 # update_cycle.mode:
 #   off         — never check, never update
-#   manual      — check on demand only (`python updater.py update-tools`)
+#   manual      — check on demand only (`python -m infra.updater update-tools`)
 #   scheduled   — check at a regular interval, log but don't auto-pull
 #   continuous  — check at a regular interval, auto-pull when changes land
 #                 (this is the league-launch mode)
@@ -145,8 +145,8 @@ cache:
 # ============================================================================
 # Update worker defaults
 # ----------------------------------------------------------------------------
-# These are the defaults for `python worker.py` when launched without explicit
-# flags. CLI flags always override this section.
+# These are the defaults for `python -m infra.worker` when launched without
+# explicit flags. CLI flags always override this section.
 # ============================================================================
 
 worker:

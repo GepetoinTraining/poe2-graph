@@ -28,13 +28,16 @@ from catalog.gem import Gem, GemCatalog
 # One gem-bearing row. The body is greedy up to the next `<tr` to avoid
 # tripping over malformed inner HTML.
 _ROW_RE = re.compile(
-    r'<tr\s+data-filters="(?P<filters>[^"]*)">(?P<body>.*?)(?=<tr\s+data-filters=|</tbody>|</table>)',
+    r'<tr\s+data-filters="(?P<filters>[^"]*)">(?P<body>.*?)(?=<tr\s+data-filters=|</tbody>|</table>|\Z)',
     re.DOTALL,
 )
 
-# A gem link: `<a class="gem_COLOR" ... href="/us/SLUG" ...>NAME</a>`.
+# A gem link: `<a class="gem_COLOR ..." ... href="/us/SLUG" ...>NAME</a>`.
+# The class attribute may carry multiple tokens (e.g. `gem_red icon`) so we
+# match the color token with word boundaries instead of requiring it to be
+# the entire value.
 _GEM_LINK_RE = re.compile(
-    r'<a\s+class="(?P<color>gem_red|gem_green|gem_blue)"[^>]*'
+    r'<a\s+class="[^"]*\b(?P<color>gem_red|gem_green|gem_blue)\b[^"]*"[^>]*'
     r'href="/[a-z]+/(?P<slug>[^"]+)"[^>]*>(?P<text>[^<]*)</a>'
 )
 
@@ -107,10 +110,14 @@ def _parse_tags(filters: str, name: str) -> list[str]:
     """Extract tag tokens from a `data-filters` attribute value.
 
     poe2db's filter string ends with the gem display name appended (so the
-    client-side filter can match on name OR tag). We strip the trailing name
-    and split the rest on whitespace.
+    client-side filter can match on name OR tag). Strip the trailing name
+    only when it sits at a token boundary — `endswith(name)` alone would
+    chop a legitimate tag whose suffix coincidentally equals the gem name.
     """
     filters = filters.strip()
-    if name and filters.endswith(name):
-        filters = filters[: -len(name)].rstrip()
+    if name:
+        if filters == name:
+            filters = ""
+        elif filters.endswith(" " + name):
+            filters = filters[: -len(name) - 1].rstrip()
     return filters.split()

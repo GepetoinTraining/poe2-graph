@@ -1,0 +1,154 @@
+"""farm.export — serialize a cycle to a .farm.graph bundle (zip).
+
+Uses graphfmt.write_bundle; no custom zip handling.
+"""
+
+from __future__ import annotations
+
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional
+from xml.sax.saxutils import escape as xml_escape
+
+import store
+import graphfmt
+from farm.lifecycle import _build_cycle_dict
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _cycle_to_xml(cycle: dict) -> str:
+    """Serialize a full cycle dict to a cycle.xml string."""
+    lt_lines = "".join(
+        f"    <target>{xml_escape(t)}</target>\n"
+        for t in cycle.get("lottery_targets", [])
+    )
+    output_lines = []
+    for out in cycle.get("outputs", []):
+        classification = xml_escape(out.get("classification", ""))
+        timestamp = xml_escape(out.get("timestamp", ""))
+        item = out.get("item", "")
+        mods = xml_escape(out.get("mods", ""))
+        output_lines.append(
+            f'  <output node_id="{xml_escape(out["node_id"])}" '
+            f'classification="{classification}" timestamp="{timestamp}">\n'
+            f"    <item><![CDATA[{item}]]></item>\n"
+            f"    <mods>{mods}</mods>\n"
+            f"  </output>"
+        )
+    outputs_xml = "\n".join(output_lines)
+
+    input_lines = []
+    for inp in cycle.get("inputs", []):
+        item = xml_escape(inp.get("item", ""))
+        qty = xml_escape(str(inp.get("quantity", 0)))
+        input_lines.append(
+            f"  <input>\n"
+            f"    <item>{item}</item>\n"
+            f"    <quantity>{qty}</quantity>\n"
+            f"  </input>"
+        )
+    inputs_xml = "\n".join(input_lines)
+
+    summary = cycle.get("summary", {})
+    summary_lines = "".join(
+        f'  <metric name="{xml_escape(k)}" value="{xml_escape(str(v))}"/>\n'
+        for k, v in summary.items()
+    )
+
+    return (
+        f'<cycle id="{xml_escape(cycle["cycle_id"])}" status="{xml_escape(cycle["status"])}">\n'
+        f"  <farm_target>{xml_escape(cycle['farm_target'])}</farm_target>\n"
+        f"  <lottery_targets>\n{lt_lines}  </lottery_targets>\n"
+        f"  <declared_at>{xml_escape(cycle['declared_at'])}</declared_at>\n"
+        f"  <opened_at>{xml_escape(cycle['opened_at'])}</opened_at>\n"
+        f"  <closed_at>{xml_escape(cycle['closed_at'])}</closed_at>\n"
+        f"  <notes>{xml_escape(cycle['notes'])}</notes>\n"
+        f"  <inputs>\n{inputs_xml}\n  </inputs>\n"
+        f"  <summary>\n{summary_lines}  </summary>\n"
+        f"  <outputs>\n{outputs_xml}\n  </outputs>\n"
+        f"</cycle>"
+    )
+
+
+def _empirical_xml(cycle: dict) -> str:
+    """Serialize output measurements to empirical.xml."""
+    lines = ['<empirical>']
+    for out in cycle.get("outputs", []):
+        classification = xml_escape(out.get("classification", ""))
+        timestamp = xml_escape(out.get("timestamp", ""))
+        mods = xml_escape(out.get("mods", ""))
+        item = out.get("item", "")
+        lines.append(
+            f'  <measurement node_id="{xml_escape(out["node_id"])}" '
+            f'classification="{classification}" timestamp="{timestamp}">\n'
+            f"    <item><![CDATA[{item}]]></item>\n"
+            f"    <mods>{mods}</mods>\n"
+            f"  </measurement>"
+        )
+    lines.append('</empirical>')
+    return "\n".join(lines)
+
+
+def export_cycle_bundle(
+    conn,
+    cycle_id: str,
+    out_path: str,
+    *,
+    build_snapshot_path: Optional[str] = None,
+    author: str = "unknown",
+    readme: Optional[str] = None,
+) -> str:
+    """Export a closed cycle to a .farm.graph bundle (zip). Returns out_path."""
+    cycle = _build_cycle_dict(conn, cycle_id)
+    if cycle is None:
+        raise ValueError(f"Cycle {cycle_id!r} not found")
+
+    now = _now_iso()
+
+    manifest = {
+        "bundle_id": cycle_id,
+        "graph_type": "farm",
+        "format_version": "1",
+        "created_at": now,
+        "author": author,
+        "contents": [
+            {"path": "cycle.xml", "role": "cycle"},
+            {"path": "empirical.xml", "role": "empirical"},
+        ],
+    }
+
+    contents: dict[str, str] = {
+        "cycle.xml": _cycle_to_xml(cycle),
+        "empirical.xml": _empirical_xml(cycle),
+    }
+
+    media: dict[str, bytes] = {}
+
+    if build_snapshot_path is not None:
+        # graphfmt treats .build as text content (see bundle._TEXT_EXTENSIONS)
+        build_text = Path(build_snapshot_path).read_bytes().decode("utf-8", errors="replace")
+        contents["character.build"] = build_text
+        manifest["contents"].append({"path": "character.build", "role": "character_build"})
+
+    if readme is None:
+        readme = (
+            f"# Farming cycle: {cycle_id}\n\n"
+            f"Target: {cycle['farm_target']}\n"
+            f"Status: {cycle['status']}\n"
+            f"Outputs: {len(cycle.get('outputs', []))}\n\n"
+            f"Generated by poe2-graph farm.export.\n"
+        )
+
+    graphfmt.write_bundle(
+        out_path,
+        manifest=manifest,
+        contents=contents,
+        readme=readme,
+        media=media or None,
+    )
+
+    return out_path
